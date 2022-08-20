@@ -1,0 +1,5 @@
+.DS_Store
+/mpv.conf
+/custom.conf
+/custom-input.conf
+/script-opts/custom.conf

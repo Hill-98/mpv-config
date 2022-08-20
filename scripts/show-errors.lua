@@ -1,0 +1,1 @@
+../git-modules/mpv-scripts/show-errors.lua
