@@ -1,9 +1,6 @@
 [submodule "git-modules/mpv-scripts"]
 	path = git-modules/mpv-scripts
 	url = https://github.com/CogentRedTester/mpv-scripts.git
-[submodule "git-modules/mpv-osc-modern"]
-	path = git-modules/mpv-osc-modern
-	url = https://github.com/maoiscat/mpv-osc-modern.git
 [submodule "git-modules/mpv-scroll-list"]
 	path = git-modules/mpv-scroll-list
 	url = https://github.com/CogentRedTester/mpv-scroll-list.git

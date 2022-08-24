@@ -1,1 +1,0 @@
-../git-modules/mpv-osc-modern/modern.lua
