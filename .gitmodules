@@ -4,3 +4,6 @@
 [submodule "git-modules/ACNetGLSL"]
 	path = git-modules/ACNetGLSL
 	url = https://github.com/TianZerL/ACNetGLSL.git
+[submodule "git-modules/uosc"]
+	path = git-modules/uosc
+	url = https://github.com/tomasklaen/uosc.git
