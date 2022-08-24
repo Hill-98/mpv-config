@@ -69,6 +69,7 @@ foreach ($key in $BASE64_TEXT.Keys) {
     $TEXT.Add($key, [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($BASE64_TEXT.$key)))
 }
 
+[string]$mpvConfigDir = (Get-Item $PSScriptRoot).Parent
 [string]$mpvPath = ""
 
 try {
@@ -97,7 +98,7 @@ If ($mpvPath -eq "") {
 if ([Windows.Forms.MessageBox]::Show($TEXT.D, $TEXT.A, [Windows.Forms.MessageBoxButtons]::YesNo, [Windows.Forms.MessageBoxIcon]::Question) -eq [Windows.Forms.DialogResult]::Yes) {
     $mpvCmdArg = [Microsoft.VisualBasic.Interaction]::InputBox($TEXT.E, $TEXT.F, "", 100, 100)
 }
-$mpvCmdArg = $mpvCmdArg.Trim()
+$mpvCmdArg = "--config-dir=""$mpvConfigDir"" " + $mpvCmdArg.Trim()
 
 [string]$videoIdentifier = "Mpv.Player.Video"
 [string]$playlistIdentifier = "Mpv.Player.Playlist"
