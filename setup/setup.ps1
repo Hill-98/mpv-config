@@ -37,6 +37,7 @@ function AssociateFile([string]$Identifier, [string]$ExtName) {
 [Array]$VIDEO_EXTS = @(
     "avi",
     "flv"
+    "m2ts",
     "mkv",
     "mov",
     "mp4",
