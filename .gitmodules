@@ -7,3 +7,15 @@
 [submodule "git-modules/uosc"]
 	path = git-modules/uosc
 	url = https://github.com/tomasklaen/uosc.git
+[submodule "git-modules/SSimSuperRes"]
+	path = git-modules/SSimSuperRes
+	url = https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b.git
+[submodule "git-modules/SSimDownscaler"]
+	path = git-modules/SSimDownscaler
+	url = https://gist.github.com/igv/36508af3ffc84410fe39761d6969be10.git
+[submodule "git-modules/KrigBilateral"]
+	path = git-modules/KrigBilateral
+	url = https://gist.github.com/igv/a015fc885d5c22e6891820ad89555637.git
+[submodule "git-modules/NVScaler"]
+	path = git-modules/NVScaler
+	url = https://gist.github.com/agyild/7e8951915b2bf24526a9343d951db214.git
