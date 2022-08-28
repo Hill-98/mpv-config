@@ -1,3 +1,11 @@
+/**
+ * 用法: script-message apply-shaders <identifier> <display_name> <shaders> [profile]
+ * 
+ * 方便切换具有相同功能的着色器集合
+ *  
+ * 加载/卸载 着色器集合并用标识符记录，如果标识符之前已被用于加载其他着色器，则先卸载已加载的着色器，如果着色器和已加载的一致，则卸载着色器。
+ */
+
 var msg = mp.msg;
 var delimiter = ';';
 var loaded = Object.create(null);
@@ -17,11 +25,11 @@ function restore_profile(name) {
 }
 
 function append_shader(path) {
-  mp.command_native(['change-list', 'glsl-shaders', 'append', mp.command_native(['expand-path', path])]);
+  mp.command_native(['change-list', 'glsl-shaders', 'append', path]);
 }
 
 function remove_shader(path) {
-  mp.command_native(['change-list', 'glsl-shaders', 'remove', mp.command_native(['expand-path', path])]);
+  mp.command_native(['change-list', 'glsl-shaders', 'remove', path]);
 }
 
 function empty(value) {
