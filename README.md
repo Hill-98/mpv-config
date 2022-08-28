@@ -7,8 +7,10 @@ MPV 配置文件
 
 ### 安装
 
+0. **确保你系统安装的 git 已启用符号链接支持。(git 安装时启用 `Enable symbolic links` 选项)**
 1. 克隆存储库: `git clone --recursive https://github.com/Hill-98/mpv-config.git D:\mpv-config`
 2. 执行配置脚本: `powershell D:\mpv-config\setup\setup.ps1`
+3. 修复 git 符号链接错误: `powershell -Command " Remove-Item D:\mpv-config\shaders\ACNet -Recurse; Start-Process -FilePath cmd.exe -ArgumentList @('/c', 'mklink', '/D', 'D:\mpv-config\shaders\ACNet', '..\git-modules\ACNetGLSL\glsl') -Verb runas"`
 3. 打开 Windows 设置或控制面板设置文件关联。
 
 ### 更新
