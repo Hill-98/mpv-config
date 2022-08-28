@@ -8,11 +8,8 @@ function AddProgramID([string]$Identifier, [string]$Name, [string]$Icon, [string
         throw "Identifier is empty"
     }
     [string]$regPath = "HKCU:\Software\Classes\$Identifier"
-    if (Test-Path -Path $regPath) {
-        Remove-Item -Path $regPath -Force -Recurse
-    }
-    New-Item -Path $regPath
-    New-Item -Path $regPath\DefaultIcon
+    Remove-Item -Path $regPath -Force -Recurse
+    New-Item -Path $regPath\DefaultIcon -Force
     New-Item -Path $regPath\shell\open\command -Force
     New-ItemProperty -Path "$regPath\DefaultIcon" -Name "(Default)" -Value $Icon
     New-ItemProperty -Path "$regPath\shell\open" -Name "FriendlyAppName" -Value $Name
@@ -24,14 +21,10 @@ function AssociateFile([string]$Identifier, [string]$ExtName) {
         throw "Identifier or ExtName is empty"
     }
     [string]$regPath = "HKCU:\Software\Classes\." + $ExtName.Trim(".")
-    if (!(Test-Path -Path "$regPath")) {
-        New-Item -Path $regPath
-    }
-    if (!(Test-Path -Path "$regPath\OpenWithProgids")) {
-        New-Item -Path "$regPath\OpenWithProgids"
-    }
+    New-Item -Path "$regPath\OpenWithProgids" -Force
     Set-ItemProperty -Path $regPath -Name "(Default)" -Value $Identifier
     Set-ItemProperty -Path "$regPath\OpenWithProgids" -Name $Identifier -Value ""  -Force
+    Set-ItemProperty -Path $CLIENT_REG_PATH\Capabilities\FileAssociations -Name ".$ext" -Value $VIDEO_IDENTIFIER
 }
 
 [Array]$VIDEO_EXTS = @(
@@ -66,6 +59,12 @@ $BASE64_TEXT = @{
 }
 $TEXT = @{}
 
+[string]$COMMON_IDENTIFIER = "Mpv.Player"
+[string]$VIDEO_IDENTIFIER = "$COMMON_IDENTIFIER.Video"
+[string]$PLAYLIST_IDENTIFIER = "$COMMON_IDENTIFIER.Playlist"
+
+[string]$CLIENT_REG_PATH = "HKCU:\Software\Clients\Media\$COMMON_IDENTIFIER"
+
 foreach ($key in $BASE64_TEXT.Keys) {
     $TEXT.Add($key, [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($BASE64_TEXT.$key)))
 }
@@ -76,9 +75,8 @@ foreach ($key in $BASE64_TEXT.Keys) {
 if (!(Test-Path "$mpvConfigDir\mpv.conf")) {
     Start-Process -FilePath cmd.exe -ArgumentList @("/c", "mklink", "$mpvConfigDir\mpv.conf", "windows.conf") -Verb runas
 }
-
 try {
-    $mpvPath = (Get-Command -CommandType Application mpv.exe).Source
+    $mpvPath = (Get-Command -CommandType Application mpv.exe -ErrorAction Stop).Source
     if ([Windows.Forms.MessageBox]::Show($TEXT.B.Replace("%mpv%", $mpvPath), $TEXT.A, [Windows.Forms.MessageBoxButtons]::YesNo, [Windows.Forms.MessageBoxIcon]::Question) -eq [Windows.Forms.DialogResult]::Yes) {
         $mpvPath = ""
     }
@@ -105,18 +103,21 @@ if ([Windows.Forms.MessageBox]::Show($TEXT.D, $TEXT.A, [Windows.Forms.MessageBox
 }
 $mpvCmdArg = "--config-dir=""$mpvConfigDir"" " + $mpvCmdArg.Trim()
 
-[string]$videoIdentifier = "Mpv.Player.Video"
-[string]$playlistIdentifier = "Mpv.Player.Playlist"
+AddProgramID -Identifier $VIDEO_IDENTIFIER -Name "MPV Player" -Icon "@%SystemRoot%\System32\shell32.dll,313" -OpenCmd """$mpvPath"" $mpvCmdArg ""%1"""
+AddProgramID -Identifier $PLAYLIST_IDENTIFIER -Name "MPV Player" -Icon "@%SystemRoot%\System32\shell32.dll,299" -OpenCmd """$mpvPath"" $mpvCmdArg --playlist=""%1"""
 
-AddProgramID -Identifier $videoIdentifier -Name "MPV Player" -Icon "@%SystemRoot%\System32\shell32.dll,313" -OpenCmd """$mpvPath"" $mpvCmdArg ""%1"""
-AddProgramID -Identifier $playlistIdentifier -Name "MPV Player" -Icon "@%SystemRoot%\System32\shell32.dll,299" -OpenCmd """$mpvPath"" $mpvCmdArg --playlist=""%1"""
+Remove-Item -Path $CLIENT_REG_PATH -Force -Recurse
+New-Item -Path $CLIENT_REG_PATH\Capabilities\FileAssociations -Force
+Set-ItemProperty -Path $CLIENT_REG_PATH\Capabilities -Name "ApplicationName" -Value "MPV Player"
+Set-ItemProperty -Path $CLIENT_REG_PATH\Capabilities -Name "ApplicationIcon" -Value """$mpvPath, 0"""
+Set-ItemProperty -Path HKCU:\Software\RegisteredApplications -Name $COMMON_IDENTIFIER -Value Software\Clients\Media\$COMMON_IDENTIFIER\Capabilities
 
 foreach ($ext in $VIDEO_EXTS) {
-    AssociateFile -Identifier $videoIdentifier -ExtName $ext
+    AssociateFile -Identifier $VIDEO_IDENTIFIER -ExtName $ext
 }
 
 foreach ($ext in $PLAYLIST_EXTS) {
-    AssociateFile -Identifier $playlistIdentifier -ExtName $ext
+    AssociateFile -Identifier $PLAYLIST_IDENTIFIER -ExtName $ext
 }
 
 $code = @'
