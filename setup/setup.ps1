@@ -73,6 +73,10 @@ foreach ($key in $BASE64_TEXT.Keys) {
 [string]$mpvConfigDir = (Get-Item $PSScriptRoot).Parent
 [string]$mpvPath = ""
 
+if (!(Test-Path "$mpvConfigDir\mpv.conf")) {
+    Start-Process -FilePath cmd.exe -ArgumentList @("/c", "mklink", "$mpvConfigDir\mpv.conf", "windows.conf") -Verb runas
+}
+
 try {
     $mpvPath = (Get-Command -CommandType Application mpv.exe).Source
     if ([Windows.Forms.MessageBox]::Show($TEXT.B.Replace("%mpv%", $mpvPath), $TEXT.A, [Windows.Forms.MessageBoxButtons]::YesNo, [Windows.Forms.MessageBoxIcon]::Question) -eq [Windows.Forms.DialogResult]::Yes) {
