@@ -70,7 +70,7 @@ foreach ($key in $BASE64_TEXT.Keys) {
     $TEXT.Add($key, [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($BASE64_TEXT.$key)))
 }
 
-[string]$mpvConfigDir = (Get-Item $PSScriptRoot).Parent
+[string]$mpvConfigDir = (Get-Item $PSScriptRoot).Parent.FullName
 [string]$mpvPath = ""
 
 if (!(Test-Path "$mpvConfigDir\mpv.conf")) {
