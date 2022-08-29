@@ -24,7 +24,7 @@ function AssociateFile([string]$Identifier, [string]$ExtName) {
     New-Item -Path "$regPath\OpenWithProgids" -Force
     Set-ItemProperty -Path $regPath -Name "(Default)" -Value $Identifier
     Set-ItemProperty -Path "$regPath\OpenWithProgids" -Name $Identifier -Value ""  -Force
-    Set-ItemProperty -Path $CLIENT_REG_PATH\Capabilities\FileAssociations -Name ".$ext" -Value $VIDEO_IDENTIFIER
+    Set-ItemProperty -Path $CLIENT_REG_PATH\Capabilities\FileAssociations -Name ".$ext" -Value $Identifier
 }
 
 [Array]$VIDEO_EXTS = @(
