@@ -110,7 +110,7 @@ if ([MessageBox]::Show($TEXT.D, $TEXT.A, [MessageBoxButtons]::YesNo, [MessageBox
 }
 $mpvArg = ($mpvArg.Trim() + " --config-dir=""$MPV_CONFIG_DIR""").Trim()
 
-Write-Output "mpv.exe: $MPV_CONFIG_DIR"
+Write-Output "mpv.exe: $mpv"
 Write-Output "mpv config dir: $MPV_CONFIG_DIR"
 Write-Output "mpv arg: $mpvArg"
 Write-Output ""
