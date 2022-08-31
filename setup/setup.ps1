@@ -1,51 +1,49 @@
+using namespace Microsoft.Win32
+using namespace System.IO
+using namespace System.Text
+using namespace System.Windows.Forms
+
 Add-Type -AssemblyName Microsoft.VisualBasic
+Add-Type -AssemblyName mscorlib
 Add-Type -AssemblyName System.Windows.Forms
 
-[Windows.Forms.Application]::EnableVisualStyles()
+[Application]::EnableVisualStyles()
 
 function AddProgramID([string]$Identifier, [string]$Name, [string]$Icon, [string]$OpenCmd) {
-    if ($Identifier.Trim() -eq "") {
+    if ([string]::IsNullOrWhiteSpace($Identifier)) {
         throw "Identifier is empty"
     }
-    [string]$regPath = "HKCU:\Software\Classes\$Identifier"
-    Remove-Item -Path $regPath -Force -Recurse
-    New-Item -Path $regPath\DefaultIcon -Force
-    New-Item -Path $regPath\shell\open\command -Force
-    New-ItemProperty -Path "$regPath\DefaultIcon" -Name "(Default)" -Value $Icon
-    New-ItemProperty -Path "$regPath\shell\open" -Name "FriendlyAppName" -Value $Name
-    New-ItemProperty -Path "$regPath\shell\open\command" -Name "(Default)" -Value $OpenCmd
+    [string]$regPath = "Software\Classes\$Identifier"
+    [Registry]::CurrentUser.DeleteSubKeyTree($regPath, $false)
+    [RegistryKey]$reg = [Registry]::CurrentUser.CreateSubKey($regPath, $true)
+    $reg.CreateSubKey("DefaultIcon", $true).SetValue($null, $Icon)
+    $reg.CreateSubKey("shell\open", $true).SetValue("FriendlyAppName", $Name)
+    $reg.CreateSubKey("shell\open\command", $true).SetValue($null, $OpenCmd)
+    $reg.Dispose()
 }
 
-function AssociateFile([string]$Identifier, [string]$ExtName) {
-    if ($Identifier.Trim() -eq "" -or $ExtName.Trim() -eq "") {
-        throw "Identifier or ExtName is empty"
-    }
-    [string]$regPath = "HKCU:\Software\Classes\." + $ExtName.Trim(".")
-    New-Item -Path "$regPath\OpenWithProgids" -Force
-    Set-ItemProperty -Path $regPath -Name "(Default)" -Value $Identifier
-    Set-ItemProperty -Path "$regPath\OpenWithProgids" -Name $Identifier -Value ""  -Force
-    Set-ItemProperty -Path $CLIENT_REG_PATH\Capabilities\FileAssociations -Name ".$ext" -Value $Identifier
-}
+[string]$COMMON_IDENTIFIER = "MPV.Player"
+[string]$VIDEO_IDENTIFIER = "$COMMON_IDENTIFIER.Video"
+[string]$PLAYLIST_IDENTIFIER = "$COMMON_IDENTIFIER.Playlist"
+[string]$APP_NAME = "MPV Player"
+[string]$APP_REG_PATH = "Software\Clients\Media\$COMMON_IDENTIFIER"
+[string]$APP_CAP_REG_PATH = "$APP_REG_PATH\Capabilities"
 
-[Array]$VIDEO_EXTS = @(
-    "avi",
-    "flv"
-    "m2ts",
-    "mkv",
-    "mov",
-    "mp4",
-    "ts",
-    "webm",
-    "wmv"
-)
-
-[Array]$PLAYLIST_EXTS = @(
-    "m3u",
-    "m3u8"
-    "mpcpl",
-    "pls",
-    "vlc",
-    "wpl"
+[array]$FILETYPES = @(
+    # Video
+    @{ ContentType = "video/avi"; Ext = "avi"; OpenWith = $VIDEO_IDENTIFIER; PerceivedType = "video" },
+    @{ ContentType = "video/x-flv"; Ext = "flv"; OpenWith = $VIDEO_IDENTIFIER; PerceivedType = "video" },
+    @{ ContentType = "video/MP2T"; Ext = "m2ts"; OpenWith = $VIDEO_IDENTIFIER; PerceivedType = "video" },
+    @{ ContentType = "video/x-matroska"; Ext = "mkv"; OpenWith = $VIDEO_IDENTIFIER; PerceivedType = "video" },
+    @{ ContentType = "video/quicktime"; Ext = "mov"; OpenWith = $VIDEO_IDENTIFIER; PerceivedType = "video" },
+    @{ ContentType = "video/mp4"; Ext = "mp4"; OpenWith = $VIDEO_IDENTIFIER; PerceivedType = "video" },
+    @{ ContentType = "video/MP2T"; Ext = "ts"; OpenWith = $VIDEO_IDENTIFIER; PerceivedType = "video" },
+    @{ ContentType = "video/webm"; Ext = "webm"; OpenWith = $VIDEO_IDENTIFIER; PerceivedType = "video" },
+    @{ ContentType = "video/x-ms-wmv"; Ext = "wmv"; OpenWith = $VIDEO_IDENTIFIER; PerceivedType = "video" },
+    # Playlist
+    @{ ContentType = "application/vnd.apple.mpegurl"; Ext = "m3u"; OpenWith = $PLAYLIST_IDENTIFIER; PerceivedType = "text" },
+    @{ ContentType = "application/vnd.apple.mpegurl"; Ext = "m3u8"; OpenWith = $PLAYLIST_IDENTIFIER; PerceivedType = "text" },
+    @{ ContentType = "application/vnd.apple.mpegurl"; Ext = "vlc"; OpenWith = $PLAYLIST_IDENTIFIER; PerceivedType = "text" }
 )
 
 $BASE64_TEXT = @{
@@ -55,69 +53,101 @@ $BASE64_TEXT = @{
     D = "YE/zYOqBmltJTiAAbQBwAHYAIACEdn1U5E5MiMJTcGUXVB//"; # ask custom mpv cmd arg
     E = "KFcLTrllk49lUeqBmltJTiAAbQBwAHYAIAB9VOROTIjCU3Bl";  # custom mpv cmd arg prompt
     F = "6oGaW0lOIABtAHAAdgAgAH1U5E5MiMJTcGU="; # custom mpv cmd arg title
+    G = "oWwJZwmQ6WIgAG0AcAB2AC4AZQB4AGUADP/IfmJrTZFufwIw"; # no mpv.exe selected
     Z = "xomRmIxUrWQ+ZRdSaIiHZfZO8l1zUVSAMFIgAG0AcAB2AA=="; # done
 }
 $TEXT = @{}
 
-[string]$COMMON_IDENTIFIER = "Mpv.Player"
-[string]$VIDEO_IDENTIFIER = "$COMMON_IDENTIFIER.Video"
-[string]$PLAYLIST_IDENTIFIER = "$COMMON_IDENTIFIER.Playlist"
+[string]$MPV_CONFIG_DIR = [Path]::GetDirectoryName($PSScriptRoot)
+[string]$mpv = ""
 
-[string]$CLIENT_REG_PATH = "HKCU:\Software\Clients\Media\$COMMON_IDENTIFIER"
+[Form]$topWindow = New-Object Form
+$topWindow.Opacity = 0
+$topWindow.ShowInTaskbar = $false
+$topWindow.TopMost = $true
+$topWindow.Show()
+
+Register-EngineEvent -SourceIdentifier PowerShell.exiting -Action { $topWindow.Close() } | Out-Null
 
 foreach ($key in $BASE64_TEXT.Keys) {
-    $TEXT.Add($key, [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($BASE64_TEXT.$key)))
+    $TEXT.Add($key, [Encoding]::Unicode.GetString([Convert]::FromBase64String($BASE64_TEXT.$key)))
 }
 
-[string]$mpvConfigDir = (Get-Item $PSScriptRoot).Parent.FullName
-[string]$mpvPath = ""
-
-if (!(Test-Path "$mpvConfigDir\mpv.conf")) {
-    Start-Process -FilePath cmd.exe -ArgumentList @("/c", "mklink", "$mpvConfigDir\mpv.conf", "windows.conf") -Verb runas
+if (![File]::Exists("$MPV_CONFIG_DIR\mpv.conf")) {
+    Write-Output "Create symbolic link: $MPV_CONFIG_DIR\mpv.conf -> $MPV_CONFIG_DIR\windows.conf"
+    Start-Process -FilePath cmd.exe -ArgumentList @("/c", "mklink", "$MPV_CONFIG_DIR\mpv.conf", "windows.conf") -Verb runas
+    if (!$?) {
+        exit 1
+    }
 }
+
 try {
-    $mpvPath = (Get-Command -CommandType Application mpv.exe -ErrorAction Stop).Source
-    if ([Windows.Forms.MessageBox]::Show($TEXT.B.Replace("%mpv%", $mpvPath), $TEXT.A, [Windows.Forms.MessageBoxButtons]::YesNo, [Windows.Forms.MessageBoxIcon]::Question) -eq [Windows.Forms.DialogResult]::Yes) {
-        $mpvPath = ""
+    $mpv = (Get-Command -CommandType Application mpv.exe -ErrorAction Stop).Source
+    if ([MessageBox]::Show($TEXT.B.Replace("%mpv%", $mpv), $TEXT.A, [MessageBoxButtons]::YesNo, [MessageBoxIcon]::Question) -eq [DialogResult]::Yes) {
+        $mpv = ""
     }
 }
 catch {
-    [Windows.Forms.MessageBox]::Show($TEXT.C, $TEXT.A, [Windows.Forms.MessageBoxButtons]::OK, [Windows.Forms.MessageBoxIcon]::Warning)
+    [MessageBox]::Show($TEXT.C, $TEXT.A, [MessageBoxButtons]::OK, [MessageBoxIcon]::Warning)
 }
 
-If ($mpvPath -eq "") {
-    $selector = New-Object Windows.Forms.OpenFileDialog
+If ([string]::IsNullOrEmpty($mpv)) {
+    $selector = New-Object OpenFileDialog
     $selector.FileName = "mpv.exe"
     $selector.Filter = "mpv.exe|mpv.exe"
-    if ($selector.ShowDialog() -eq [Windows.Forms.DialogResult]::OK) {
-        $mpvPath = $selector.FileName
+    if ($selector.ShowDialog() -eq [DialogResult]::OK) {
+        $mpv = $selector.FileName
     }
     else {
-        Exit
+        [MessageBox]::Show($TEXT.G, $TEXT.A, [MessageBoxButtons]::OK, [MessageBoxIcon]::Warning) | Out-Null
+        exit 2
     }
 }
 
-[string]$mpvCmdArg = ""
-if ([Windows.Forms.MessageBox]::Show($TEXT.D, $TEXT.A, [Windows.Forms.MessageBoxButtons]::YesNo, [Windows.Forms.MessageBoxIcon]::Question) -eq [Windows.Forms.DialogResult]::Yes) {
-    $mpvCmdArg = [Microsoft.VisualBasic.Interaction]::InputBox($TEXT.E, $TEXT.F, "", 100, 100)
+[string]$mpvArg = ""
+if ([MessageBox]::Show($TEXT.D, $TEXT.A, [MessageBoxButtons]::YesNo, [MessageBoxIcon]::Question) -eq [DialogResult]::Yes) {
+    $mpvArg = [Microsoft.VisualBasic.Interaction]::InputBox($TEXT.E, $TEXT.F, "", 100, 100)
 }
-$mpvCmdArg = "--config-dir=""$mpvConfigDir"" " + $mpvCmdArg.Trim()
+$mpvArg = ($mpvArg.Trim() + " --config-dir=""$MPV_CONFIG_DIR""").Trim()
 
-AddProgramID -Identifier $VIDEO_IDENTIFIER -Name "MPV Player" -Icon "@%SystemRoot%\System32\shell32.dll,313" -OpenCmd """$mpvPath"" $mpvCmdArg ""%1"""
-AddProgramID -Identifier $PLAYLIST_IDENTIFIER -Name "MPV Player" -Icon "@%SystemRoot%\System32\shell32.dll,299" -OpenCmd """$mpvPath"" $mpvCmdArg --playlist=""%1"""
+Write-Output "mpv.exe: $MPV_CONFIG_DIR"
+Write-Output "mpv config dir: $MPV_CONFIG_DIR"
+Write-Output "mpv arg: $mpvArg"
+Write-Output ""
 
-Remove-Item -Path $CLIENT_REG_PATH -Force -Recurse
-New-Item -Path $CLIENT_REG_PATH\Capabilities\FileAssociations -Force
-Set-ItemProperty -Path $CLIENT_REG_PATH\Capabilities -Name "ApplicationName" -Value "MPV Player"
-Set-ItemProperty -Path $CLIENT_REG_PATH\Capabilities -Name "ApplicationIcon" -Value """$mpvPath, 0"""
-Set-ItemProperty -Path HKCU:\Software\RegisteredApplications -Name $COMMON_IDENTIFIER -Value Software\Clients\Media\$COMMON_IDENTIFIER\Capabilities
+[string]$mpvAppDataDir = [Environment]::ExpandEnvironmentVariables("%APPDATA%\mpv")
+if ([Directory]::Exists($mpvAppDataDir)) {
+    [FileInfo]$fileInfo = New-Object -TypeName FileInfo -ArgumentList $mpvAppDataDir
+    if ($fileInfo.Attributes.HasFlag([FileAttributes]::ReparsePoint) -or (Get-ChildItem -Path $mpvAppDataDir).Count -eq 0) {
+        [Directory]::Delete($mpvAppDataDir, $true)
+    }
+    else {
+        Write-Output "Backup mpv appdata dir: $mpvAppDataDir -> $mpvAppDataDir.bak"
+        [Directory]::Move($mpvAppDataDir, "$mpvAppDataDir.bak")
+    }
 
-foreach ($ext in $VIDEO_EXTS) {
-    AssociateFile -Identifier $VIDEO_IDENTIFIER -ExtName $ext
 }
+Write-Output "Create symbolic link: $mpvAppDataDir -> $MPV_CONFIG_DIR"
+Start-Process -FilePath cmd.exe -ArgumentList @("/c", "mklink", "/D", "/J", $mpvAppDataDir, $MPV_CONFIG_DIR) -Verb runas
+Write-Output ""
 
-foreach ($ext in $PLAYLIST_EXTS) {
-    AssociateFile -Identifier $PLAYLIST_IDENTIFIER -ExtName $ext
+AddProgramID -Identifier $VIDEO_IDENTIFIER -Name $APP_NAME -Icon "$MPV_CONFIG_DIR\setup\icons\video.ico" -OpenCmd """$mpv"" $mpvArg ""%1"""
+AddProgramID -Identifier $PLAYLIST_IDENTIFIER -Name $APP_NAME -Icon "$MPV_CONFIG_DIR\setup\icons\playlist.ico" -OpenCmd """$mpv"" $mpvArg --playlist=""%1"""
+
+[Registry]::CurrentUser.DeleteSubKeyTree($APP_REG_PATH, $false)
+[Registry]::CurrentUser.CreateSubKey($APP_CAP_REG_PATH, $true).SetValue("ApplicationName", $APP_NAME)
+[Registry]::CurrentUser.CreateSubKey($APP_CAP_REG_PATH, $true).SetValue("ApplicationIcon", "$mpv, 0")
+[Registry]::CurrentUser.CreateSubKey("Software\RegisteredApplications", $true).SetValue($COMMON_IDENTIFIER, $APP_CAP_REG_PATH)
+
+foreach ($fileType in $FILETYPES) {
+    Write-Output "Register file type: $($fileType.Ext)"
+    [RegistryKey]$typeReg = [Registry]::CurrentUser.CreateSubKey("Software\Classes\.$($fileType.Ext)", $true)
+    $typeReg.SetValue($null, $fileType.OpenWith)
+    $typeReg.SetValue("Content Type", $fileType.ContentType)
+    $typeReg.SetValue("PerceivedType", $fileType.PerceivedType)
+    $typeReg.CreateSubKey("OpenWithProgids").SetValue($fileType.OpenWith, "")
+    $typeReg.Dispose()
+    [Registry]::CurrentUser.CreateSubKey("$APP_CAP_REG_PATH\FileAssociations", $true).SetValue(".$($fileType.Ext)", $fileType.OpenWith)
 }
 
 $code = @'
@@ -128,4 +158,9 @@ $code = @'
 Add-Type -MemberDefinition $code -Namespace WinAPI -Name Explorer
 [WinAPI.Explorer]::Refresh()
 
-[Windows.Forms.MessageBox]::Show($TEXT.Z, $TEXT.A)
+Write-Output ""
+Write-Output "Done!"
+
+[MessageBox]::Show($TEXT.Z, $TEXT.A, [MessageBoxButtons]::OK, [MessageBoxIcon]::Information) | Out-Null
+
+Start-Process -FilePath ms-settings:defaultapps
