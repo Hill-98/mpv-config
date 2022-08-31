@@ -1,13 +1,11 @@
 using namespace Microsoft.Win32
 using namespace System.IO
 using namespace System.Text
-using namespace System.Windows.Forms
+using namespace System.Windows
 
 Add-Type -AssemblyName Microsoft.VisualBasic
 Add-Type -AssemblyName mscorlib
-Add-Type -AssemblyName System.Windows.Forms
-
-[Application]::EnableVisualStyles()
+Add-Type -AssemblyName PresentationFramework
 
 function AddProgramID([string]$Identifier, [string]$Name, [string]$Icon, [string]$OpenCmd) {
     if ([string]::IsNullOrWhiteSpace($Identifier)) {
@@ -19,7 +17,7 @@ function AddProgramID([string]$Identifier, [string]$Name, [string]$Icon, [string
     $reg.CreateSubKey("DefaultIcon", $true).SetValue($null, $Icon)
     $reg.CreateSubKey("shell\open", $true).SetValue("FriendlyAppName", $Name)
     $reg.CreateSubKey("shell\open\command", $true).SetValue($null, $OpenCmd)
-    $reg.Dispose()
+    $reg.Close()
 }
 
 [string]$COMMON_IDENTIFIER = "MPV.Player"
@@ -61,13 +59,13 @@ $TEXT = @{}
 [string]$MPV_CONFIG_DIR = [Path]::GetDirectoryName($PSScriptRoot)
 [string]$mpv = ""
 
-[Form]$topWindow = New-Object Form
-$topWindow.Opacity = 0
-$topWindow.ShowInTaskbar = $false
-$topWindow.TopMost = $true
+[Window]$topWindow = New-Object Window
+$topWindow.Height = 0
+$topWindow.Topmost = $true
+$topWindow.Visibility = [Visibility]::Hidden
+$topWindow.Width = 0
+$topWindow.WindowStyle = [WindowStyle]::None
 $topWindow.Show()
-
-Register-EngineEvent -SourceIdentifier PowerShell.exiting -Action { $topWindow.Close() } | Out-Null
 
 foreach ($key in $BASE64_TEXT.Keys) {
     $TEXT.Add($key, [Encoding]::Unicode.GetString([Convert]::FromBase64String($BASE64_TEXT.$key)))
@@ -83,29 +81,29 @@ if (![File]::Exists("$MPV_CONFIG_DIR\mpv.conf")) {
 
 try {
     $mpv = (Get-Command -CommandType Application mpv.exe -ErrorAction Stop).Source
-    if ([MessageBox]::Show($TEXT.B.Replace("%mpv%", $mpv), $TEXT.A, [MessageBoxButtons]::YesNo, [MessageBoxIcon]::Question) -eq [DialogResult]::Yes) {
+    if ([MessageBox]::Show($TEXT.B.Replace("%mpv%", $mpv), $TEXT.A, [MessageBoxButton]::YesNo, [MessageBoxImage]::Question) -eq [MessageBoxResult]::Yes) {
         $mpv = ""
     }
 }
 catch {
-    [MessageBox]::Show($TEXT.C, $TEXT.A, [MessageBoxButtons]::OK, [MessageBoxIcon]::Warning)
+    [MessageBox]::Show($TEXT.C, $TEXT.A, [MessageBoxButton]::OK, [MessageBoxImage]::Warning)
 }
 
 If ([string]::IsNullOrEmpty($mpv)) {
     $selector = New-Object OpenFileDialog
     $selector.FileName = "mpv.exe"
     $selector.Filter = "mpv.exe|mpv.exe"
-    if ($selector.ShowDialog() -eq [DialogResult]::OK) {
+    if ($selector.ShowDialog()) {
         $mpv = $selector.FileName
     }
     else {
-        [MessageBox]::Show($TEXT.G, $TEXT.A, [MessageBoxButtons]::OK, [MessageBoxIcon]::Warning) | Out-Null
+        [MessageBox]::Show($TEXT.G, $TEXT.A, [MessageBoxButton]::OK, [MessageBoxImage]::Warning) | Out-Null
         exit 2
     }
 }
 
 [string]$mpvArg = ""
-if ([MessageBox]::Show($TEXT.D, $TEXT.A, [MessageBoxButtons]::YesNo, [MessageBoxIcon]::Question) -eq [DialogResult]::Yes) {
+if ([MessageBox]::Show($TEXT.D, $TEXT.A, [MessageBoxButton]::YesNo, [MessageBoxImage]::Question) -eq [MessageBoxResult]::Yes) {
     $mpvArg = [Microsoft.VisualBasic.Interaction]::InputBox($TEXT.E, $TEXT.F, "", 100, 100)
 }
 $mpvArg = ($mpvArg.Trim() + " --config-dir=""$MPV_CONFIG_DIR""").Trim()
@@ -146,7 +144,7 @@ foreach ($fileType in $FILETYPES) {
     $typeReg.SetValue("Content Type", $fileType.ContentType)
     $typeReg.SetValue("PerceivedType", $fileType.PerceivedType)
     $typeReg.CreateSubKey("OpenWithProgids").SetValue($fileType.OpenWith, "")
-    $typeReg.Dispose()
+    $typeReg.Close()
     [Registry]::CurrentUser.CreateSubKey("$APP_CAP_REG_PATH\FileAssociations", $true).SetValue(".$($fileType.Ext)", $fileType.OpenWith)
 }
 
@@ -161,6 +159,8 @@ Add-Type -MemberDefinition $code -Namespace WinAPI -Name Explorer
 Write-Output ""
 Write-Output "Done!"
 
-[MessageBox]::Show($TEXT.Z, $TEXT.A, [MessageBoxButtons]::OK, [MessageBoxIcon]::Information) | Out-Null
+$topWindow.Activate() | Out-Null
+[MessageBox]::Show($TEXT.Z, $TEXT.A, [MessageBoxButton]::OK, [MessageBoxImage]::Information) | Out-Null
+$topWindow.Close()
 
 Start-Process -FilePath ms-settings:defaultapps
