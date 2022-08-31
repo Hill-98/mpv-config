@@ -37,20 +37,26 @@ git submodule update
 BackSpace 重置播放速度
 Alt+= 增加字幕字体大小
 Alt+- 减小字幕字体大小
-Alt+UP 字幕位置向上
+Alt+UP   字幕位置向上
 Alt+DOWN 字幕位置向下
 Alt+RIGHT 字幕延迟增加
-Alt+LEFT 字幕延迟减少
+Alt+LEFT  字幕延迟减少
+Shift+RIGHT 快进 10 秒
+Shift+LEFT  倒退 10秒
 [ 上一帧
 ] 下一帧
 < 减少播放速度
 > 增加播放速度
-A 选择字幕轨道
+A 显示字幕轨道列表
+C 显示章节列表
+d 切换去带
 f 切换全屏
 H 开启/关闭 硬件解码
 m 切换静音
 o 打开文件
 p 显示播放进度
+P 显示播放列表
 r 旋转视频
-S 选择音频轨道
+R 从头开始播放视频
+S 显示音频轨道列表
 ```
