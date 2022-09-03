@@ -1,1 +1,0 @@
-../git-modules/mpv-scripts/display-profiles.lua
