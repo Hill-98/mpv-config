@@ -1,10 +1,10 @@
 var msg = mp.msg;
-var HTTP_HEADERS = [];
+var protocolRegex = /^webplay:(\/\/)?/;
 
 mp.add_hook('on_load', 50, function () {
     var path = mp.get_property_native('path');
-    if (path.match(/^webplay:(\/\/)?/) === null) {
+    if (!protocolRegex.test(path)) {
         return;
     }
-    mp.set_property_native('stream-open-filename', path.replace(/^webplay:(\/\/)?/, ''))
+    mp.set_property_native('stream-open-filename', path.replace(protocolRegex, ''));
 });
