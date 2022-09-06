@@ -151,11 +151,12 @@ foreach ($fileType in $FILETYPES) {
     [Registry]::CurrentUser.CreateSubKey("$APP_CAP_REG_PATH\FileAssociations", $true).SetValue(".$($fileType.Ext)", $fileType.OpenWith)
 }
 
-[RegistryKey]$protocolReg = [Registry]::CurrentUser.CreateSubKey("Software\Classes\webplay", $true)
+[RegistryKey]$protocolReg = [Registry]::CurrentUser.CreateSubKey("$APP_CAP_REG_PATH\Protocols\webplay", $true)
 $protocolReg.SetValue($null, "URL:webplay")
 $protocolReg.SetValue("URL Protocol", "")
 $protocolReg.CreateSubKey("shell\open\command").SetValue($null, $mpvWebCommand)
 $protocolReg.Close()
+Write-Output "Register protocol: webplay"
 
 $code = @'
   [System.Runtime.InteropServices.DllImport("Shell32.dll")]
