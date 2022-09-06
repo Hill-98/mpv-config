@@ -107,6 +107,9 @@ if ([MessageBox]::Show($TEXT.D, $TEXT.A, [MessageBoxButton]::YesNo, [MessageBoxI
     $mpvArg = [Microsoft.VisualBasic.Interaction]::InputBox($TEXT.E, $TEXT.F, "", 100, 100)
 }
 $mpvArg = ($mpvArg.Trim() + " --config-dir=""$MPV_CONFIG_DIR""").Trim()
+[string]$mpvVideoCommand = """$mpv"" $mpvArg ""%1"""
+[string]$mpvPlaylistCommand = """$mpv"" $mpvArg --playlist=""%1"""
+[string]$mpvWebCommand = """$mpv"" $mpvArg -- ""%1"""
 
 Write-Output "mpv.exe: $mpv"
 Write-Output "mpv config dir: $MPV_CONFIG_DIR"
@@ -129,8 +132,8 @@ Write-Output "Create symbolic link: $mpvAppDataDir -> $MPV_CONFIG_DIR"
 Start-Process -FilePath cmd.exe -ArgumentList @("/c", "mklink", "/D", "/J", $mpvAppDataDir, $MPV_CONFIG_DIR) -Verb runas
 Write-Output ""
 
-AddProgramID -Identifier $VIDEO_IDENTIFIER -Name $APP_NAME -Icon "$MPV_CONFIG_DIR\setup\icons\video.ico" -OpenCmd """$mpv"" $mpvArg ""%1"""
-AddProgramID -Identifier $PLAYLIST_IDENTIFIER -Name $APP_NAME -Icon "$MPV_CONFIG_DIR\setup\icons\playlist.ico" -OpenCmd """$mpv"" $mpvArg --playlist=""%1"""
+AddProgramID -Identifier $VIDEO_IDENTIFIER -Name $APP_NAME -Icon "$MPV_CONFIG_DIR\setup\icons\video.ico" -OpenCmd $mpvVideoCommand
+AddProgramID -Identifier $PLAYLIST_IDENTIFIER -Name $APP_NAME -Icon "$MPV_CONFIG_DIR\setup\icons\playlist.ico" -OpenCmd $mpvPlaylistCommand
 
 [Registry]::CurrentUser.DeleteSubKeyTree($APP_REG_PATH, $false)
 [Registry]::CurrentUser.CreateSubKey($APP_CAP_REG_PATH, $true).SetValue("ApplicationName", $APP_NAME)
@@ -147,6 +150,12 @@ foreach ($fileType in $FILETYPES) {
     $typeReg.Close()
     [Registry]::CurrentUser.CreateSubKey("$APP_CAP_REG_PATH\FileAssociations", $true).SetValue(".$($fileType.Ext)", $fileType.OpenWith)
 }
+
+[RegistryKey]$protocolReg = [Registry]::CurrentUser.CreateSubKey("Software\Classes\webplay", $true)
+$protocolReg.SetValue($null, "URL:webplay")
+$protocolReg.SetValue("URL Protocol", "")
+$protocolReg.CreateSubKey("shell\open\command").SetValue($null, $mpvWebCommand)
+$protocolReg.Close()
 
 $code = @'
   [System.Runtime.InteropServices.DllImport("Shell32.dll")]
