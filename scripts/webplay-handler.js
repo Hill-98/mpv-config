@@ -19,6 +19,10 @@ function loaded(url) {
         msg.info('Title: ' + title);
         mp.set_property_native('title', title);
     }
+    var start = getParam(url, 'start');
+    if (start && parseFloat(start)) {
+        mp.command_native(['seek', start, 'absolute']);
+    }
 }
 
 mp.add_hook('on_load', 40, function () {
