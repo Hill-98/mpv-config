@@ -5,6 +5,10 @@
 
 var msg = mp.msg;
 var HTTP_HEADERS = [];
+var PROTOCOLS = [
+    'ytdl',
+    'webplay',
+];
 
 function append_header(header) {
     mp.command_native(['change-list', 'http-header-fields', 'append', header]);
@@ -17,7 +21,10 @@ function remove_header(header) {
 }
 
 mp.add_hook('on_load', 50, function () {
-    var url = mp.get_property_native('path').replace('ytdl://', '');
+    var url = mp.get_property_native('path');
+    for (var i = 0; i < PROTOCOLS.length; i++) {
+        url = url.replace(new RegExp('^' + PROTOCOLS[i] + ':(\/\/)?'), '');
+    }
     if (url.match(/^https?:\/\//) === null) {
         return;
     }
