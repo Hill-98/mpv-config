@@ -23,6 +23,7 @@ function AddProgramID([string]$Identifier, [string]$Name, [string]$Icon, [string
 [string]$COMMON_IDENTIFIER = "MPV.Player"
 [string]$VIDEO_IDENTIFIER = "$COMMON_IDENTIFIER.Video"
 [string]$PLAYLIST_IDENTIFIER = "$COMMON_IDENTIFIER.Playlist"
+[string]$WEBPLAY_IDENTIFIER = "$COMMON_IDENTIFIER.WebPlay"
 [string]$APP_NAME = "MPV Player"
 [string]$APP_REG_PATH = "Software\Clients\Media\$COMMON_IDENTIFIER"
 [string]$APP_CAP_REG_PATH = "$APP_REG_PATH\Capabilities"
@@ -42,6 +43,10 @@ function AddProgramID([string]$Identifier, [string]$Name, [string]$Icon, [string
     @{ ContentType = "application/vnd.apple.mpegurl"; Ext = "m3u"; OpenWith = $PLAYLIST_IDENTIFIER; PerceivedType = "text" },
     @{ ContentType = "application/vnd.apple.mpegurl"; Ext = "m3u8"; OpenWith = $PLAYLIST_IDENTIFIER; PerceivedType = "text" },
     @{ ContentType = "application/vnd.apple.mpegurl"; Ext = "vlc"; OpenWith = $PLAYLIST_IDENTIFIER; PerceivedType = "text" }
+)
+
+[array]$PROTOCOLS = @(
+    @{ Prefix = "webplay"; OpenWith = $WEBPLAY_IDENTIFIER }
 )
 
 $BASE64_TEXT = @{
@@ -134,6 +139,7 @@ Write-Output ""
 
 AddProgramID -Identifier $VIDEO_IDENTIFIER -Name $APP_NAME -Icon "$MPV_CONFIG_DIR\setup\icons\video.ico" -OpenCmd $mpvVideoCommand
 AddProgramID -Identifier $PLAYLIST_IDENTIFIER -Name $APP_NAME -Icon "$MPV_CONFIG_DIR\setup\icons\playlist.ico" -OpenCmd $mpvPlaylistCommand
+AddProgramID -Identifier $WEBPLAY_IDENTIFIER -Name $APP_NAME -Icon "" -OpenCmd $mpvWebCommand
 
 [Registry]::CurrentUser.DeleteSubKeyTree($APP_REG_PATH, $false)
 [Registry]::CurrentUser.CreateSubKey($APP_CAP_REG_PATH, $true).SetValue("ApplicationName", $APP_NAME)
@@ -151,12 +157,11 @@ foreach ($fileType in $FILETYPES) {
     [Registry]::CurrentUser.CreateSubKey("$APP_CAP_REG_PATH\FileAssociations", $true).SetValue(".$($fileType.Ext)", $fileType.OpenWith)
 }
 
-[RegistryKey]$protocolReg = [Registry]::CurrentUser.CreateSubKey("$APP_CAP_REG_PATH\Protocols\webplay", $true)
-$protocolReg.SetValue($null, "URL:webplay")
-$protocolReg.SetValue("URL Protocol", "")
-$protocolReg.CreateSubKey("shell\open\command").SetValue($null, $mpvWebCommand)
-$protocolReg.Close()
-Write-Output "Register protocol: webplay"
+
+foreach ($protocol in $PROTOCOLS) {
+    Write-Output "Register protocol: $($protocol.Prefix)"
+    [Registry]::CurrentUser.CreateSubKey("$APP_CAP_REG_PATH\URLAssociations", $true).SetValue("$($protocol.Prefix)", $protocol.OpenWith)
+}
 
 $code = @'
   [System.Runtime.InteropServices.DllImport("Shell32.dll")]
