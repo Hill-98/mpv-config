@@ -21,7 +21,7 @@ function remove_header(header) {
 
 mp.add_hook('on_load', 50, function () {
     var url = mp.get_property_native('path');
-    if (url.indexOf('webplay:') !== -1) {
+    if (url.indexOf('webplay:?') === 0) {
         url = mp.get_property_native('stream-open-filename');
     }
     for (var i = 0; i < PROTOCOLS.length; i++) {
