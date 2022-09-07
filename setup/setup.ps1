@@ -94,7 +94,7 @@ catch {
     [MessageBox]::Show($TEXT.C, $TEXT.A, [MessageBoxButton]::OK, [MessageBoxImage]::Warning)
 }
 
-If ([string]::IsNullOrEmpty($mpv)) {
+if ([string]::IsNullOrEmpty($mpv)) {
     $selector = New-Object OpenFileDialog
     $selector.FileName = "mpv.exe"
     $selector.Filter = "mpv.exe|mpv.exe"
