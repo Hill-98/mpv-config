@@ -114,7 +114,7 @@ if ([MessageBox]::Show($TEXT.D, $TEXT.A, [MessageBoxButton]::YesNo, [MessageBoxI
 $mpvArg = ($mpvArg.Trim() + " --config-dir=""$MPV_CONFIG_DIR""").Trim()
 [string]$mpvVideoCommand = """$mpv"" $mpvArg ""%1"""
 [string]$mpvPlaylistCommand = """$mpv"" $mpvArg --playlist=""%1"""
-[string]$mpvWebCommand = """$mpv"" $mpvArg -- ""%1"""
+[string]$mpvWebCommand = """$mpv"" $mpvArg --idle=yes -- ""%1"""
 
 Write-Output "mpv.exe: $mpv"
 Write-Output "mpv config dir: $MPV_CONFIG_DIR"

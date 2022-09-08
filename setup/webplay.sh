@@ -21,7 +21,7 @@ if [[ $# -gt 0 ]]; then
             fi
         fi
     done
-    if ! $mpv --player-operation-mode=cplayer -- "$1"; then
+    if ! $mpv --idle=yes --player-operation-mode=cplayer -- "$1"; then
         read -r
     fi
     exit
