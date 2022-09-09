@@ -14,12 +14,12 @@ if [[ $# -gt 0 ]]; then
         if [[ -f "$dir/mpv.desktop" ]] && exec=$(grep -E "^Exec=(.+)" "$dir/mpv.desktop"); then
                 exec=${exec/Exec=/}
                 exec=${exec/\%U/}
+                exec=${exec/ -- /}
                 mpv=$exec
                 break
-            fi
         fi
     done
-    $mpv "$1"
+    exec $mpv "$1"
     exit
 fi
 
