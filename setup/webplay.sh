@@ -9,35 +9,31 @@ DESKTOP_DIRS=(
 )
 
 if [[ $# -gt 0 ]]; then
-    mpv="mpv"
+    mpv="mpv --player-operation-mode=pseudo-gui"
     for dir in "${DESKTOP_DIRS[@]}"; do
-        if [[ -f "$dir/mpv.desktop" ]]; then
-            if exec=$(grep -E "^Exec=(.+)" "$dir/mpv.desktop"); then
+        if [[ -f "$dir/mpv.desktop" ]] && exec=$(grep -E "^Exec=(.+)" "$dir/mpv.desktop"); then
                 exec=${exec/Exec=/}
                 exec=${exec/\%U/}
-                exec=${exec/ -- /}
                 mpv=$exec
                 break
             fi
         fi
     done
-    if ! $mpv --idle=yes --player-operation-mode=cplayer -- "$1"; then
-        read -r
-    fi
+    $mpv "$1"
     exit
 fi
 
 self=$(realpath "$0")
 desktop_file="$APPLICATIONS_DIR/webplay-handler.desktop"
 
-cat <<EOF > "$desktop_file"
+cat > "$desktop_file" <<EOF
 [Desktop Entry]
 Type=Application
 Version=1.5
 Name=WebPlay
 NoDisplay=true
 Exec="$self" %u
-Terminal=true
+Terminal=false
 MimeType=x-scheme-handler/webplay;
 PrefersNonDefaultGPU=true
 EOF
