@@ -4,22 +4,13 @@
  */
 
 var msg = mp.msg;
-var HTTP_HEADERS = [];
+var HttpHeaders = require('../script-modules/HttpHeaders');
+
 var PROTOCOLS = [
     'ytdl',
 ];
 
-function append_header(header) {
-    mp.command_native(['change-list', 'http-header-fields', 'append', header]);
-    HTTP_HEADERS.push(header);
-    msg.info('Append http header: ' + header);
-}
-
-function remove_header(header) {
-    mp.command_native(['change-list', 'http-header-fields', 'remove', header]);
-}
-
-mp.add_hook('on_load', 50, function () {
+mp.add_hook('on_load', 99, function () {
     var url = mp.get_property_native('path');
     if (url.indexOf('webplay:?') === 0) {
         url = mp.get_property_native('stream-open-filename');
@@ -27,20 +18,21 @@ mp.add_hook('on_load', 50, function () {
     for (var i = 0; i < PROTOCOLS.length; i++) {
         url = url.replace(new RegExp('^' + PROTOCOLS[i] + ':(\/\/)?'), '');
     }
-    
     if (url.match(/^https?:\/\//) === null) {
         return;
     }
+    var httpHeaders = new HttpHeaders();
+    var headers = [];
     var matches = url.match(/https?:\/\/[\w\.-]+/);
     if (matches !== null) {
-        append_header('origin: ' + matches[0]);
+        headers.push('origin: ' + matches[0]);
     }
-    append_header('referer: ' + url);
-});
-
-mp.add_hook('on_unload', 50, function () {
-    for (var i = 0; i < HTTP_HEADERS.length; i++) {
-        remove_header(HTTP_HEADERS[i]);
+    headers.push('referer: ' + url);
+    for (var i = 0; i < headers.length; i++) {
+        var header = HttpHeaders.parse(headers[i]);
+        if (!HttpHeaders.global.has(header.name)) {
+            msg.info('Add header: ' + header.original);
+            httpHeaders.add(header.name, header.value);
+        }
     }
-    HTTP_HEADERS = [];
 });
