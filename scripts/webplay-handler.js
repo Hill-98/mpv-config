@@ -1,8 +1,13 @@
 var msg = mp.msg;
 var TEMP_URLS = [];
 var PROTOCOL_PREFIX = 'webplay:?';
+/** @type {number|null} */
 var START = null;
 
+/**
+ * @param {string} url
+ * @returns {Object.<string, string>}
+ */
 function parse_url(url) {
     var decode = function (value) {
         return decodeURIComponent(value.replace(/\+/g, '%20'));
@@ -20,6 +25,7 @@ function parse_url(url) {
 }
 
 mp.add_hook('on_load', 40, function () {
+    /** @type {string} */
     var path = mp.get_property_native('path');
     if (path.indexOf(PROTOCOL_PREFIX) !== 0) {
         return;

@@ -1,5 +1,5 @@
 module.exports = {
-    once: function (event, handler) {
+    once: function once(event, handler) {
         var fn = function (ev) {
             handler(ev);
             mp.unregister_event(fn);

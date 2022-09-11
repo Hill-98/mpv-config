@@ -10,28 +10,44 @@ var msg = mp.msg;
 var delimiter = ';';
 var loaded = Object.create(null);
 
+/**
+ * @param {string} name
+ */
 function apply_profile(name) {
   if (!name) {
-    return
+    return;
   }
   mp.command_native(['apply-profile', name]);
 }
 
+/**
+ * @param {string} name
+ */
 function restore_profile(name) {
   if (!name) {
-    return
+    return;
   }
   mp.command_native(['apply-profile', name, 'restore']);
 }
 
+/**
+ * @param {string} path
+ */
 function append_shader(path) {
   mp.command_native(['change-list', 'glsl-shaders', 'append', path]);
 }
 
+/**
+ * @param {string} path
+ */
 function remove_shader(path) {
   mp.command_native(['change-list', 'glsl-shaders', 'remove', path]);
 }
 
+/**
+ * @param {*} value
+ * @returns {boolean}
+ */
 function empty(value) {
   if (value === undefined || value === null) {
     return true;
@@ -45,11 +61,17 @@ function empty(value) {
   return false;
 }
 
-function handle(identifier, display_name, paths, profile) {
+/**
+ * @param {string} identifier
+ * @param {string} display_name
+ * @param {string} paths
+ * @param {string} profile
+ */
+function handler(identifier, display_name, paths, profile) {
   if (identifier === '<clear>') {
     for (var key in loaded) {
       var obj = loaded[key];
-      handle(key, obj.display_name, obj.shaders.join(delimiter), obj.profile);
+      handler(key, obj.display_name, obj.shaders.join(delimiter), obj.profile);
     }
     mp.osd_message('所有着色器已卸载', 2);
     return;
@@ -117,4 +139,4 @@ function handle(identifier, display_name, paths, profile) {
   mp.osd_message(display_name + ' 着色器已加载', 2);
 }
 
-mp.register_script_message('apply-shaders', handle);
+mp.register_script_message('apply-shaders', handler);

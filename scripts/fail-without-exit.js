@@ -1,11 +1,19 @@
 var msg = mp.msg;
+/** @type {string} */
 var IDLE = mp.get_property_native('idle');
 var IDLE_CHANGED = false;
 
+/**
+ * @param {string} name
+ * @param {string} value
+ */
 function observe_idle(name, value) {
     IDLE = value;
 }
 
+/**
+ * @param {string} value
+ */
 function set_idle(value) {
     mp.unobserve_property(observe_idle);
     mp.set_property_native('idle', value);
@@ -25,7 +33,7 @@ mp.add_hook('on_load_fail', 50, function () {
     if (mp.get_property_native('terminal')) {
         return;
     }
-    set_idle(true);
+    set_idle('yes');
     IDLE_CHANGED = true;
 });
 

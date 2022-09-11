@@ -8,10 +8,16 @@ var msg = mp.msg;
 var utils = mp.utils;
 var pressed_keys = [];
 
+/**
+ * @param {string} key
+ */
 function keypress(key) {
     mp.command_native(['keypress', key]);
 }
 
+/**
+ * @param {string[]} keys
+ */
 function press_keys(keys) {
     for (var i = 0; i < keys.length; i++) {
         var key = keys[i];
@@ -24,6 +30,10 @@ function press_keys(keys) {
     }
 }
 
+/**
+ * @param {string} path
+ * @returns {string[]}
+ */
 function resolve_keys_file(path) {
     var info = utils.file_info(path);
     if (typeof info !== 'object' || !info.is_file) {
@@ -46,7 +56,7 @@ function resolve_keys_file(path) {
     return results;
 }
 
-mp.register_event("start-file", function () {
+mp.register_event('start-file', function () {
     var path = mp.get_property_native('path');
     var paths = utils.split_path(path);
     var dir = paths[0];
@@ -55,12 +65,11 @@ mp.register_event("start-file", function () {
     press_keys(common_keys);
     var specific_keys = resolve_keys_file(utils.join_path(dir, filename + '.mpv.keys'));
     press_keys(specific_keys);
-
 });
-mp.register_event("end-file", function () {
+
+mp.register_event('end-file', function () {
     for (var i = 0; i < pressed_keys.length; i++) {
         keypress(pressed_keys[i]);
     }
     pressed_keys = [];
 });
-

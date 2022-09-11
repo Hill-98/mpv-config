@@ -11,6 +11,7 @@ var PROTOCOLS = [
 ];
 
 mp.add_hook('on_load', 99, function () {
+    /** @type {string} */
     var url = mp.get_property_native('path');
     if (url.indexOf('webplay:?') === 0) {
         url = mp.get_property_native('stream-open-filename');

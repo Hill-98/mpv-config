@@ -1,4 +1,15 @@
-var parseHeader = function parseHeader(header) {
+/**
+ * @typedef {Object} Header
+ * @property {string} name
+ * @property {string} value
+ * @property {string} original
+ */
+
+/**
+ * @param {string} header
+ * @returns {Header}
+ */
+function parseHeader(header) {
     var index = header.indexOf(':');
     if (index === -1) {
         return null;
@@ -11,28 +22,41 @@ var parseHeader = function parseHeader(header) {
 };
 
 var GlobalHttpHeaders = {
+    /**
+     * @param {string} name
+     * @param {string} value
+     * @returns {boolean}
+     */
     add: function add(name, value) {
         var header = name.concat(': ', value).toLowerCase();
         return mp.command_native(['change-list', 'file-local-options/http-header-fields', 'append', header]) === null;
     },
+    /**
+    * @returns {boolean}
+    */
     clear: function clear() {
         return mp.command_native(['change-list', 'file-local-options/http-header-fields', 'clr', '']) === null;
     },
+    /**
+     * @param {string} name
+     * @param {string} value
+     * @returns {boolean}
+     */
     del: function del(name, value) {
         var headers = this.get(name);
-        if (headers === null) {
-            return;
-        }
         for (var i = 0; i < headers.length; i++) {
             if (value === undefined) {
-                mp.command_native(['change-list', 'file-local-options/http-header-fields', 'remove', headers[i].original]) === null;
-            } else if(value === headers[i].value) {
                 mp.command_native(['change-list', 'file-local-options/http-header-fields', 'remove', headers[i].original]);
-                break;
+            } else if(value === headers[i].value) {
+                return mp.command_native(['change-list', 'file-local-options/http-header-fields', 'remove', headers[i].original]) === null;
             }
         }
-        return;
+        return true;
     },
+    /**
+     * @param {string} name
+     * @returns {Header[]}
+     */
     get: function get(name) {
         var _name = name.toLowerCase();
         var headers = this.list();
@@ -42,11 +66,18 @@ var GlobalHttpHeaders = {
                 results.push(headers[i]);
             }
         }
-        return results.length === 0 ? null : results;
+        return results;
     },
+    /**
+     * @param {string} name
+     * @returns {boolean}
+     */
     has: function has(name) {
-        return this.get(name) !== null;
+        return this.get(name).length !== 0;
     },
+    /**
+     * @returns {Header[]}
+     */
     list: function list() {
         var headers = mp.get_property_native('file-local-options/http-header-fields');
         var results = [];
@@ -88,7 +119,7 @@ var HttpHeaders = function () {
         if (header === null) {
             return false;
         }
-        GlobalHttpHeaders.del(header.name, header.value);
+        GlobalHttpHeaders.del(header.name, header.valuD);
         var index = this.list().indexOf(header);
         this.headers.splice(index, 1);
         return true;

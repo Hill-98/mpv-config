@@ -1,3 +1,6 @@
 .DS_Store
 /mpv.conf
 /input.local.conf
+/node_modules
+package.json
+yarn.lock
