@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
     once: function once(event, handler) {
         var fn = function (ev) {

@@ -1,3 +1,9 @@
+/**
+ * 播放文件失败时不自动退出 mpv
+ */
+
+'use strict';
+
 var msg = mp.msg;
 /** @type {string} */
 var IDLE = mp.get_property_native('idle');

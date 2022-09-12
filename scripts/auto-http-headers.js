@@ -3,6 +3,8 @@
  * 用于解决部分网站无法正常播放的问题
  */
 
+'use strict';
+
 var msg = mp.msg;
 var HttpHeaders = require('../script-modules/HttpHeaders');
 

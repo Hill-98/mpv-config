@@ -4,6 +4,8 @@
  * 主要用于配合 apply-shaders 实现着色器自动加载
  */
 
+'use strict';
+
 var msg = mp.msg;
 var utils = mp.utils;
 var pressed_keys = [];

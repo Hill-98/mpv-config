@@ -1,3 +1,5 @@
+'use strict';
+
 var msg = mp.msg;
 var TEMP_URLS = [];
 var PROTOCOL_PREFIX = 'webplay:?';

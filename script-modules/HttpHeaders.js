@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @typedef {Object} Header
  * @property {string} name

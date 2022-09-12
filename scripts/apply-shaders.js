@@ -6,6 +6,8 @@
  * 加载/卸载 着色器集合并用标识符记录，如果标识符之前已被用于加载其他着色器，则先卸载已加载的着色器，如果着色器和已加载的一致，则卸载着色器。
  */
 
+'use strict';
+
 var msg = mp.msg;
 var delimiter = ';';
 var loaded = Object.create(null);
