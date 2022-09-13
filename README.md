@@ -7,7 +7,7 @@
 
 ### 安装
 
-0. 启用 Windows 开发人员模式和 Git 符号链接支持 
+0. 启用 Windows 开发人员模式和 Git 符号链接支持 (`git config --global --bool core.symlinks true`)
 1. 克隆存储库: `git clone --recursive https://github.com/Hill-98/mpv-config.git D:\mpv-config`
 2. 执行配置脚本: `powershell D:\mpv-config\setup\setup.ps1`
 3. 修复 git 符号链接错误: `powershell -Command "Remove-Item D:\mpv-config\shaders\ACNet -Recurse; Start-Process -FilePath cmd.exe -ArgumentList @('/c', 'mklink', '/D', 'D:\mpv-config\shaders\ACNet', '..\git-modules\ACNetGLSL\glsl') -Verb runas"`
@@ -23,18 +23,27 @@ git submodule update
 
 ## 说明
 
-默认使用 UOSC 作为播放控制界面，有右键菜单。
+**控制界面**: [UOSC](https://github.com/tomasklaen/uosc) (有右键菜单)
 
-默认启用 `gpu-hq-max` 配置文件，继承于 `gpu-hq`，但启用了最佳缩放算法、关闭去带和加载了 `KrigBilateral` 和 `SSimSuperRes` 着色器，可以使用快捷键 `~` 回退到 `gpu-hq`。
+**渲染配置**：
+* `gpu-hq`
+* 关闭去带
+* `scale`, `dscale` = `ewa_lanczossharp`
+* [`KrigBilateral`](gist.github.com/igv/a015fc885d5c22e6891820ad89555637) 和 [`SSimSuperRes`](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b) 着色器。
+
+**默认配置：**
+* 特定于文件的配置文件
+* 中文音频/字幕优先 (日文、英文其次)
+* 退出时保存对当前文件的部分配置
+* 始终启用缓存 (1G)
+* 自动检测 icc 配置文件
+* 垂直同步
+* 增强的去带参数
+* 字幕字体：文泉驿微米黑
 
 **极速模式**: 卸载所有着色器、还原占用性能的配置文件、开启硬件解码。(适合低性能设备播放 4K60FPS 等视频文件时开启)
 
-**默认启用功能：**
-* 自动检测 icc 配置文件
-* 帧率补偿 (使渲染帧率与显示器帧率一致)
-* 退出时保存对当前文件的配置
-
-**常用快捷键列表：**
+**不完整快捷键列表：**
 ```
 BackSpace 重置播放速度
 Alt+= 增加字幕字体大小
@@ -66,3 +75,9 @@ t 显示系统时间
 v 开启/关闭 垂直同步 (默认开启)
 V 显示视频轨道列表
 ```
+
+## 特色功能
+
+### Auto Press Key
+
+### WebPlay
