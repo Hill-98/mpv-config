@@ -1,20 +1,27 @@
 /**
- * 播放文件失败时不自动退出 mpv
+ * 加载文件失败时不自动退出 mpv
+ */
+
+/**
+ * @typedef {Object} StatObj
+ * @property {string} idle
+ * @property {boolean} idle_changed
  */
 
 'use strict';
 
-var msg = mp.msg;
-/** @type {string} */
-var IDLE = mp.get_property_native('idle');
-var IDLE_CHANGED = false;
+/** @type {StatObj} */
+var stat = {
+    idle: mp.get_property_native('idle'),
+    idle_changed: false,
+};
 
 /**
  * @param {string} name
  * @param {string} value
  */
 function observe_idle(name, value) {
-    IDLE = value;
+    stat.idle = value;
 }
 
 /**
@@ -29,10 +36,10 @@ function set_idle(value) {
 }
 
 mp.add_hook('on_unload', 50, function () {
-    if (!IDLE_CHANGED) {
-        set_idle(IDLE);
+    if (!stat.idle_changed) {
+        set_idle(stat.idle);
     }
-    IDLE_CHANGED = false;
+    stat.idle_changed = false;
 });
 
 mp.add_hook('on_load_fail', 50, function () {
@@ -40,8 +47,7 @@ mp.add_hook('on_load_fail', 50, function () {
         return;
     }
     set_idle('yes');
-    IDLE_CHANGED = true;
+    stat.idle_changed = true;
 });
 
 mp.observe_property('idle', 'native', observe_idle);
-

@@ -5,12 +5,12 @@
 
 'use strict';
 
-var msg = mp.msg;
-var HttpHeaders = require('../script-modules/HttpHeaders');
-
 var PROTOCOLS = [
     'ytdl',
 ];
+
+var msg = mp.msg;
+var HttpHeaders = require('../script-modules/HttpHeaders');
 
 mp.add_hook('on_load', 99, function () {
     /** @type {string} */

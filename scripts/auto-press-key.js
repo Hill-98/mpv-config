@@ -1,15 +1,15 @@
 /**
  * 如果播放文件目录存在 mpv.keys 或 ${filename}.mpv.keys
  * 则在文件加载开始时自动按下按键，文件加载结束时再次按下按键。
- * 主要用于配合 apply-shaders 实现着色器自动加载
+ * 主要用于配合 smart-shaders 实现着色器自动加载
  */
 
 'use strict';
 
-var msg = mp.msg;
 var utils = mp.utils;
 var commands = require('../script-modules/commands');
 var u = require('../script-modules/utils');
+/** @type {Array.<string>} */
 var pressed_keys = [];
 
 /**

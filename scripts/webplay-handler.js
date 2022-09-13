@@ -1,11 +1,13 @@
 'use strict';
 
+var PROTOCOL_PREFIX = 'webplay:?';
+
 var msg = mp.msg;
 var commands = require('../script-modules/commands');
-var TEMP_URLS = [];
-var PROTOCOL_PREFIX = 'webplay:?';
+/** @type {Array.<string>} */
+var temp_urls = [];
 /** @type {number|null} */
-var START = null;
+var temp_start = null;
 
 /**
  * @param {string} url
@@ -34,19 +36,19 @@ mp.add_hook('on_load', 40, function () {
         return;
     }
     mp.set_property_native('file-local-options/save-position-on-quit', false);
-    var index = TEMP_URLS.indexOf(path);
+    var index = temp_urls.indexOf(path);
     var isTempUrl = index !== -1;
     if (isTempUrl) {
-        path = TEMP_URLS[index + 1];
-        TEMP_URLS.splice(index, 2);
+        path = temp_urls[index + 1];
+        temp_urls.splice(index, 2);
     }
     var params = parse_url(path);
     var link = params.link;
     var isParse = params.parse === '1';
     var opts = {};
     if (params.start !== undefined && parseInt(params.start) > 0) {
-        START = parseInt(params.start);
-        opts.start = START;
+        temp_start = parseInt(params.start);
+        opts.start = temp_start;
     }
     if (isParse) {
         commands.loadfile(link, 'replace');
@@ -56,8 +58,8 @@ mp.add_hook('on_load', 40, function () {
     // 保存的文件设置具有统一性
     if (referer !== null && !isTempUrl) {
         var tempUrl = 'webplay:?' + referer;
-        TEMP_URLS.push(tempUrl);
-        TEMP_URLS.push(path);
+        temp_urls.push(tempUrl);
+        temp_urls.push(path);
         commands.loadfile(tempUrl);
         return;
     }
@@ -68,12 +70,9 @@ mp.add_hook('on_load', 40, function () {
     mp.set_property_native('file-local-options/title', title);
 });
 
-mp.add_hook('on_unload', 50, function () {
-    START = null;
-});
-
 mp.register_event('file-loaded', function () {
-    if (START !== null) {
-        mp.set_property_native('playback-time', START);
+    if (temp_start !== null) {
+        mp.set_property_native('playback-time', temp_start);
+        temp_start = null;
     }
 });

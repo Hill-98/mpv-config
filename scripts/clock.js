@@ -1,8 +1,14 @@
+/**
+ * 在右上角显示当前系统时间，并在一定时间后隐藏。
+ * script-binding clock
+ */
+
 'use strict';
 
-var msg = mp.msg;
 var osd = mp.create_osd_overlay('ass-events');
+/** @type {number|null} */
 var timer = null;
+/** @type {number|null} */
 var timeoutTimer = null;
 var options = {
     timeout: 5000,

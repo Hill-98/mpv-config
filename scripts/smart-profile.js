@@ -9,11 +9,6 @@ var msg = mp.msg;
 var commands = require('../script-modules/commands');
 var u = require('../script-modules/utils');
 
-/** @type {string[]} */
-var FILES = [
-    commands.expand_path('~~/profiles.local'),
-    commands.expand_path('~~/profiles'),
-];
 /** @type {Object.<string, boolean>} */
 var stat = {};
 
@@ -68,7 +63,7 @@ function restore_profile_handler(profile) {
  */
 function smart_profile_handler(profile, display_name, restored_message) {
     if (u.empty(profile)) {
-        msg.info('empty profile');
+        msg.error('empty profile');
         return;
     }
     var name = restored_message === undefined ? u.default_value(display_name, profile) : profile;
@@ -84,14 +79,20 @@ mp.register_script_message('apply-profile', apply_profile_handler);
 mp.register_script_message('restore-profile', restore_profile_handler);
 mp.register_script_message('smart-profile', smart_profile_handler);
 
-for (var i = 0; i < FILES.length; i++) {
-    var file = FILES[i];
-    var profiles = u.read_file_lines(file);
-    if (profiles === undefined) {
-        continue;
+(function () {
+    var files = [
+        commands.expand_path('~~/profiles.local'),
+        commands.expand_path('~~/profiles'),
+    ];
+    for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        var profiles = u.read_file_lines(file);
+        if (profiles === undefined) {
+            continue;
+        }
+        for (var k = 0; k < profiles.length; k++) {
+            apply_profile_handler(profiles[k]);
+        }
+        break;
     }
-    for (var k = 0; k < profiles.length; k++) {
-        apply_profile_handler(profiles[k]);
-    }
-    break;
-}
+})();
