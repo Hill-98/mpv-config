@@ -24,7 +24,7 @@ mp.add_hook('on_load', 99, function () {
     if (url.match(/^https?:\/\//) === null) {
         return;
     }
-    var httpHeaders = new HttpHeaders();
+    var http_headers = new HttpHeaders();
     var headers = [];
     var matches = url.match(/https?:\/\/[\w\.-]+/);
     if (matches !== null) {
@@ -35,7 +35,7 @@ mp.add_hook('on_load', 99, function () {
         var header = HttpHeaders.parse(headers[i]);
         if (!HttpHeaders.global.has(header.name)) {
             msg.info('Add header: ' + header.original);
-            httpHeaders.add(header.name, header.value);
+            http_headers.add(header.name, header.value);
         }
     }
 });

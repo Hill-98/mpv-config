@@ -1,4 +1,6 @@
-export function default_value(valuie: any, default_value: any): any;
+export function arguments2array(args: object): any[];
+
+export function default_value(value: any, default_value: any): any;
 
 export function empty(value: any): boolean;
 

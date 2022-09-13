@@ -11,7 +11,7 @@ interface globalHttpHeaders {
 
     del(name: string, value?: string): boolean;
 
-    get(name: string): Header;
+    get(name: string): Header[];
 
     has(name: string): boolean;
 

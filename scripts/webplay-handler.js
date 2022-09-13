@@ -1,6 +1,7 @@
 'use strict';
 
 var msg = mp.msg;
+var commands = require('../script-modules/commands');
 var TEMP_URLS = [];
 var PROTOCOL_PREFIX = 'webplay:?';
 /** @type {number|null} */
@@ -48,7 +49,7 @@ mp.add_hook('on_load', 40, function () {
         opts.start = START;
     }
     if (isParse) {
-        mp.command_native(['loadfile', link, 'replace', ]);
+        commands.loadfile(link, 'replace');
         return;
     }
     var referer = params.referer;
@@ -57,7 +58,7 @@ mp.add_hook('on_load', 40, function () {
         var tempUrl = 'webplay:?' + referer;
         TEMP_URLS.push(tempUrl);
         TEMP_URLS.push(path);
-        mp.command_native(['loadfile', tempUrl]);
+        commands.loadfile(tempUrl);
         return;
     }
     var title = params.title || referer || link;

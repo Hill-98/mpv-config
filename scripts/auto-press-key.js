@@ -8,15 +8,9 @@
 
 var msg = mp.msg;
 var utils = mp.utils;
+var commands = require('../script-modules/commands');
 var u = require('../script-modules/utils');
 var pressed_keys = [];
-
-/**
- * @param {string} key
- */
-function keypress(key) {
-    mp.command_native(['keypress', key]);
-}
 
 /**
  * @param {string[]} keys
@@ -24,12 +18,12 @@ function keypress(key) {
 function press_keys(keys) {
     for (var i = 0; i < keys.length; i++) {
         var key = keys[i];
-        if (key.substring(0, 1) === '!') {
+        if (key.indexOf('!') === 0) {
             key = key.substring(1);
         } else {
             pressed_keys.push(key);
         }
-        keypress(key);
+        commands.keypress(key);
     }
 }
 
@@ -53,8 +47,6 @@ mp.register_event('start-file', function () {
 });
 
 mp.register_event('end-file', function () {
-    for (var i = 0; i < pressed_keys.length; i++) {
-        keypress(pressed_keys[i]);
-    }
+    pressed_keys.forEach(commands.keypress);
     pressed_keys = [];
 });

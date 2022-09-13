@@ -16,49 +16,42 @@
 'use strict';
 
 var msg = mp.msg;
-var utils = require('../script-modules/utils');
-var delimiter = ';';
+var commands = require('../script-modules/commands');
+var u = require('../script-modules/utils');
 /** @type {Object.<string, StatObj>} */
 var stat = {};
+var glsl_shaders = commands.change_list('glsl-shaders');
 
 /**
- * @param {string} name
+ * @param {string} profile
  */
-function apply_profile(name) {
-  if (!name) {
+function apply_profile(profile) {
+  if (!profile) {
     return;
   }
-  mp.command_native(['apply-profile', name]);
+  commands.apply_profile(profile);
 }
 
 /**
- * @param {string} name
+ * @param {string} profile
  */
-function restore_profile(name) {
-  if (!name) {
+function restore_profile(profile) {
+  if (!profile) {
     return;
   }
-  mp.command_native(['apply-profile', name, 'restore']);
+  commands.restore_profile(profile);
 }
 
 /**
- * @param {string} path
+ * @param {string} paths
+ * @returns {string[]}
  */
-function append_shader(path) {
-  mp.command_native(['change-list', 'glsl-shaders', 'append', path]);
-}
-
-/**
- * @param {string} path
- */
-function remove_shader(path) {
-  mp.command_native(['change-list', 'glsl-shaders', 'remove', path]);
+function paths2shaders(paths) {
+  return paths.split(';').filter(function (v) { return v.trim() !== '' });
 }
 
 function install_shaders(identifier, display_name, shaders, profile) {
-  for (var i = 0; i < shaders.length; i++) {
-    append_shader(shaders[i]);
-  }
+  shaders.forEach(glsl_shaders.append);
   apply_profile(profile);
   stat[identifier] = {
     'shaders': shaders,
@@ -72,13 +65,11 @@ function install_shaders(identifier, display_name, shaders, profile) {
  */
 function uninstall_shaders(identifier) {
   var obj = stat[identifier];
-  if (utils.empty(obj)) {
+  if (u.empty(obj)) {
     return;
   }
   var loaded_shaders = obj.shaders;
-  for (var i = 0; i < loaded_shaders.length; i++) {
-    remove_shader(loaded_shaders[i]);
-  }
+  loaded_shaders.forEach(glsl_shaders.remove);
   restore_profile(obj.profile);
   stat[identifier] = null;
 }
@@ -91,62 +82,38 @@ function uninstall_shaders(identifier) {
  */
 function smart_shaders_handler(identifier, display_name, paths, profile) {
   if (identifier === '<clear>') {
-    for (var key in stat) {
-      var obj = stat[key];
-      smart_shaders_handler(key, obj.display_name, obj.shaders.join(delimiter), obj.profile);
-    }
+    Object.keys(stat).forEach(uninstall_shaders);
     mp.osd_message('所有着色器已卸载', 2);
     return;
   }
 
-  if (utils.empty(identifier)) {
+  if (u.empty(identifier)) {
     msg.error('empty identifier');
     return;
   }
-  if (utils.empty(display_name)) {
+  if (u.empty(display_name)) {
     msg.error('empty display name');
     return;
   }
 
-  if (utils.empty(paths)) {
+  if (u.empty(paths)) {
     msg.error('empty shaders');
     return;
   }
 
-  var shaders = (function () {
-    var results = [];
-    var s = paths.split(delimiter);
-    for (var i = 0; i < s.length; i++) {
-      var path = s[i].trim();
-      if (!utils.empty(path)) {
-        results.push(path);
-      }
-    }
-    return results;
-  })();
+  var shaders = paths2shaders(paths).sort();
 
-  if (utils.empty(shaders)) {
+  if (shaders.length === 0) {
     msg.error('empty shaders');
     return;
   }
 
-  if (stat[identifier]) {
-    var obj = stat[identifier];
-    var loaded_shaders = obj.shaders;
-    var is_equal = shaders.length === loaded_shaders.length;
-    if (is_equal) {
-      for (var i = 0; i < loaded_shaders.length; i++) {
-        var loaded_shader = loaded_shaders[i];
-        var shader = shaders[i];
-        if (is_equal && shader !== loaded_shader) {
-          is_equal = false;
-          break;
-        }
-      }
-    }
+  var loaded_obj = stat[identifier];
+  if (loaded_obj) {
     uninstall_shaders(identifier);
-    mp.osd_message(obj.display_name + ' 着色器已卸载', 2);
-    if (is_equal) {
+    mp.osd_message(loaded_obj.display_name + ' 着色器已卸载', 2);
+    var equal = shaders.join('|') === loaded_obj.shaders.join('|');
+    if (equal) {
       return;
     }
   }

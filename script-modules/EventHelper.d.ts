@@ -1,1 +1,1 @@
-export function once(event: string, handler: ({[string]: unknown})): void;
+export function once(event: string, handler: ({[key: string]: unknown})): void;

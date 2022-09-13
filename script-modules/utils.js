@@ -2,6 +2,10 @@
 
 var utils = mp.utils;
 
+function arguments2array(args) {
+    return Array.prototype.slice.call(args).filter(function (v) { return v !== undefined });
+}
+
 function default_value (value, default_value) {
     return value === undefined ? default_value : value;
 }
@@ -29,20 +33,16 @@ function read_file_lines(file, ignore_comments) {
     if (typeof data !== 'string') {
         return undefined;
     }
-    var results = [];
     var lines = data.replace('\r', '').split('\n');
-    for (var i = 0; i < lines.length; i++) {
-        var line = lines[i].trim();
-        var startChar = line.substring(0, 1);
-        if (line === '' || (startChar === '#' && ic)) {
-            continue;
-        }
-        results.push(line);
-    }
+    var results = lines.filter(function (v) {
+        var line = v.trim();
+        return line !== '' && !(line.indexOf('#') === 0 && ic);
+    });
     return results;
 }
 
 module.exports = {
+    arguments2array: arguments2array,
     default_value: default_value,
     empty: empty,
     read_file_lines: read_file_lines,
