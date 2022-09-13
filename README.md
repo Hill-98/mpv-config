@@ -25,7 +25,7 @@ git submodule update
 
 默认使用 UOSC 作为播放控制界面，有右键菜单。
 
-默认启用 `gpu-hq-max` 配置文件，继承于 `gpu-hq`，但启用了最佳缩放算法，并且加载了 `KrigBilateral` 和 `SSimSuperRes` 着色器，可以使用快捷键 `~` 回退到 `gpu-hq`。
+默认启用 `gpu-hq-max` 配置文件，继承于 `gpu-hq`，但启用了最佳缩放算法、关闭去带和加载了 `KrigBilateral` 和 `SSimSuperRes` 着色器，可以使用快捷键 `~` 回退到 `gpu-hq`。
 
 **默认启用功能：**
 * 自动检测 icc 配置文件
