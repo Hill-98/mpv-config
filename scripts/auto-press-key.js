@@ -8,6 +8,7 @@
 
 var msg = mp.msg;
 var utils = mp.utils;
+var u = require('../script-modules/utils');
 var pressed_keys = [];
 
 /**
@@ -32,41 +33,23 @@ function press_keys(keys) {
     }
 }
 
-/**
- * @param {string} path
- * @returns {string[]}
- */
-function resolve_keys_file(path) {
-    var info = utils.file_info(path);
-    if (typeof info !== 'object' || !info.is_file) {
-        return [];
-    }
-    var data = utils.read_file(path);
-    if (typeof data !== 'string') {
-        return [];
-    }
-    var results = [];
-    var keys = data.split('\n');
-    for (var i = 0; i < keys.length; i++) {
-        var key = keys[i].trim();
-        var startChar = key.substring(0, 1);
-        if (key === '' || startChar === '#') {
-            continue;
-        }
-        results.push(key);
-    }
-    return results;
-}
-
 mp.register_event('start-file', function () {
     var path = mp.get_property_native('path');
     var paths = utils.split_path(path);
     var dir = paths[0];
     var filename = paths[1];
-    var common_keys = resolve_keys_file(utils.join_path(dir, 'mpv.keys'));
-    press_keys(common_keys);
-    var specific_keys = resolve_keys_file(utils.join_path(dir, filename + '.mpv.keys'));
-    press_keys(specific_keys);
+    var files = [
+        utils.join_path(dir, filename + '.mpv.keys'),
+        utils.join_path(dir, 'mpv.keys'),
+    ];
+    for (var i = 0; i < files.length; i++) {
+        var keys = u.read_file_lines(files[i]);
+        if (keys === undefined || keys.length === 0) {
+            continue;
+        }
+        press_keys(keys);
+        break;
+    }
 });
 
 mp.register_event('end-file', function () {
