@@ -19,3 +19,6 @@
 [submodule "git-modules/NVScaler"]
 	path = git-modules/NVScaler
 	url = https://gist.github.com/agyild/7e8951915b2bf24526a9343d951db214.git
+[submodule "git-modules/VideoPlayerCode-mpv-tools"]
+	path = git-modules/VideoPlayerCode-mpv-tools
+	url = https://github.com/VideoPlayerCode/mpv-tools.git
