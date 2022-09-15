@@ -25,11 +25,14 @@ git submodule update
 
 **控制界面**: [UOSC](https://github.com/tomasklaen/uosc) (有右键菜单)
 
-**渲染配置**：
+**默认渲染配置 (gpu-hq-max)**：
 * `gpu-hq`
-* 关闭去带
 * `scale`, `dscale` = `ewa_lanczossharp`
-* [`KrigBilateral`](gist.github.com/igv/a015fc885d5c22e6891820ad89555637) 和 [`SSimSuperRes`](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b) 着色器。
+* 去带: 关闭
+* 着色器: [`KrigBilateral`](gist.github.com/igv/a015fc885d5c22e6891820ad89555637), [`SSimSuperRes`](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b)
+* 垂直同步 (`tscale=oversample`)
+
+> 可以使用快捷键 `~` 回退到 `gpu-hq`，然后还可以使用快捷键 ``Alt+` `` 回退到 `default` ()。
 
 **默认配置：**
 * 特定于文件的配置文件
