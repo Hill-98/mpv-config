@@ -3,15 +3,15 @@
  */
 
 /**
- * @typedef {Object} StatObj
+ * @typedef {Object} StateObj
  * @property {string} idle
  * @property {boolean} idle_changed
  */
 
 'use strict';
 
-/** @type {StatObj} */
-var stat = {
+/** @type {StateObj} */
+var state = {
     idle: mp.get_property_native('idle'),
     idle_changed: false,
 };
@@ -21,7 +21,7 @@ var stat = {
  * @param {string} value
  */
 function observe_idle(name, value) {
-    stat.idle = value;
+    state.idle = value;
 }
 
 /**
@@ -36,10 +36,10 @@ function set_idle(value) {
 }
 
 mp.add_hook('on_unload', 50, function () {
-    if (!stat.idle_changed) {
-        set_idle(stat.idle);
+    if (!state.idle_changed) {
+        set_idle(state.idle);
     }
-    stat.idle_changed = false;
+    state.idle_changed = false;
 });
 
 mp.add_hook('on_load_fail', 50, function () {
@@ -47,7 +47,7 @@ mp.add_hook('on_load_fail', 50, function () {
         return;
     }
     set_idle('yes');
-    stat.idle_changed = true;
+    state.idle_changed = true;
 });
 
 mp.observe_property('idle', 'native', observe_idle);
