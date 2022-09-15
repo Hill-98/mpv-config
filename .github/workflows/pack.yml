@@ -1,0 +1,23 @@
+name: Pack
+on: [push, pull_request]
+jobs:
+  pack-zip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install zip
+        run: apt -y install zip unzip
+      - name: Pack to zip
+        run: |
+          cd $GITHUB_WORKSPACE/..
+          zip -9 -r -v $RUNNER_TEMP/mpv-config.zip mpv-config
+          zip -d -v $RUNNER_TEMP/mpv-config.zip \*.git\* mpv-config/git-modules\*
+          unzip -d $RUNNER_TEMP $RUNNER_TEMP/mpv-config.zip
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: mpv-config
+          path: ${{ runner.temp }}/mpv-config
