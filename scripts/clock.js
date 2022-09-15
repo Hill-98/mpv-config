@@ -3,15 +3,24 @@
  * script-binding clock
  */
 
+/**
+ * @typedef {Object} StateObj
+ * @property {boolean} showing
+ * @property {number|null} timer
+ * @property {number|null} timeout_timer
+ */
+
 'use strict';
 
 var osd = mp.create_osd_overlay('ass-events');
-/** @type {number|null} */
-var timer = null;
-/** @type {number|null} */
-var timeoutTimer = null;
 var options = {
     timeout: 5000,
+};
+/** @type {StateObj} */
+var state = {
+    showing: false,
+    timer: null,
+    timeout_timer: null,
 };
 
 mp.options.read_options(options, 'clock');
@@ -28,7 +37,7 @@ function fill0(value, count) {
     for (var i = 0; i < total; i++) {
         zeros += '0';
     }
-    return zeros.concat(str);
+    return zeros + str;
 }
 
 /**
@@ -39,24 +48,28 @@ function getTime() {
     return fill0(date.getHours()) + ':' + fill0(date.getMinutes()) + ':' + fill0(date.getSeconds());
 }
 
-function destroy_clock() {
-    clearInterval(timer);
+function hide_clock() {
     osd.remove();
-    timer = null;
+    state.showing = false;
 }
 
 function show_clock() {
     osd.data = '{\\a7}' + getTime();
     osd.update();
+    state.showing = true;
 }
 
 mp.add_key_binding(null, 'clock', function () {
-    if (timer) {
-        clearTimeout(timeoutTimer);
-        destroy_clock();
+    if (state.showing) {
+        clearInterval(state.timer);
+        clearTimeout(state.timeout_timer);
+        hide_clock();
         return;
     }
     show_clock();
-    timer = setInterval(show_clock, 300);
-    timeoutTimer = setTimeout(destroy_clock, options.timeout);
+    state.timer = setInterval(show_clock, 300);
+    state.timeout_timer = setTimeout(function () {
+        clearInterval(state.timer);
+        hide_clock();
+    }, options.timeout);
 });
