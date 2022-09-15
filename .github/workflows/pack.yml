@@ -9,7 +9,7 @@ jobs:
         with:
           submodules: true
       - name: Install zip
-        run: apt -y install zip unzip
+        run: sudo apt -y install zip unzip
       - name: Pack to zip
         run: |
           cd $GITHUB_WORKSPACE/..
