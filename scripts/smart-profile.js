@@ -72,7 +72,11 @@ function smart_profile_handler(profile, display_name, restored_message) {
         restored: u.default_value(restored_message, name + ' 配置文件已还原'),
     };
     var state = switch_profile_state(profile);
-    mp.osd_message(state ? messages.loaded : messages.restored);
+    /** @type {string} */
+    var message = state ? messages.loaded : messages.restored;
+    if (message.trim() !== '') {
+        mp.osd_message(message);
+    }
 }
 
 mp.register_script_message('apply-profile', apply_profile_handler);
