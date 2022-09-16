@@ -1,4 +1,5 @@
 using namespace Microsoft.Win32
+using namespace System.Diagnostics
 using namespace System.IO
 using namespace System.Text
 using namespace System.Windows
@@ -44,22 +45,9 @@ function AddProgramID([string]$Identifier, [string]$Name, [string]$Icon, [string
     @{ ContentType = "application/vnd.apple.mpegurl"; Ext = "m3u8"; OpenWith = $PLAYLIST_IDENTIFIER; PerceivedType = "text" },
     @{ ContentType = "application/vnd.apple.mpegurl"; Ext = "vlc"; OpenWith = $PLAYLIST_IDENTIFIER; PerceivedType = "text" }
 )
-
 [array]$PROTOCOLS = @(
     @{ Prefix = "webplay"; OpenWith = $WEBPLAY_IDENTIFIER }
 )
-
-$BASE64_TEXT = @{
-    A = "0GM6eQ=="; # prompt box title
-    B = "8l1+YjBSIABtAHAAdgA6ACAAJQBtAHAAdgAlAAoAL2YmVACXgYlLYqhSCZDpYiAAbQBwAHYALgBlAHgAZQAgAO+NhF8f/w=="; # found mpv
-    C = "Kmd+YjBSIABtAHAAdgAuAGUAeABlAAz/94tLYqhSCZDpYiAAbQBwAHYALgBlAHgAZQAgAO+NhF8CMA==" # not found mpv
-    D = "YE/zYOqBmltJTiAAbQBwAHYAIACEdn1U5E5MiMJTcGUXVB//"; # ask custom mpv cmd arg
-    E = "KFcLTrllk49lUeqBmltJTiAAbQBwAHYAIAB9VOROTIjCU3Bl";  # custom mpv cmd arg prompt
-    F = "6oGaW0lOIABtAHAAdgAgAH1U5E5MiMJTcGU="; # custom mpv cmd arg title
-    G = "oWwJZwmQ6WIgAG0AcAB2AC4AZQB4AGUADP/IfmJrTZFufwIw"; # no mpv.exe selected
-    Z = "xomRmIxUrWQ+ZRdSaIiHZfZO8l1zUVSAMFIgAG0AcAB2AA=="; # done
-}
-$TEXT = @{}
 
 [string]$MPV_CONFIG_DIR = [Path]::GetDirectoryName($PSScriptRoot)
 [string]$mpv = ""
@@ -72,47 +60,38 @@ $topWindow.Width = 0
 $topWindow.WindowStyle = [WindowStyle]::None
 $topWindow.Show()
 
-foreach ($key in $BASE64_TEXT.Keys) {
-    $TEXT.Add($key, [Encoding]::Unicode.GetString([Convert]::FromBase64String($BASE64_TEXT.$key)))
-}
-
-if (![File]::Exists("$MPV_CONFIG_DIR\mpv.conf")) {
-    Write-Output "Create symbolic link: $MPV_CONFIG_DIR\mpv.conf -> $MPV_CONFIG_DIR\windows.conf"
-    Start-Process -FilePath cmd.exe -ArgumentList @("/c", "mklink", "$MPV_CONFIG_DIR\mpv.conf", "windows.conf") -Verb runas
-    if (!$?) {
-        exit 1
-    }
-}
+$Env:Path += ";$MPV_CONFIG_DIR;" + [Path]::GetDirectoryName($MPV_CONFIG_DIR)
 
 try {
     $mpv = (Get-Command -CommandType Application mpv.exe -ErrorAction Stop).Source
-    if ([MessageBox]::Show($TEXT.B.Replace("%mpv%", $mpv), $TEXT.A, [MessageBoxButton]::YesNo, [MessageBoxImage]::Question) -eq [MessageBoxResult]::Yes) {
+    if ([MessageBox]::Show("已找到 mpv.exe: $mpv`n是否需要手动选择其他 mpv.exe？", "提示", [MessageBoxButton]::YesNo, [MessageBoxImage]::Question) -eq [MessageBoxResult]::Yes) {
         $mpv = ""
     }
 }
 catch {
-    [MessageBox]::Show($TEXT.C, $TEXT.A, [MessageBoxButton]::OK, [MessageBoxImage]::Warning)
+    [MessageBox]::Show("未找到 mpv.exe，请手动选择。", "提示", [MessageBoxButton]::OK, [MessageBoxImage]::Warning) | Out-Null
 }
 
 if ([string]::IsNullOrEmpty($mpv)) {
     $selector = New-Object OpenFileDialog
     $selector.FileName = "mpv.exe"
     $selector.Filter = "mpv.exe|mpv.exe"
+    $selector.Title = "选择"
     if ($selector.ShowDialog()) {
         $mpv = $selector.FileName
     }
     else {
-        [MessageBox]::Show($TEXT.G, $TEXT.A, [MessageBoxButton]::OK, [MessageBoxImage]::Warning) | Out-Null
+        [MessageBox]::Show("没有选择 mpv.exe，终止配置。", "提示", [MessageBoxButton]::OK, [MessageBoxImage]::Warning) | Out-Null
         exit 2
     }
 }
 
 [string]$mpvArg = ""
-if ([MessageBox]::Show($TEXT.D, $TEXT.A, [MessageBoxButton]::YesNo, [MessageBoxImage]::Question) -eq [MessageBoxResult]::Yes) {
-    $mpvArg = [Microsoft.VisualBasic.Interaction]::InputBox($TEXT.E, $TEXT.F, "", 100, 100)
+if ([MessageBox]::Show("你想自定义 mpv 的命令行参数吗？（仅限高级用户）", "提示", [MessageBoxButton]::YesNo, [MessageBoxImage]::Question) -eq [MessageBoxResult]::Yes) {
+    $mpvArg = [Microsoft.VisualBasic.Interaction]::InputBox("在下方输入自定义 mpv 命令行参数", "自定义 mpv 命令行参数", "", 100, 100)
 }
-$mpvArg = ($mpvArg.Trim() + " --config-dir=""$MPV_CONFIG_DIR""").Trim()
-[string]$mpvVideoCommand = """$mpv"" $mpvArg ""%1"""
+$mpvArg = "$($mpvArg.Trim()) --config-dir=""$MPV_CONFIG_DIR""".Trim()
+[string]$mpvVideoCommand = """$mpv"" $mpvArg -- ""%1"""
 [string]$mpvPlaylistCommand = """$mpv"" $mpvArg --playlist=""%1"""
 [string]$mpvWebCommand = """$mpv"" $mpvArg -- ""%1"""
 
@@ -121,20 +100,32 @@ Write-Output "mpv config dir: $MPV_CONFIG_DIR"
 Write-Output "mpv arg: $mpvArg"
 Write-Output ""
 
-[string]$mpvAppDataDir = [Environment]::ExpandEnvironmentVariables("%APPDATA%\mpv")
-if ([Directory]::Exists($mpvAppDataDir)) {
-    [FileInfo]$fileInfo = New-Object -TypeName FileInfo -ArgumentList $mpvAppDataDir
-    if ($fileInfo.Attributes.HasFlag([FileAttributes]::ReparsePoint) -or (Get-ChildItem -Path $mpvAppDataDir).Count -eq 0) {
-        [Directory]::Delete($mpvAppDataDir, $true)
+[FileInfo]$mpvConf = New-Object -TypeName FileInfo -ArgumentList @([Path]::Combine($MPV_CONFIG_DIR, "mpv.conf"))
+if ($mpvConf.Exists -and $mpvConf.Attributes.HasFlag([FileAttributes]::ReparsePoint)) {
+    $mpvConf.Delete()
+}
+
+if (![File]::Exists($mpvConf.FullName)) {
+    Write-Output "Create symbolic link: $($mpvConf.FullName) -> $([Path]::Combine($mpvConf.DirectoryName, "windows.conf"))"
+    [Process]$process = Start-Process -FilePath cmd.exe -ArgumentList @("/c", "mklink", $mpvConf.FullName, "windows.conf") -PassThru -Verb runas -Wait
+    if ($process.ExitCode -ne 0) {
+        [MessageBox]::Show("创建 mpv.conf 符号链接失败。", "错误", [MessageBoxButton]::OK, [MessageBoxImage]::Error) | Out-Null
+        exit 1
+    }
+}
+
+[FileInfo]$mpvAppDataDir = New-Object -TypeName FileInfo -ArgumentList @([Environment]::ExpandEnvironmentVariables("%APPDATA%\mpv"))
+if ($mpvAppDataDir.Exists) {
+    if ($mpvAppDataDir.Attributes.HasFlag([FileAttributes]::ReparsePoint) -or (Get-ChildItem -Path $mpvAppDataDir.FullName).Count -eq 0) {
+        $mpvAppDataDir.Delete();
     }
     else {
-        Write-Output "Backup mpv appdata dir: $mpvAppDataDir -> $mpvAppDataDir.bak"
-        [Directory]::Move($mpvAppDataDir, "$mpvAppDataDir.bak")
+        Write-Output "Backup mpv appdata dir: $($mpvAppDataDir.FullName) -> $($mpvAppDataDir.FullName).bak"
+        $mpvAppDataDir.MoveTo("$($mpvAppDataDir.FullName).bak");
     }
-
 }
-Write-Output "Create symbolic link: $mpvAppDataDir -> $MPV_CONFIG_DIR"
-Start-Process -FilePath cmd.exe -ArgumentList @("/c", "mklink", "/D", "/J", $mpvAppDataDir, $MPV_CONFIG_DIR) -Verb runas
+Write-Output "Create symbolic link: $($mpvAppDataDir.FullName) -> $MPV_CONFIG_DIR"
+Start-Process -FilePath cmd.exe -ArgumentList @("/c", "mklink", "/D", "/J", $mpvAppDataDir.FullName, $MPV_CONFIG_DIR) -Verb runas -Wait
 Write-Output ""
 
 AddProgramID -Identifier $VIDEO_IDENTIFIER -Name $APP_NAME -Icon "$MPV_CONFIG_DIR\setup\icons\video.ico" -OpenCmd $mpvVideoCommand
@@ -175,7 +166,7 @@ Write-Output ""
 Write-Output "Done!"
 
 $topWindow.Activate() | Out-Null
-[MessageBox]::Show($TEXT.Z, $TEXT.A, [MessageBoxButton]::OK, [MessageBoxImage]::Information) | Out-Null
+[MessageBox]::Show("视频和播放列表文件已关联到 mpv", "提示", [MessageBoxButton]::OK, [MessageBoxImage]::Information) | Out-Null
 $topWindow.Close()
 
 Start-Process -FilePath ms-settings:defaultapps
