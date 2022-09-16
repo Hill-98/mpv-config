@@ -1,5 +1,7 @@
 .DS_Store
 /mpv.conf
+/mpv.conf.bak
+/local.conf
 /input.local.conf
 /profiles.local
 /TODO

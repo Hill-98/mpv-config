@@ -100,32 +100,34 @@ Write-Output "mpv config dir: $MPV_CONFIG_DIR"
 Write-Output "mpv arg: $mpvArg"
 Write-Output ""
 
-[FileInfo]$mpvConf = New-Object -TypeName FileInfo -ArgumentList @([Path]::Combine($MPV_CONFIG_DIR, "mpv.conf"))
-if ($mpvConf.Exists -and $mpvConf.Attributes.HasFlag([FileAttributes]::ReparsePoint)) {
-    $mpvConf.Delete()
+[string]$mpvConf = [Path]::Combine($MPV_CONFIG_DIR, "mpv.conf")
+[string]$localConf = [Path]::Combine($MPV_CONFIG_DIR, "local.conf")
+if ([File]::Exists($mpvConf)) {
+    [File]::Delete($mpvConf)
 }
-
-if (![File]::Exists($mpvConf.FullName)) {
-    Write-Output "Create symbolic link: $($mpvConf.FullName) -> $([Path]::Combine($mpvConf.DirectoryName, "windows.conf"))"
-    [Process]$process = Start-Process -FilePath cmd.exe -ArgumentList @("/c", "mklink", $mpvConf.FullName, "windows.conf") -PassThru -Verb runas -Wait
-    if ($process.ExitCode -ne 0) {
-        [MessageBox]::Show("创建 mpv.conf 符号链接失败。", "错误", [MessageBoxButton]::OK, [MessageBoxImage]::Error) | Out-Null
-        exit 1
-    }
+if (![File]::Exists($localConf)) {
+    [File]::Create($localConf) | Out-Null
 }
+[File]::WriteAllText($mpvConf, @'
+include="~~/common.conf"
+include="~~/windows.conf"
+include="~~/local.conf"
+'@);
 
-[FileInfo]$mpvAppDataDir = New-Object -TypeName FileInfo -ArgumentList @([Environment]::ExpandEnvironmentVariables("%APPDATA%\mpv"))
-if ($mpvAppDataDir.Exists) {
-    if ($mpvAppDataDir.Attributes.HasFlag([FileAttributes]::ReparsePoint) -or (Get-ChildItem -Path $mpvAppDataDir.FullName).Count -eq 0) {
-        $mpvAppDataDir.Delete();
+[string]$mpvAppDataDir = [Environment]::ExpandEnvironmentVariables("%APPDATA%\mpv")
+if ([Directory]::Exists($mpvAppDataDir)) {
+    [FileInfo]$mpvAppDataDirInfo = New-Object -TypeName FileInfo -ArgumentList $mpvAppDataDir
+    if ($mpvAppDataDirInfo.Attributes.HasFlag([FileAttributes]::ReparsePoint) -or (Get-ChildItem -Path $mpvAppDataDir).Count -eq 0) {
+        [Directory]::Delete($mpvAppDataDir)
     }
     else {
-        Write-Output "Backup mpv appdata dir: $($mpvAppDataDir.FullName) -> $($mpvAppDataDir.FullName).bak"
-        $mpvAppDataDir.MoveTo("$($mpvAppDataDir.FullName).bak");
+        [string]$mpvAppDataDirBackup = $mpvAppDataDir + ".bak." + [DateTime]::Now.ToString("yyyyMMddHHmmss")
+        Write-Output "Backup mpv appdata dir: $mpvAppDataDir -> $mpvAppDataDirBackup"
+        [Directory]::Move($mpvAppDataDir, $mpvAppDataDirBackup)
     }
 }
-Write-Output "Create symbolic link: $($mpvAppDataDir.FullName) -> $MPV_CONFIG_DIR"
-Start-Process -FilePath cmd.exe -ArgumentList @("/c", "mklink", "/D", "/J", $mpvAppDataDir.FullName, $MPV_CONFIG_DIR) -Verb runas -Wait
+Write-Output "Create symbolic link: $mpvAppDataDir -> $MPV_CONFIG_DIR"
+Start-Process -FilePath cmd.exe -ArgumentList @("/c", "mklink", "/D", "/J", $mpvAppDataDir, $MPV_CONFIG_DIR) -Verb runas -Wait
 Write-Output ""
 
 AddProgramID -Identifier $VIDEO_IDENTIFIER -Name $APP_NAME -Icon "$MPV_CONFIG_DIR\setup\icons\video.ico" -OpenCmd $mpvVideoCommand

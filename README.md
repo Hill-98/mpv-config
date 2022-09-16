@@ -7,10 +7,10 @@
 
 ### 安装
 
-0. 启用 Windows 开发人员模式和 Git 符号链接支持 (`git config --global --bool core.symlinks true`)
-1. 克隆存储库: `git clone --recursive https://github.com/Hill-98/mpv-config.git D:\mpv-config`
-2. 执行配置脚本: `powershell D:\mpv-config\setup\setup.ps1`
-3. 修复 git 符号链接错误: `powershell -Command "Remove-Item D:\mpv-config\shaders\ACNet -Recurse; Start-Process -FilePath cmd.exe -ArgumentList @('/c', 'mklink', '/D', 'D:\mpv-config\shaders\ACNet', '..\git-modules\ACNetGLSL\glsl') -Verb runas"`
+0. 启用 [Windows 开发人员模式](https://docs.microsoft.com/windows/apps/get-started/enable-your-device-for-development) 和 Git 符号链接支持 (`git config --global --bool core.symlinks true`)
+1. 克隆存储库: `git clone --recursive https://github.com/Hill-98/mpv-config.git mpv-config`
+2. 执行配置脚本: `powershell mpv-config\setup\setup.ps1`
+3. 修复 git 符号链接错误: `powershell mpv-config\setup\fix-symbolic-link.ps1`
 3. 打开 Windows 设置或控制面板设置文件关联。
 
 ### 更新
@@ -19,22 +19,24 @@
 git pull
 git submodule init
 git submodule update
+powershell setup\setup.ps1
+powershell setup\fix-symbolic-link.ps1
 ```
 
 ## 说明
 
-**控制界面**: [UOSC](https://github.com/tomasklaen/uosc) (有右键菜单)
+**控制界面:** [UOSC](https://github.com/tomasklaen/uosc) (有右键菜单)
 
-**默认渲染配置 (gpu-hq-max)**：
+**默认渲染配置 (gpu-hq-max):**
 * `gpu-hq`
 * `scale`, `dscale` = `ewa_lanczossharp`
 * 去带: 关闭
-* 着色器: [`KrigBilateral`](gist.github.com/igv/a015fc885d5c22e6891820ad89555637), [`SSimSuperRes`](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b)
+* 着色器: [`KrigBilateral`](https://gist.github.com/igv/a015fc885d5c22e6891820ad89555637), [`SSimSuperRes`](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b)
 * 垂直同步 (`tscale=oversample`)
 
-> 可以使用快捷键 `~` 回退到 `gpu-hq`，然后还可以使用快捷键 ``Alt+` `` 回退到 `default` ()。
+> 可以使用快捷键 `~` 回退到 `gpu-hq`，然后还可以使用快捷键 ``Alt+` `` 回退到 `default`。
 
-**默认配置：**
+**默认配置:**
 * 特定于文件的配置文件
 * 中文音频/字幕优先 (日文、英文其次)
 * 退出时保存对当前文件的部分配置
@@ -44,10 +46,32 @@ git submodule update
 * 增强的去带参数
 * 字幕字体：文泉驿微米黑
 
-**极速模式**: 卸载所有着色器、还原占用性能的配置文件、开启硬件解码。(适合低性能设备播放 4K60FPS 等视频文件时开启)
+> 如需自定义或覆盖默认配置，可以在配置目录创建 `local.conf` 文件，并在此文件编写配置项。
+
+**极速模式:** 卸载所有着色器、还原占用性能的配置文件、开启硬件解码。(适合低性能设备播放 4K60FPS 等视频文件时开启)
+
+**默认保存的文件设置:**
+```conf
+af 音频过滤器
+vf 视频过滤器
+aid 音频轨道
+sid 字幕轨道
+vid 视频轨道
+deband 去带
+panscan 平移和扫描
+speed 播放速度
+video-rotate 视频旋转
+video-sync 垂直同步
+video-zoom 视频缩放
+sub-delay 字幕延迟
+sub-font-size 字幕字体大小
+sub-pos 字幕位置
+```
+
+> 可以使用快捷键 `DEL` 删除当前文件保存的设置。
 
 **不完整快捷键列表：**
-```
+```conf
 BackSpace 重置播放速度
 Alt+= 增加字幕字体大小
 Alt+- 减小字幕字体大小
@@ -56,9 +80,9 @@ Alt+DOWN 字幕位置向下
 Alt+RIGHT 字幕延迟增加
 Alt+LEFT  字幕延迟减少
 Shift+RIGHT 快进 10 秒
-Shift+LEFT  倒退 10秒
+Shift+LEFT  倒退 10 秒
 PAGE DOWN 播放列表上一个
-PAGE UP 播放列表下一个
+PAGE UP   播放列表下一个
 [ 上一帧
 ] 下一帧
 < 减少播放速度
