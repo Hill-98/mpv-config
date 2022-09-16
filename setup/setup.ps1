@@ -93,7 +93,7 @@ if ([MessageBox]::Show("你想自定义 mpv 的命令行参数吗？（仅限高
 $mpvArg = "$($mpvArg.Trim()) --config-dir=""$MPV_CONFIG_DIR""".Trim()
 [string]$mpvVideoCommand = """$mpv"" $mpvArg -- ""%1"""
 [string]$mpvPlaylistCommand = """$mpv"" $mpvArg --playlist=""%1"""
-[string]$mpvWebCommand = """$mpv"" $mpvArg -- ""%1"""
+[string]$mpvWebVideoCommand = $mpvVideoCommand
 
 Write-Output "mpv.exe: $mpv"
 Write-Output "mpv config dir: $MPV_CONFIG_DIR"
@@ -130,7 +130,7 @@ Write-Output ""
 
 AddProgramID -Identifier $VIDEO_IDENTIFIER -Name $APP_NAME -Icon "$MPV_CONFIG_DIR\setup\icons\video.ico" -OpenCmd $mpvVideoCommand
 AddProgramID -Identifier $PLAYLIST_IDENTIFIER -Name $APP_NAME -Icon "$MPV_CONFIG_DIR\setup\icons\playlist.ico" -OpenCmd $mpvPlaylistCommand
-AddProgramID -Identifier $WEBPLAY_IDENTIFIER -Name $APP_NAME -Icon "" -OpenCmd $mpvWebCommand
+AddProgramID -Identifier $WEBPLAY_IDENTIFIER -Name $APP_NAME -Icon "" -OpenCmd $mpvWebVideoCommand
 
 [Registry]::CurrentUser.DeleteSubKeyTree($APP_REG_PATH, $false)
 [Registry]::CurrentUser.CreateSubKey($APP_CAP_REG_PATH, $true).SetValue("ApplicationName", $APP_NAME)
@@ -151,6 +151,12 @@ foreach ($fileType in $FILETYPES) {
 
 foreach ($protocol in $PROTOCOLS) {
     Write-Output "Register protocol: $($protocol.Prefix)"
+    [string]$command = [Registry]::CurrentUser.OpenSubKey("Software\Classes\$($protocol.OpenWith)\shell\open\command").GetValue($null);
+    [RegistryKey]$protocolReg = [Registry]::CurrentUser.CreateSubKey("Software\Classes\$($protocol.Prefix)", $true)
+    $protocolReg.SetValue($null, "URL:$($protocol.Prefix)")
+    $protocolReg.SetValue("URL Protocol", "")
+    $protocolReg.CreateSubKey("shell\open\command").SetValue($null, $command)
+    $protocolReg.Close()
     [Registry]::CurrentUser.CreateSubKey("$APP_CAP_REG_PATH\URLAssociations", $true).SetValue("$($protocol.Prefix)", $protocol.OpenWith)
 }
 
