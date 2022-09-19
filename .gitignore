@@ -1,4 +1,5 @@
 .DS_Store
+/.input.conf
 /mpv.conf
 /mpv.conf.bak
 /local.conf

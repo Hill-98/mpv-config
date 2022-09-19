@@ -23,12 +23,16 @@ function empty(value) {
     return false;
 }
 
-function read_file_lines(file, ignore_comments) {
-    var ic = default_value(ignore_comments, true);
+function file_exist(file) {
     var info = utils.file_info(file);
-    if (typeof info !== 'object' || !info.is_file) {
+    return typeof info === 'object' && info.is_file;
+}
+
+function read_file_lines(file, ignore_comments) {
+    if (!file_exist(file)) {
         return undefined;
     }
+    var ic = default_value(ignore_comments, true);
     var data = utils.read_file(file);
     if (typeof data !== 'string') {
         return undefined;
@@ -36,7 +40,7 @@ function read_file_lines(file, ignore_comments) {
     var lines = data.replace('\r', '').split('\n');
     var results = lines.filter(function (v) {
         var line = v.trim();
-        return line !== '' && !(line.indexOf('#') === 0 && ic);
+        return line !== '' && !(ic && line.indexOf('#') === 0);
     });
     return results;
 }
@@ -45,5 +49,6 @@ module.exports = {
     arguments2array: arguments2array,
     default_value: default_value,
     empty: empty,
+    file_exist: file_exist,
     read_file_lines: read_file_lines,
 };
