@@ -29,7 +29,7 @@ powershell setup\fix-symbolic-link.ps1
 
 **默认渲染配置 (gpu-hq-max):**
 * `gpu-hq`
-* `scale`, `dscale` = `ewa_lanczossharp`
+* `scale` = `ewa_lanczossharp`
 * 去带: 关闭
 * 着色器: [`KrigBilateral`](https://gist.github.com/igv/a015fc885d5c22e6891820ad89555637), [`SSimSuperRes`](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b)
 * 垂直同步 (`tscale=oversample`)
