@@ -87,6 +87,19 @@ function smart_shaders_handler(identifier, display_name, paths, profile) {
     return;
   }
 
+  if (identifier === '<show>') {
+    var keys = Object.keys(stat).filter(function (key) { return !u.empty(stat[key]); });
+    var text = '当前已加载的着色器 : %s%\n'.replace('%s%', keys.length);
+    keys.forEach(function (key) {
+      var obj = stat[key];
+      text += obj.display_name + ' <%k%> \n'.replace('%k%', key);
+    });
+    text += '(不包括配置文件预加载的着色器)\n';
+    text += '查看着色器详细信息: 打开统计信息然后按数字键 2';
+    mp.osd_message(text, 5);
+    return;
+  }
+
   if (u.empty(identifier)) {
     msg.error('empty identifier');
     return;
