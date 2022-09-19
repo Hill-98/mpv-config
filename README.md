@@ -59,6 +59,7 @@ sid 字幕轨道
 vid 视频轨道
 deband 去带
 panscan 平移和扫描
+pause 暂停状态
 speed 播放速度
 video-rotate 视频旋转
 video-sync 垂直同步
@@ -79,8 +80,8 @@ Alt+UP   字幕位置向上
 Alt+DOWN 字幕位置向下
 Alt+RIGHT 字幕延迟增加
 Alt+LEFT  字幕延迟减少
-Shift+RIGHT 快进 10 秒
-Shift+LEFT  倒退 10 秒
+Shift+RIGHT 快进 60 秒
+Shift+LEFT  倒退 60 秒
 PAGE DOWN 播放列表上一个
 PAGE UP   播放列表下一个
 [ 上一帧
@@ -104,7 +105,7 @@ t 显示系统时间
 v 开启/关闭 垂直同步 (默认开启)
 V 显示视频轨道列表
 Ctrl+c 切换自动裁剪黑边
-Ctrl+p 填充黑边使视频比例与屏幕比例相同 (解决 21:9 视频在小于 21:9 比例屏幕全屏播放时字幕位置偏高)
+Ctrl+p 填充黑边使视频比例与当前窗口比例相同 (解决视频比例大于屏幕比例时字幕位置偏高)
 ```
 
 ## 特色功能
