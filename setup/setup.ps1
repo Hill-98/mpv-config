@@ -102,11 +102,8 @@ Write-Output ""
 
 [string]$mpvConf = [Path]::Combine($MPV_CONFIG_DIR, "mpv.conf")
 [string]$localConf = [Path]::Combine($MPV_CONFIG_DIR, "local.conf")
-if ([File]::Exists($mpvConf)) {
-    [File]::Delete($mpvConf)
-}
 if (![File]::Exists($localConf)) {
-    [File]::Create($localConf) | Out-Null
+    [File]::WriteAllBytes($localConf, [Encoding]::UTF8.GetBytes("# 自定义配置文件`n")) | Out-Null
 }
 [File]::WriteAllText($mpvConf, @'
 include="~~/common.conf"
