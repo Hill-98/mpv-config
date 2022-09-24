@@ -1,1 +1,1 @@
-../git-modules/uosc/uosc.lua
+../git-modules/uosc/scripts/uosc.lua
