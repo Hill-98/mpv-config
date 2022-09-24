@@ -8,14 +8,19 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Install zip
-        run: sudo apt -y install zip unzip
+      - name: Install dependencies
+        run: sudo apt -y install findutils zip unzip
       - name: Pack to zip
         run: |
-          cd $GITHUB_WORKSPACE/..
-          zip -9 -r -v $RUNNER_TEMP/mpv-config.zip mpv-config
-          zip -d -v $RUNNER_TEMP/mpv-config.zip \*.git\* mpv-config/git-modules\*
-          unzip -d $RUNNER_TEMP $RUNNER_TEMP/mpv-config.zip
+          cd "$GITHUB_WORKSPACE/.."
+          zip -9 -r -v "$RUNNER_TEMP/mpv-config".zip mpv-config
+          zip -d -v "$RUNNER_TEMP/mpv-config.zip" \*.git\* mpv-config/git-modules\*
+          unzip -d "$RUNNER_TEMP" "$RUNNER_TEMP/mpv-config.zip"
+      - name: Create clean script
+        run: |
+          cd "$RUNNER_TEMP/mpv-config"
+          echo 'CD %~dp0' > clean.bat
+          find . -type f ! -path ./clean.bat | sed -e 's|^./|DEL |g' -e 's|/|\\|g' >> clean.bat
       - name: Upload
         uses: actions/upload-artifact@v3
         with:

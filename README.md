@@ -3,14 +3,16 @@
 
 ## 使用
 
+**Linux 使用方法: 如果你已经用 Linux 了，那么这应该难不倒你。**
+
 **以下为 Windows 使用方法**
 
 ### 安装
 
 0. 启用 [Windows 开发人员模式](https://docs.microsoft.com/windows/apps/get-started/enable-your-device-for-development) 和 Git 符号链接支持 (`git config --global --bool core.symlinks true`)
 1. 克隆存储库: `git clone --recursive https://github.com/Hill-98/mpv-config.git mpv-config`
-2. 执行配置脚本: `powershell mpv-config\setup\setup.ps1`
-3. 修复 git 符号链接错误: `powershell mpv-config\setup\fix-symbolic-link.ps1`
+2. 执行配置脚本: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\setup.ps1`
+3. 修复 git 符号链接错误: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\fix-symbolic-link.ps1`
 3. 打开 Windows 设置或控制面板设置文件关联。
 
 ### 更新
@@ -19,9 +21,14 @@
 git pull
 git submodule init
 git submodule update
-powershell setup\setup.ps1
-powershell setup\fix-symbolic-link.ps1
+powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
+powershell -ExecutionPolicy RemoteSigned setup\fix-symbolic-link.ps1
 ```
+
+### 备用安装方法
+1. 前往 GitHub Actions 下载最新打包版本: [https://github.com/Hill-98/mpv-config/actions](https://github.com/Hill-98/mpv-config/actions)
+2. 执行配置脚本: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\setup.ps1`
+3. 打开 Windows 设置或控制面板设置文件关联。
 
 ## 说明
 
