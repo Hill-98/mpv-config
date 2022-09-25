@@ -20,6 +20,19 @@ var options = {
 };
 mp.options.read_options(options, 'auto-load-fonts');
 
+/**
+ * @param {string} str
+ * @returns {string}
+ */
+function escape_xml(str) {
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 (function () {
     if (!options.enable) {
         return;
@@ -30,7 +43,7 @@ mp.options.read_options(options, 'auto-load-fonts');
         var fonts_dir = utils.join_path(spaths[0], 'fonts');
         var xml = '';
         if (u.dir_exist(spaths[0]) && u.dir_exist(fonts_dir)) {
-            xml = FONTCONFIG_DIR_XML.replace('%FONTS_DIR%', fonts_dir);
+            xml = FONTCONFIG_DIR_XML.replace('%FONTS_DIR%', escape_xml(fonts_dir));
             msg.info('Set fonts dir: ' + fonts_dir);
         }
         utils.write_file('file://' + fonts_conf, FONTCONFIG_XML.replace('%XML%', xml));
