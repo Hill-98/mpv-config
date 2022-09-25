@@ -53,6 +53,7 @@ powershell -ExecutionPolicy RemoteSigned setup\fix-symbolic-link.ps1
 * 垂直同步
 * 增强的去带参数
 * 字幕字体: 文泉驿微米黑
+* 字幕字体提供者: `fontconfig` (支持自动加载当前播放文件路径下 `fonts` 文件夹的字体文件，相关 BUG 见 mpv-player/mpv#10679)
 
 **极速模式:** 卸载所有着色器、还原占用性能的配置文件、开启硬件解码。(适合低性能设备播放 4K60FPS 等视频文件时开启)
 

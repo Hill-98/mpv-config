@@ -1,7 +1,10 @@
 .DS_Store
+/.fonts.conf
 /.input.conf
 /mpv.conf
 /mpv.conf.bak
+/fonts.conf
+/fonts.conf.d
 /local.conf
 /input.local.conf
 /profiles.local

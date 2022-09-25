@@ -102,9 +102,12 @@ Write-Output ""
 
 [string]$mpvConf = [Path]::Combine($MPV_CONFIG_DIR, "mpv.conf")
 [string]$localConf = [Path]::Combine($MPV_CONFIG_DIR, "local.conf")
+[string]$fontsConfData = [File]::ReadAllText([Path]::Combine($MPV_CONFIG_DIR, "fonts.windows.conf"))
+$fontsConfData = $fontsConfData.Replace("%CONFIG_DIR%", $MPV_CONFIG_DIR)
 if (![File]::Exists($localConf)) {
-    [File]::WriteAllBytes($localConf, [Encoding]::UTF8.GetBytes("# 自定义配置文件`n")) | Out-Null
+    [File]::WriteAllBytes($localConf, [Encoding]::UTF8.GetBytes("# 自定义配置文件`n"))
 }
+[File]::WriteAllBytes([Path]::Combine($MPV_CONFIG_DIR, "fonts.conf"), [Encoding]::UTF8.GetBytes($fontsConfData))
 [File]::WriteAllText($mpvConf, @'
 include="~~/common.conf"
 include="~~/windows.conf"
