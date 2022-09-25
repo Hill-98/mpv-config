@@ -33,23 +33,40 @@ function escape_xml(str) {
         .replace(/"/g, "&quot;");
 }
 
+/**
+ * @param {str} data
+ * @param {boolean} require_exist
+ */
+function write_fonts_conf(data, require_exist) {
+    var exist = u.file_exist(fonts_conf);
+    // 做一些检查，避免无用的重复写入。
+    if (require_exist && !exist) {
+        return;
+    }
+    if (exist && utils.read_file(fonts_conf) === data) {
+        return;
+    }
+    utils.write_file('file://' + fonts_conf, data);
+}
+
 (function () {
-    if (!options.enable) {
+    if (!options.enable || mp.get_property_native('sub-font-provider') !== 'fontconfig') {
         return;
     }
     mp.add_hook('on_load', 99, function () {
         var path = mp.get_property_native('path');
         var spaths = utils.split_path(path);
         var fonts_dir = utils.join_path(spaths[0], 'fonts');
-        var xml = '';
-        if (u.dir_exist(spaths[0]) && u.dir_exist(fonts_dir)) {
-            xml = FONTCONFIG_DIR_XML.replace('%FONTS_DIR%', escape_xml(fonts_dir));
-            msg.info('Set fonts dir: ' + fonts_dir);
+        if (!u.dir_exist(spaths[0]) || !u.dir_exist(fonts_dir)) {
+            return;
         }
-        utils.write_file('file://' + fonts_conf, FONTCONFIG_XML.replace('%XML%', xml));
+        var xml = FONTCONFIG_DIR_XML.replace('%FONTS_DIR%', escape_xml(fonts_dir));
+        xml = FONTCONFIG_XML.replace('%XML%', xml);
+        write_fonts_conf(xml);
+        msg.info('Set fonts dir: ' + fonts_dir);
     });
 
     mp.add_hook('on_unload', 99, function () {
-        utils.write_file('file://' + fonts_conf, FONTCONFIG_XML.replace('%XML%', ''));
+        write_fonts_conf(FONTCONFIG_XML.replace('%XML%', ''), true);
     });
 })();
