@@ -23,6 +23,11 @@ function empty(value) {
     return false;
 }
 
+function dir_exist(dir) {
+    var info = utils.file_info(dir);
+    return typeof info === 'object' && info.is_dir;
+}
+
 function file_exist(file) {
     var info = utils.file_info(file);
     return typeof info === 'object' && info.is_file;
@@ -49,6 +54,7 @@ module.exports = {
     arguments2array: arguments2array,
     default_value: default_value,
     empty: empty,
+    dir_exist: dir_exist,
     file_exist: file_exist,
     read_file_lines: read_file_lines,
 };
