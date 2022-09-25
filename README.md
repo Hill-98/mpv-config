@@ -1,5 +1,5 @@
 # MPV Config
-带有一些优化体验的自制脚本的 MPV 配置文件
+带有一些优化体验的自制脚本的 MPV 配置文件 ([特色功能](#特色功能))
 
 ## 使用
 
@@ -138,6 +138,18 @@ script-opts-append="custom-input-enable=yes"
 
 ## 特色功能
 
-### Auto Press Key
+### [Auto Load Fonts](scripts/auto-load-fonts.js)
 
-### WebPlay
+自动设置 fontconfig 以加载播放文件路径下 fonts 文件夹内的字体文件
+
+### [Auto Press Key](scripts/auto-press-key.js)
+
+如果播放文件目录存在 `mpv.keys` 或 `${filename}.mpv.keys`，则在文件加载后自动按下按键，文件结束时再次按下按键。
+
+`mpv.keys`: 每行一个按键，可以是组合键，以 `#` 开头的行会被忽略。
+
+### [WebPlay](scripts/webplay-handler.js)
+
+为 mpv 新增 `webplay` 协议，用于从浏览器调用 mpv 播放媒体。
+
+可以配合油猴脚本 [WebPlay for ytdl](https://greasyfork.org/zh-CN/scripts/451443) 使用。
