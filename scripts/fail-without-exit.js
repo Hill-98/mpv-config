@@ -1,18 +1,13 @@
 /**
- * 加载文件失败时不自动退出 mpv
- */
-
-/**
- * @typedef {Object} StateObj
- * @property {string} idle
- * @property {boolean} idle_changed
+ * 如果 idle=no，则文件加载失败时不自动退出。
  */
 
 'use strict';
 
-/** @type {StateObj} */
 var state = {
+    /** @type {boolean} */
     idle: mp.get_property_native('idle'),
+    /** @type {boolean} */
     idle_changed: false,
 };
 

@@ -3,23 +3,18 @@
  * script-binding clock
  */
 
-/**
- * @typedef {Object} StateObj
- * @property {boolean} showing
- * @property {number|null} timer
- * @property {number|null} timeout_timer
- */
-
 'use strict';
 
 var osd = mp.create_osd_overlay('ass-events');
 var options = {
     timeout: 5000,
 };
-/** @type {StateObj} */
 var state = {
+    /** @type {boolean} */
     showing: false,
+    /** @type {number|null} */
     timer: null,
+    /** @type {number|null} */
     timeout_timer: null,
 };
 
