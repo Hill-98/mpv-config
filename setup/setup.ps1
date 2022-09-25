@@ -1,6 +1,7 @@
 using namespace Microsoft.Win32
 using namespace System.Diagnostics
 using namespace System.IO
+using namespace System.Security
 using namespace System.Text
 using namespace System.Windows
 
@@ -103,7 +104,7 @@ Write-Output ""
 [string]$mpvConf = [Path]::Combine($MPV_CONFIG_DIR, "mpv.conf")
 [string]$localConf = [Path]::Combine($MPV_CONFIG_DIR, "local.conf")
 [string]$fontsConfData = [File]::ReadAllText([Path]::Combine($MPV_CONFIG_DIR, "fonts.windows.conf"))
-$fontsConfData = $fontsConfData.Replace("%CONFIG_DIR%", $MPV_CONFIG_DIR)
+$fontsConfData = $fontsConfData.Replace("%CONFIG_DIR%", [SecurityElement]::Escape($MPV_CONFIG_DIR))
 if (![File]::Exists($localConf)) {
     [File]::WriteAllBytes($localConf, [Encoding]::UTF8.GetBytes("# 自定义配置文件`n"))
 }
