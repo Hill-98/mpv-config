@@ -35,6 +35,7 @@ mp.add_hook('on_load', 40, function () {
     if (path.indexOf(PROTOCOL_PREFIX) !== 0) {
         return;
     }
+    var save_on_quit = mp.get_property_native('save-position-on-quit');
     mp.set_property_native('file-local-options/save-position-on-quit', false);
     var index = temp_urls.indexOf(path);
     var isTempUrl = index !== -1;
@@ -66,7 +67,7 @@ mp.add_hook('on_load', 40, function () {
     var title = params.title || referer || link;
     msg.info('Play: ' + (referer || link));
     mp.set_property_native('stream-open-filename', link);
-    mp.set_property_native('file-local-options/save-position-on-quit', true);
+    mp.set_property_native('file-local-options/save-position-on-quit', save_on_quit);
     mp.set_property_native('file-local-options/title', title);
 });
 

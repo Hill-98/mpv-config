@@ -1,6 +1,6 @@
 /**
  * 如果播放文件目录存在 mpv.keys 或 ${filename}.mpv.keys
- * 则在文件加载开始时自动按下按键，文件加载结束时再次按下按键。
+ * 则在文件加载后自动按下按键，文件结束时再次按下按键。
  * 主要用于配合 smart-shaders 实现着色器自动加载
  */
 
@@ -27,7 +27,10 @@ function press_keys(keys) {
     }
 }
 
-mp.register_event('start-file', function () {
+mp.register_event('file-loaded', function () {
+    if (mp.get_property_native('demuxer-via-network')) {
+        return;
+    }
     var path = mp.get_property_native('path');
     var paths = utils.split_path(path);
     var dir = paths[0];
