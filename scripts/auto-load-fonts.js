@@ -2,7 +2,7 @@
  * 自动设置 fontconfig 以加载播放文件路径下 fonts 文件夹内的字体文件
  *
  * 需要 sub-font-provider=fontconfig 和
- * fonts.conf 加入 <include ignore_missing="yes">%CONFIG_DIR%/.fonts.conf</include> 行。
+ * fonts.conf 添加 <include ignore_missing="yes">%CONFIG_DIR%/.fonts.conf</include> 行。
  */
 
 'use strict';
@@ -56,7 +56,7 @@ function write_fonts_conf(data, require_exist) {
     mp.add_hook('on_load', 99, function () {
         var path = mp.get_property_native('path');
         var spaths = utils.split_path(path);
-        var fonts_dir = utils.join_path(spaths[0], 'fonts');
+        var fonts_dir = u.absolute_path(utils.join_path(spaths[0], 'fonts'));
         if (!u.dir_exist(spaths[0]) || !u.dir_exist(fonts_dir)) {
             return;
         }

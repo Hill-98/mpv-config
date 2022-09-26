@@ -2,6 +2,13 @@
 
 var utils = mp.utils;
 
+function absolute_path(path) {
+    if (path.indexOf('/') === 0 || path.match(/^[A-Za-z]:/) !== null) {
+        return path;
+    }
+    return utils.join_path(mp.get_property_native('working-directory'), path);
+}
+
 function arguments2array(args) {
     return Array.prototype.slice.call(args).filter(function (v) { return v !== undefined });
 }
@@ -51,6 +58,7 @@ function read_file_lines(file, ignore_comments) {
 }
 
 module.exports = {
+    absolute_path: absolute_path,
     arguments2array: arguments2array,
     default_value: default_value,
     empty: empty,
