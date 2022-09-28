@@ -17,6 +17,29 @@ function default_value (value, default_value) {
     return value === undefined ? default_value : value;
 }
 
+function detect_os() {
+    var home = utils.getenv('USERPROFILE');
+    if (typeof home === 'string' && home.match(/^[A-Za-z]:/) !== null) {
+        return 'windows';
+    }
+    var process = mp.command_native({
+        name: 'subprocess',
+        capture_stdout: true,
+        playback_only: false,
+        args: ['uname'],
+    });
+    if (process.status === 0) {
+        var os = process.stdout;
+        if (os.indexOf('Linux') !== -1) {
+            return 'linux';
+        }
+        if (os.indexOf('Darwin') !== -1) {
+            return 'macos';
+        }
+    }
+    return undefined;
+}
+
 function empty(value) {
     if (value === undefined || value === null) {
         return true;
@@ -61,6 +84,7 @@ module.exports = {
     absolute_path: absolute_path,
     arguments2array: arguments2array,
     default_value: default_value,
+    detect_os: detect_os,
     empty: empty,
     dir_exist: dir_exist,
     file_exist: file_exist,

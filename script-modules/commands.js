@@ -4,6 +4,9 @@ var u = require('../script-modules/utils');
 
 function command_native() {
     var args = u.arguments2array(arguments);
+    if (args.length === 1 && typeof args[0] === 'object') {
+        return mp.command_native(args[0]);
+    }
     return mp.command_native(args);
 }
 
@@ -50,6 +53,17 @@ function restore_profile(profile) {
     return command_native('apply-profile', profile, 'restore');
 }
 
+function subprocess(args, options) {
+    var obj = JSON.parse(JSON.stringify(options || {
+        playback_only: false,
+        capture_stdout: true,
+        capture_stderr: true,
+    }));
+    obj.name = 'subprocess';
+    obj.args = args;
+    return command_native(obj);
+}
+
 module.exports = {
     apply_profile: apply_profile,
     change_list: change_list,
@@ -57,5 +71,6 @@ module.exports = {
     keypress: keypress,
     loadfile: loadfile,
     restore_profile: restore_profile,
+    subprocess: subprocess,
 };
 

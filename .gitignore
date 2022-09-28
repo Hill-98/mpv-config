@@ -1,4 +1,5 @@
 .DS_Store
+/.fonts
 /.fonts.conf
 /.input.conf
 /mpv.conf

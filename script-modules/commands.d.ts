@@ -16,6 +16,14 @@ interface ChangeList {
     toggle(item: any): null | undefined;
 }
 
+interface SubprocessResult {
+    status: number;
+    stdout: string;
+    stderr: string;
+    error_string: string;
+    killed_by_us: boolean;
+}
+
 export function apply_profile(profile: string): null | undefined;
 
 export function change_list(path: string): ChangeList;
@@ -27,3 +35,5 @@ export function keypress(key: string): null | undefined
 export function loadfile(file: string, mode?: 'replace' | 'append' | 'append-play', options?: {[key: string]: unknown}): null | undefined
 
 export function restore_profile(profile: string): null | undefined;
+
+export function subprocess(args: string[], options?: object): Readonly<SubprocessResult> | undefined
