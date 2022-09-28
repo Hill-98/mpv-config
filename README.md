@@ -9,11 +9,11 @@
 
 ### 安装
 
-0. 启用 [Windows 开发人员模式](https://docs.microsoft.com/windows/apps/get-started/enable-your-device-for-development) 和 Git 符号链接支持 (`git config --global --bool core.symlinks true`)
+0. 启用 [Windows 开发人员模式](https://docs.microsoft.com/windows/apps/get-started/enable-your-device-for-development)、[Git LFS](https://git-lfs.github.com/) 和 Git 符号链接支持 (`git config --global --bool core.symlinks true`)
 1. 克隆存储库: `git clone --recursive https://github.com/Hill-98/mpv-config.git mpv-config`
-2. 执行配置脚本: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\setup.ps1`
-3. 修复 git 符号链接错误: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\fix-symbolic-link.ps1`
-3. 打开 Windows 设置或控制面板设置文件关联。
+2. 修复 git 符号链接错误: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\fix-symbolic-link.ps1`
+3. 执行配置脚本: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\setup.ps1`
+4. 打开 Windows 设置或控制面板设置文件关联。
 
 ### 更新
 
@@ -21,8 +21,8 @@
 git pull
 git submodule init
 git submodule update
-powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 powershell -ExecutionPolicy RemoteSigned setup\fix-symbolic-link.ps1
+powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 ```
 
 ### 备用安装方法
@@ -46,14 +46,14 @@ powershell -ExecutionPolicy RemoteSigned setup\fix-symbolic-link.ps1
 **默认配置:**
 * 特定于文件的配置文件
 * 中文音频/字幕优先 (日文、英文其次)
-* 退出时保存对当前文件的部分配置
+* 退出时保存对当前文件的部分设置
 * 始终启用缓存 (1G)
 * 模糊匹配外部音频文件
 * 自动检测 icc 配置文件
 * 垂直同步
 * 增强的去带参数
 * 字幕字体: 文泉驿微米黑
-* 字幕字体提供者: `fontconfig` (支持自动加载当前播放文件路径下 `fonts` 文件夹的字体文件，相关 BUG 见 mpv-player/mpv#10679)
+* 字幕字体提供程序: `fontconfig` (支持自动加载当前播放文件路径下 `fonts` 文件夹的字体文件，详情见[特色功能](#auto-load-fonts)。)
 
 **极速模式:** 卸载所有着色器、还原占用性能的配置文件、开启硬件解码。(适合低性能设备播放 4K60FPS 等视频文件时开启)
 
@@ -125,7 +125,7 @@ Ctrl+p 填充黑边使视频比例与当前窗口比例相同 (解决视频比�
 如果你需要修改默认加载的预设配置文件 (profile)，可以在配置文件目录创建 `profiles.local`，语法可以参考 `profiles` 文件。
 
 如果你需要自定义快捷键，并且需要继承原有快捷键配置，可以按以下步骤进行操作:
-1. 在 `local.conf` 文件加入已下行:
+1. 在 `local.conf` 文件加入以下行:
 ```
 input-conf="~~/.input.conf"
 script-opts-append="custom-input-enable=yes"
@@ -142,6 +142,22 @@ script-opts-append="custom-input-enable=yes"
 ### [Auto Load Fonts](scripts/auto-load-fonts.js)
 
 自动设置 fontconfig 以加载播放文件路径下 fonts 文件夹内的字体文件
+
+由于 Windows 的 NTFS 分区路径字符编码不统一 (mpv-player/mpv#10679)，在某些分区上会遇到无法加载文件名包含非英文字符的字体文件，遇到此问题可以用以下几种方法解决：
+
+* 重新使用 Windows 内置的磁盘管理重新格式化分区
+* 将文件名包含非英文字符的字体文件重命名为只包含英文字符文件名。
+* 启用兼容模式
+
+**兼容模式:**
+
+兼容模式主要用于解决一些性能问题和 Windows 某些分区上的错误，脚本在兼容模式下加载字体文件时会将 `fonts` 目录复制到指定位置，然后使用新位置进行加载。默认位置为配置目录的 `.fonts` 目录，如果配置目录所在分区也存在兼容性问题，你还可以自定义兼容目录位置。
+
+启用方法: 在 `local.conf` 加入 `script-opts-append="auto-load-fonts-compatible_mode=yes"` 行。
+
+自定义兼容目录: 在 `local.conf` 加入 `script-opts-append="auto-load-fonts-compatible_dir=D:\fonts-cache" # 兼容目录设置为 D:\fonts-cache` 行。
+
+> 小提示：如果所有分区都不兼容又不想拆分现有分区，可以使用 [ImDisk](https://sourceforge.net/projects/imdisk-toolkit/) 等软件创建内存盘。
 
 ### [Auto Press Key](scripts/auto-press-key.js)
 
