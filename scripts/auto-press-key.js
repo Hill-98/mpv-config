@@ -16,15 +16,14 @@ var pressed_keys = [];
  * @param {string[]} keys
  */
 function press_keys(keys) {
-    for (var i = 0; i < keys.length; i++) {
-        var key = keys[i];
+    keys.forEach(function (key) {
         if (key.indexOf('!') === 0) {
             key = key.substring(1);
         } else {
             pressed_keys.push(key);
         }
         commands.keypress(key);
-    }
+    });
 }
 
 mp.register_event('file-loaded', function () {

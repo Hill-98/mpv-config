@@ -9,8 +9,8 @@
 
 'use strict';
 
-var FONTCONFIG_XML = '<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd"><fontconfig>%XML%</fontconfig>';
-var FONTCONFIG_DIR_XML = '<dir>%FONTS_DIR%</dir>';
+var FONTCONFIG_XML = '<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd"><fontconfig>%s</fontconfig>';
+var FONTCONFIG_DIR_XML = '<dir>%s</dir>';
 
 var msg = mp.msg;
 var utils = mp.utils;
@@ -64,7 +64,7 @@ function clear_fonts() {
     }
     var args = [];
     if (state.os === 'windows') {
-        args = powershell_command('Remove-Item -Path "%dir%" -Recurse'.replace('%dir%', state.compatible_fonts_dir));
+        args = powershell_command(u.string_format('Remove-Item -Path "%s" -Recurse', state.compatible_fonts_dir));
     } else {
         args = ['rm', '-r', state.compatible_fonts_dir];
     }
@@ -80,7 +80,7 @@ function copy_fonts(path) {
     var process = null;
     if (!u.dir_exist(options.compatible_dir)) {
         if (state.os === 'windows') {
-            args = powershell_command('New-Item -Path "%dir%" -ItemType Directory'.replace('%dir%', options.compatible_dir));
+            args = powershell_command(u.string_format('New-Item -Path "%s" -ItemType Directory', options.compatible_dir));
         } else {
             args = ['mkdir', '-p', options.compatible_dir];
         }
@@ -90,7 +90,7 @@ function copy_fonts(path) {
         }
     }
     if (state.os === 'windows') {
-        args = powershell_command('Copy-Item -Path "%src%" -Destination "%dest%" -Recurse'.replace('%src%', path).replace('%dest%', state.compatible_fonts_dir));
+        args = powershell_command(u.string_format('Copy-Item -Path "%s" -Destination "%s" -Recurse', path, state.compatible_fonts_dir));
     } else {
         args = ['cp', '-p', '-r', path, state.compatible_fonts_dir];
     }
@@ -145,19 +145,19 @@ function write_fonts_conf(data, require_exist) {
                 }
             }
         }
-        var xml = FONTCONFIG_DIR_XML.replace('%FONTS_DIR%', escape_xml(fonts_dir));
-        xml = FONTCONFIG_XML.replace('%XML%', xml);
+        var xml = u.string_format(FONTCONFIG_DIR_XML, escape_xml(fonts_dir));
+        xml = u.string_format(FONTCONFIG_XML, xml);
         write_fonts_conf(xml);
         msg.info(info);
     });
 
     mp.add_hook('on_unload', 99, function () {
-        write_fonts_conf(FONTCONFIG_XML.replace('%XML%', ''), true);
+        write_fonts_conf(u.string_format(FONTCONFIG_XML, ''), true);
     });
 
     mp.register_event('shutdown', function () {
-    if (options.compatible_mode) {
+        if (options.compatible_mode) {
             clear_fonts();
-    }
+        }
     });
 })();

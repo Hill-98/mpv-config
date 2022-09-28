@@ -13,3 +13,5 @@ export function dir_exist(dir: string): boolean;
 export function file_exist(file: string): boolean;
 
 export function read_file_lines(file: string, ignore_comments?: boolean): string[] | undefined;
+
+export function string_format(str: string, ...args: string[]): string;

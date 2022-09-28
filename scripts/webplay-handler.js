@@ -28,13 +28,13 @@ function parse_url(url) {
 
     var results = {};
     var params = url.replace(PROTOCOL_PREFIX, '').split('&').map(trim_map).filter(empty_filter);
-    for (var i = 0; i < params.length; i++) {
-        var strs = params[i].split('=').map(trim_map).filter(empty_filter);
+    params.forEach(function (p) {
+        var strs = p.split('=').map(trim_map).filter(empty_filter);
         if (strs.length != 2) {
-            continue;
+            return;
         }
         results[strs[0]] = decode(strs[1]);
-    }
+    });
     return results;
 }
 

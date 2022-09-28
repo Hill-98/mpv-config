@@ -1,8 +1,8 @@
 /**
  * 用法: script-message smart-shaders <identifier> <display_name> <shaders> [profile]
- * 
+ *
  * 方便切换具有相同功能的着色器集合
- *  
+ *
  * 加载/卸载 着色器集合并用标识符记录，如果标识符之前已被用于加载其他着色器，则先卸载已加载的着色器，如果着色器和已加载的一致，则卸载着色器。
  */
 
@@ -89,10 +89,10 @@ function smart_shaders_handler(identifier, display_name, paths, profile) {
 
   if (identifier === '<show>') {
     var keys = Object.keys(stat).filter(function (key) { return !u.empty(stat[key]); });
-    var text = '当前已加载的着色器 : %s%\n'.replace('%s%', keys.length);
+    var text = u.string_format('当前已加载的着色器 : %s\n', keys.length);
     keys.forEach(function (key) {
       var obj = stat[key];
-      text += obj.display_name + ' <%k%> \n'.replace('%k%', key);
+      text += obj.display_name + u.string_format(' <%s> \n', key);
     });
     text += '(不包括配置文件预加载的着色器)\n';
     text += '查看着色器详细信息: 打开统计信息然后按数字键 2';

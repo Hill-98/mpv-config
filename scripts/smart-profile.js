@@ -94,9 +94,7 @@ mp.register_script_message('smart-profile', smart_profile_handler);
         if (profiles === undefined) {
             continue;
         }
-        for (var k = 0; k < profiles.length; k++) {
-            apply_profile_handler(profiles[k]);
-        }
+        profiles.forEach(apply_profile_handler);
         break;
     }
 })();

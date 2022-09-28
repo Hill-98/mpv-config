@@ -5,12 +5,13 @@
 
 'use strict';
 
-var PROTOCOLS = [
-    'ytdl',
-];
-
 var msg = mp.msg;
 var HttpHeaders = require('../script-modules/HttpHeaders');
+
+var http_prefix_regex = new RegExp('^https?:\/\/');
+var protocols = [
+    'ytdl',
+].map(function (v) { return new RegExp('^' + v + ':(\/\/)?') });
 
 mp.add_hook('on_load', 99, function () {
     /** @type {string} */
@@ -18,10 +19,8 @@ mp.add_hook('on_load', 99, function () {
     if (url.indexOf('webplay:?') === 0) {
         url = mp.get_property_native('stream-open-filename');
     }
-    for (var i = 0; i < PROTOCOLS.length; i++) {
-        url = url.replace(new RegExp('^' + PROTOCOLS[i] + ':(\/\/)?'), '');
-    }
-    if (url.match(/^https?:\/\//) === null) {
+    protocols.forEach(function (regex) { return url = url.replace(regex, ''); })
+    if (!http_prefix_regex.test(url)) {
         return;
     }
     var http_headers = new HttpHeaders();
@@ -31,11 +30,11 @@ mp.add_hook('on_load', 99, function () {
         headers.push('origin: ' + matches[0]);
     }
     headers.push('referer: ' + url);
-    for (var i = 0; i < headers.length; i++) {
-        var header = HttpHeaders.parse(headers[i]);
+    headers.forEach(function (h) {
+        var header = HttpHeaders.parse(h);
         if (!HttpHeaders.global.has(header.name)) {
             msg.info('Add header: ' + header.original);
             http_headers.add(header.name, header.value);
         }
-    }
+    });
 });
