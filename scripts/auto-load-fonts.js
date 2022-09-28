@@ -22,20 +22,12 @@ var options = {
     compatible_dir: '~~/.fonts',
 };
 var state = {
-    compatible_fonts_dir: utils.join_path(options.compatible_dir, mp.get_script_name() + '-' + mp.get_property_native('pid')),
+    compatible_fonts_dir: '',
     fonts_conf: commands.expand_path('~~/.fonts.conf'),
     /** @type {string|null} */
     last_fonts_dir: null,
     os: u.detect_os(),
 };
-mp.options.read_options(options, 'auto-load-fonts', function () {
-    if (!options.compatible_mode) {
-        clear_fonts();
-        return;
-    }
-    options.compatible_dir = commands.expand_path(options.compatible_dir);
-    state.compatible_fonts_dir = utils.join_path(options.compatible_dir, mp.get_script_name() + '-' + mp.get_property_native('pid'));
-});
 
 /**
  * @param {string} command
@@ -98,6 +90,11 @@ function copy_fonts(path) {
     return process.status === 0;
 }
 
+function update_options() {
+    options.compatible_dir = commands.expand_path(options.compatible_dir);
+    state.compatible_fonts_dir = utils.join_path(options.compatible_dir, mp.get_script_name() + '-' + mp.get_property_native('pid'));
+}
+
 /**
  * @param {string} data
  * @param {boolean} require_exist
@@ -113,6 +110,15 @@ function write_fonts_conf(data, require_exist) {
     }
     utils.write_file('file://' + state.fonts_conf, data);
 }
+
+mp.options.read_options(options, 'auto-load-fonts', function () {
+    if (!options.compatible_mode) {
+        clear_fonts();
+        return;
+    }
+    update_options();
+});
+update_options();
 
 (function () {
     if (!options.enable || mp.get_property_native('sub-font-provider') !== 'fontconfig') {
