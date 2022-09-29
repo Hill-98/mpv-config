@@ -10,6 +10,20 @@ function command_native() {
     return mp.command_native(args);
 }
 
+function command_native_async() {
+    var args = u.arguments2array(arguments);
+    var callback = args.pop();
+    var result = undefined;
+    if (args.length === 1 && typeof args[0] === 'object') {
+        result = mp.command_native_async(args[0], callback);
+    } else {
+        result = mp.command_native_async(args, callback);
+    }
+    return {
+        abort: mp.abort_async_command.bind(result),
+    };
+}
+
 function apply_profile(profile) {
     return command_native('apply-profile', profile);
 }
@@ -64,6 +78,19 @@ function subprocess(args, options) {
     return command_native(obj);
 }
 
+function subprocess_async(args, options, callback) {
+    var cb = typeof callback === 'undefined' ? options : callback;
+    var opt = typeof callback === 'undefined' ? undefined : options;
+    var obj = JSON.parse(JSON.stringify(opt || {
+        playback_only: false,
+        capture_stdout: true,
+        capture_stderr: true,
+    }));
+    obj.name = 'subprocess';
+    obj.args = args;
+    return command_native_async(obj, cb);
+}
+
 module.exports = {
     apply_profile: apply_profile,
     change_list: change_list,
@@ -72,5 +99,6 @@ module.exports = {
     loadfile: loadfile,
     restore_profile: restore_profile,
     subprocess: subprocess,
+    subprocess_async: subprocess_async
 };
 

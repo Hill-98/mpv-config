@@ -137,11 +137,16 @@ script-opts-append="custom-input-enable=yes"
 3. 在 `input.local.conf` 文件设置新的快捷键
 4. 每次更改文件后，启动 mpv 并退出，新的快捷键将在下次启动时生效。
 
+如果你需要自定义脚本设置项，可以在 `local.conf` 使用 `script-opts-append` 设置:
+```
+script-opts-append="auto-load-fonts-compatible_mode=yes" # 启用 Auto Load Fonts 兼容模式
+```
+
 ## 特色功能
 
 ### [Auto Load Fonts](scripts/auto-load-fonts.js)
 
-自动设置 fontconfig 以加载播放文件路径下 fonts 文件夹内的字体文件
+自动设置 fontconfig 以加载播放文件路径下 `fonts` 文件夹内的字体文件
 
 由于 Windows 的 NTFS 分区路径字符编码不统一 (mpv-player/mpv#10679)，在某些分区上会遇到无法加载文件名包含非英文字符的字体文件，遇到此问题可以用以下几种方法解决：
 
@@ -149,13 +154,13 @@ script-opts-append="custom-input-enable=yes"
 * 将文件名包含非英文字符的字体文件重命名为只包含英文字符文件名。
 * 启用兼容模式
 
-**兼容模式:**
+**兼容模式:** 兼容模式主要用于解决一些性能问题和 Windows 某些分区上的错误，脚本在兼容模式下加载字体文件时会将 `fonts` 文件夹复制到指定位置，然后使用新位置进行加载。默认位置为配置目录的 `.fonts` 目录，如果配置目录所在分区也存在兼容性问题，你还可以自定义兼容目录位置。
 
-兼容模式主要用于解决一些性能问题和 Windows 某些分区上的错误，脚本在兼容模式下加载字体文件时会将 `fonts` 目录复制到指定位置，然后使用新位置进行加载。默认位置为配置目录的 `.fonts` 目录，如果配置目录所在分区也存在兼容性问题，你还可以自定义兼容目录位置。
+**设置项:**
 
-启用方法: 在 `local.conf` 加入 `script-opts-append="auto-load-fonts-compatible_mode=yes"` 行。
+兼容模式: `auto-load-fonts-compatible_mode=[yes|no] # 默认关闭`
 
-自定义兼容目录: 在 `local.conf` 加入 `script-opts-append="auto-load-fonts-compatible_dir=D:\fonts-cache" # 兼容目录设置为 D:\fonts-cache` 行。
+兼容目录: `auto-load-fonts-compatible_dir=D:\fonts-cache # 设置兼容目录为 D:\fonts-cache`
 
 > 小提示：如果所有分区都不兼容又不想拆分现有分区，可以使用 [ImDisk](https://sourceforge.net/projects/imdisk-toolkit/) 等软件创建内存盘。
 
@@ -164,6 +169,26 @@ script-opts-append="custom-input-enable=yes"
 如果播放文件目录存在 `mpv.keys` 或 `${filename}.mpv.keys`，则在文件加载后自动按下按键，文件结束时再次按下按键。
 
 `mpv.keys`: 每行一个按键，可以是组合键，以 `#` 开头的行会被忽略。
+
+### [Check Update](scripts/check-update.js)
+
+自动检查配置文件更新，还支持 mpv 新版本检查，默认检查源 : [mpv-winbuild-cmake/releases](https://github.com/shinchiro/mpv-winbuild-cmake)。
+
+配置文件默认每 7 天检查一次， mpv 默认每 1 天检查一次。
+
+网络请求依赖于外部工具 `curl`，如果存在 `http_proxy` 环境变量或 mpv 设置项，那么请求时会自动用作 HTTP 代理，你也可以单独为这个脚本设置 HTTP 代理。
+
+**设置项:**
+
+配置文件检查间隔: `check-update-check_config_interval=3 # 每 3 天检查一次配置文件更新`。
+
+mpv 新版本检查: `check-update-check_mpv_update=[yes|no] # 默认关闭`。
+
+mpv 检查间隔: `check-update-check_mpv_interval=3 # 每 3 天检查一次 mpv 更新`
+
+mpv 检查源: `check-update-check_mpv_update_repo=shinchiro/mpv-winbuild-cmake # 设置检查源为 https://github.com/shinchiro/mpv-winbuild-cmake`
+
+HTTP 代理: `check-update-http_proxy=http://127.0.0.1:8080 # 设置 HTTP 代理为 http://127.0.0.1:8080` 行。
 
 ### [WebPlay](scripts/webplay-handler.js)
 

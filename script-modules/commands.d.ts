@@ -24,6 +24,12 @@ interface SubprocessResult {
     killed_by_us: boolean;
 }
 
+interface AsyncCommandResult {
+    abort: () => void;
+}
+
+type AsyncCommandCallback<T> = (success: boolean, result: T | undefined, error: string | undefined) => void
+
 export function apply_profile(profile: string): null | undefined;
 
 export function change_list(path: string): ChangeList;
@@ -37,3 +43,7 @@ export function loadfile(file: string, mode?: 'replace' | 'append' | 'append-pla
 export function restore_profile(profile: string): null | undefined;
 
 export function subprocess(args: string[], options?: object): Readonly<SubprocessResult> | undefined
+
+export function subprocess_async(args: string[], callback: AsyncCommandCallback<Readonly<SubprocessResult>>): AsyncCommandResult
+
+export function subprocess_async(args: string[], options: object, callback: AsyncCommandCallback<Readonly<SubprocessResult>>): AsyncCommandResult
