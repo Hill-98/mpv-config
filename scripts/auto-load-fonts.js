@@ -30,11 +30,12 @@ var state = {
 };
 
 /**
- * @param {string} command
+ * @param {string[]} command
  * @returns {string[]}
  */
 function powershell_command(command) {
-    return ['powershell.exe', '-Command', command];
+    var commands = command.map(function (c) { return c.indexOf(' ') === -1 ? c : u.string_format('"%s"', c); });
+    return ['powershell.exe', '-Command', commands.join(' ')];
 };
 
 /**
@@ -56,7 +57,7 @@ function clear_fonts() {
     }
     var args = [];
     if (state.os === 'windows') {
-        args = powershell_command(u.string_format('Remove-Item -Path "%s" -Recurse', state.compatible_fonts_dir));
+        args = powershell_command(['Remove-Item', '-Path', state.compatible_fonts_dir, '-Recurse']);
     } else {
         args = ['rm', '-r', state.compatible_fonts_dir];
     }
@@ -72,7 +73,7 @@ function copy_fonts(path) {
     var process = null;
     if (!u.dir_exist(options.compatible_dir)) {
         if (state.os === 'windows') {
-            args = powershell_command(u.string_format('New-Item -Path "%s" -ItemType Directory', options.compatible_dir));
+            args = powershell_command(['New-Item', '-Path', options.compatible_dir, '-ItemType', 'Directory']);
         } else {
             args = ['mkdir', '-p', options.compatible_dir];
         }
@@ -82,7 +83,7 @@ function copy_fonts(path) {
         }
     }
     if (state.os === 'windows') {
-        args = powershell_command(u.string_format('Copy-Item -Path "%s" -Destination "%s" -Recurse', path, state.compatible_fonts_dir));
+        args = powershell_command(['Copy-Item', '-Path', path, '-Destination', state.compatible_fonts_dir, '-Recurse']);
     } else {
         args = ['cp', '-p', '-r', path, state.compatible_fonts_dir];
     }
@@ -128,7 +129,7 @@ update_options();
         options.compatible_mode = false;
         msg.warn('Unknown OS detected, compatibility mode turned off.');
     }
-    mp.add_hook('on_load', 99, function () {
+    mp.add_hook('on_load', 50, function () {
         var path = mp.get_property_native('path');
         var spaths = utils.split_path(path);
         var fonts_dir = u.absolute_path(utils.join_path(spaths[0], 'fonts'));
@@ -157,7 +158,7 @@ update_options();
         msg.info(info);
     });
 
-    mp.add_hook('on_unload', 99, function () {
+    mp.add_hook('on_unload', 50, function () {
         write_fonts_conf(u.string_format(FONTCONFIG_XML, ''), true);
     });
 
