@@ -31,6 +31,16 @@ function check_executable(name) {
     return process.status === 0 ? process.stdout.trim() : undefined;
 }
 
+
+/**
+ * @param {number} last_time
+ * @param {number} interval
+ * @returns {boolean}
+ */
+function check_interval(last_time, interval) {
+    return Date.now() - last_time >= interval;
+}
+
 /**
  * @typedef {Object} HttpResponse
  * @property {string} data
@@ -63,7 +73,7 @@ function http_get_request(url, callback) {
         args.push('--proxy', state.http_proxy);
     }
     if (Array.isArray(options.headers)) {
-        options.headers.forEach(function (header) { args.push('--header', header) });
+        options.headers.forEach(function (header) { args.push('--header', header); });
     }
     args.push(options.url);
     return commands.subprocess_async(args, function (success, result, error) {
@@ -80,6 +90,14 @@ function http_get_request(url, callback) {
             status: result.status,
         });
     });
+}
+
+/**
+ * @param {number} interval
+ * @returns {number}
+ */
+function parse_interval(interval) {
+    return interval * 86400 * 1000;
 }
 
 /**
@@ -118,9 +136,8 @@ function write_cache(name, data) {
 function check_config_update() {
     var local_version_file = commands.expand_path('~~/.commit_time');
     var cache = read_cache('config');
-    var check_interval = options.check_config_interval * 86400 * 1000;
-    var last_check_update_time = cache.last_check_update_time;
-    var remote_commit_time = cache.remote_commit_time;
+    var cache_valid = typeof cache.last_check_update_time === 'number' && typeof cache.remote_commit_time === 'number';
+    var check_update_interval = parse_interval(options.check_config_interval);
     var local_commit_time = undefined;
 
     if (u.file_exist(local_version_file)) {
@@ -150,7 +167,7 @@ function check_config_update() {
         }, 3000);
     };
 
-    if (typeof last_check_update_time !== 'number' || typeof remote_commit_time !== 'number' || Date.now() - last_check_update_time >= check_interval) {
+    if (!cache_valid || check_interval(cache.last_check_update_time, check_update_interval)) {
         http_get_request({
             url: 'https://api.github.com/repos/Hill-98/mpv-config/commits/main',
             headers: ['Accept: application/vnd.github+json'],
@@ -176,17 +193,16 @@ function check_config_update() {
             write_cache('config', cache);
         });
     } else {
-        compare_version(local_commit_time, remote_commit_time);
+        compare_version(local_commit_time, cache.remote_commit_time);
     }
 }
 
 function check_mpv_update() {
     var cache = read_cache('mpv');
+    var cache_valid = typeof cache.last_check_update_time === 'number' && typeof cache.local_version === 'string' && typeof cache.remote_version === 'string';
     /** @type {string} */
     var mpv_version = mp.get_property_native('mpv-version').trim();
-    var check_interval = options.check_mpv_interval * 86400 * 1000;
-    var last_check_update_time = cache.last_check_update_time;
-    var remote_version = cache.remote_version;
+    var check_update_interval = parse_interval(options.check_config_interval);
     var matches = mpv_version.match(/-g([a-z0-9-]{7})/);
 
     if (matches === null) {
@@ -199,7 +215,7 @@ function check_mpv_update() {
             return;
         }
         var osd = mp.create_osd_overlay('ass-events');
-        osd.data = '检查到 mpv 新版本: ' + s;
+        osd.data = '检查到 mpv 新版本: ' + (s || b);
         osd.update();
         setTimeout(function () {
             osd.remove();
@@ -207,7 +223,7 @@ function check_mpv_update() {
     };
     var local_version = matches[1];
 
-    if (typeof last_check_update_time !== 'number' || typeof remote_version !== 'string' || Date.now() - last_check_update_time >= check_interval || cache.remote_repo !== options.check_mpv_update_repo) {
+    if (!cache_valid || check_interval(cache.last_check_update_time, check_update_interval) || cache.local_version !== local_version || cache.remote_repo !== options.check_mpv_update_repo) {
         http_get_request({
             url: u.string_format('https://api.github.com/repos/%s/releases/latest', options.check_mpv_update_repo),
             headers: ['Accept: application/vnd.github+json'],
@@ -225,7 +241,7 @@ function check_mpv_update() {
                 return;
             }
             var not_found = true;
-            var assets_prefix = 'mpv-x86_64';
+            var assets_prefix = 'mpv-x86_64-';
             for (var i = 0; i < json.assets.length; i++) {
                 /** @type {string} */
                 var name = json.assets[i].name;
@@ -235,12 +251,15 @@ function check_mpv_update() {
                 var matches = name.match(/-git-([a-z0-9-]{7})/);
                 if (matches !== null) {
                     var remote_version = matches[1];
-                    compare_version(local_version, remote_version, name);
+                    matches = name.match(/-([\w]+-git-[a-z0-9]{7})/);
+                    var remote_version_name = matches === null ? null : matches[1];
+                    compare_version(local_version, remote_version, remote_version_name);
                     var cache = {
                         last_check_update_time: Date.now(),
+                        local_version: local_version,
                         remote_repo: options.check_mpv_update_repo,
                         remote_version: remote_version,
-                        remote_version_name: name,
+                        remote_version_name: remote_version_name,
                     };
                     write_cache('mpv', cache);
                     var not_found = false;
@@ -252,7 +271,7 @@ function check_mpv_update() {
             }
         });
     } else {
-        compare_version(local_version, remote_version, cache.remote_version_name);
+        compare_version(local_version, cache.remote_version, cache.remote_version_name);
     }
 }
 
