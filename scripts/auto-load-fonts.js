@@ -140,7 +140,7 @@ update_options();
         if (options.compatible_mode) {
             // 检查是否与上次字体目录相同，避免多次复制文件。
             if (state.last_fonts_dir === fonts_dir) {
-                fonts_dir = state.last_fonts_dir;
+                fonts_dir = state.compatible_fonts_dir;
             } else {
                 clear_fonts();
                 if (copy_fonts(fonts_dir)) {
