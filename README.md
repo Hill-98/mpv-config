@@ -74,7 +74,6 @@ video-zoom 视频缩放
 sub-delay 字幕延迟
 sub-font-size 字幕字体大小
 sub-pos 字幕位置
-playlist-start 播放列表索引
 ```
 
 > 可以使用快捷键 `DEL` 删除当前文件保存的设置。
