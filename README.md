@@ -185,7 +185,7 @@ mpv 新版本检查: `check-update-check_mpv_update=[yes|no] # 默认关闭`。
 
 mpv 检查间隔: `check-update-check_mpv_interval=3 # 每 3 天检查一次 mpv 更新`
 
-mpv 检查源: `check-update-check_mpv_update_repo=shinchiro/mpv-winbuild-cmake # 设置检查源为 https://github.com/shinchiro/mpv-winbuild-cmake`
+mpv 检查源: `check-update-check_mpv_repo=shinchiro/mpv-winbuild-cmake # 设置检查源为 https://github.com/shinchiro/mpv-winbuild-cmake`
 
 HTTP 代理: `check-update-http_proxy=http://127.0.0.1:8080 # 设置 HTTP 代理为 http://127.0.0.1:8080` 行。
 

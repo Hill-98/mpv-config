@@ -6,9 +6,9 @@ var commands = require('../script-modules/commands');
 var u = require('../script-modules/utils');
 var options = {
     check_config_interval: 7,
-    check_mpv_interval: 1,
     check_mpv_update: false,
-    check_mpv_update_repo: 'shinchiro/mpv-winbuild-cmake',
+    check_mpv_repo: 'shinchiro/mpv-winbuild-cmake',
+    check_mpv_interval: 1,
     http_proxy: '',
 };
 mp.options.read_options(options, 'check-update');
@@ -202,7 +202,8 @@ function check_mpv_update() {
     var cache_valid = typeof cache.last_check_update_time === 'number' && typeof cache.local_version === 'string' && typeof cache.remote_version === 'string';
     /** @type {string} */
     var mpv_version = mp.get_property_native('mpv-version').trim();
-    var check_update_interval = parse_interval(options.check_config_interval);
+    var check_update_interval = parse_interval(options.check_mpv_interval);
+    var remote_repo = options.check_mpv_repo;
     var matches = mpv_version.match(/-g([a-z0-9-]{7})/);
 
     if (matches === null) {
@@ -223,9 +224,9 @@ function check_mpv_update() {
     };
     var local_version = matches[1];
 
-    if (!cache_valid || check_interval(cache.last_check_update_time, check_update_interval) || cache.local_version !== local_version || cache.remote_repo !== options.check_mpv_update_repo) {
+    if (!cache_valid || check_interval(cache.last_check_update_time, check_update_interval) || cache.local_version !== local_version || cache.remote_repo !== remote_repo) {
         http_get_request({
-            url: u.string_format('https://api.github.com/repos/%s/releases/latest', options.check_mpv_update_repo),
+            url: u.string_format('https://api.github.com/repos/%s/releases/latest', remote_repo),
             headers: ['Accept: application/vnd.github+json'],
         }, function (response) {
             if (response.http_code !== 200) {
@@ -257,7 +258,7 @@ function check_mpv_update() {
                     var cache = {
                         last_check_update_time: Date.now(),
                         local_version: local_version,
-                        remote_repo: options.check_mpv_update_repo,
+                        remote_repo: remote_repo,
                         remote_version: remote_version,
                         remote_version_name: remote_version_name,
                     };
