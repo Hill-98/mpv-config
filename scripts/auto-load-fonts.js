@@ -27,6 +27,7 @@ var state = {
     /** @type {string|null} */
     last_fonts_dir: null,
     os: u.detect_os(),
+    set_fonts_dir: false,
 };
 
 /**
@@ -68,7 +69,7 @@ function clear_fonts() {
  * @param {string} dir
  * @returns {boolean}
  */
-function copy_fonts(path) {
+function copy_fonts(dir) {
     var args = [];
     var process = null;
     if (!u.dir_exist(options.compatible_dir)) {
@@ -83,25 +84,36 @@ function copy_fonts(path) {
         }
     }
     if (state.os === 'windows') {
-        args = powershell_command(['Copy-Item', '-Path', path, '-Destination', state.compatible_fonts_dir, '-Recurse']);
+        args = powershell_command(['Copy-Item', '-Path', dir, '-Destination', state.compatible_fonts_dir, '-Recurse']);
     } else {
-        args = ['cp', '-p', '-r', path, state.compatible_fonts_dir];
+        args = ['cp', '-p', '-r', dir, state.compatible_fonts_dir];
     }
     process = commands.subprocess(args);
     return process.status === 0;
 }
 
 function update_options() {
+    if (options.compatible_mode && !state.os) {
+        options.compatible_mode = false;
+        msg.warn('Unknown OS detected, compatibility mode disabled.');
+    }
     options.compatible_dir = commands.expand_path(options.compatible_dir);
-    state.compatible_fonts_dir = utils.join_path(options.compatible_dir, mp.get_script_name() + '-' + mp.get_property_native('pid'));
+    var compatible_fonts_dir = utils.join_path(options.compatible_dir, mp.get_script_name() + '-' + mp.get_property_native('pid'));
+    if (state.compatible_fonts_dir && state.compatible_fonts_dir !== compatible_fonts_dir) {
+        clear_fonts();
+    }
+    state.compatible_fonts_dir = compatible_fonts_dir;
+    state.last_fonts_dir = null;
 }
 
 /**
- * @param {string} data
+ * @param {string} dir
  * @param {boolean} require_exist
  */
-function write_fonts_conf(data, require_exist) {
+function write_fonts_conf(dir, require_exist) {
     var exist = u.file_exist(state.fonts_conf);
+    var xml = dir === '' ? '' : u.string_format(FONTCONFIG_DIR_XML, escape_xml(dir));
+    var data = u.string_format(FONTCONFIG_XML, xml);
     // 做一些检查，避免无用的重复写入。
     if (require_exist && !exist) {
         return;
@@ -113,58 +125,63 @@ function write_fonts_conf(data, require_exist) {
 }
 
 mp.options.read_options(options, 'auto-load-fonts', function () {
-    if (!options.compatible_mode) {
+    if (!options.enable) {
+        state.set_fonts_dir = false;
         clear_fonts();
-        return;
+        write_fonts_conf('', true);
     }
     update_options();
 });
 update_options();
 
 (function () {
-    if (!options.enable || mp.get_property_native('sub-font-provider') !== 'fontconfig') {
-        return;
-    }
-    if (options.compatible_mode && !state.os) {
-        options.compatible_mode = false;
-        msg.warn('Unknown OS detected, compatibility mode turned off.');
-    }
     mp.add_hook('on_load', 50, function () {
+        if (!options.enable || mp.get_property_native('sub-font-provider') !== 'fontconfig') {
+            return;
+        }
+
         var path = mp.get_property_native('path');
         var spaths = utils.split_path(path);
         var fonts_dir = u.absolute_path(utils.join_path(spaths[0], 'fonts'));
+        var source_font_dir = fonts_dir;
+        var reset = state.last_fonts_dir !== source_font_dir;
+
         if (!u.dir_exist(fonts_dir)) {
+            // 如果没有字体目录并且设置字体目录，那么写入空的配置文件。
+            if (state.set_fonts_dir) {
+                write_fonts_conf('', true);
+                state.set_fonts_dir = false;
+            }
             return;
         }
-        var info = 'Set fonts dir: ' + fonts_dir;
-        if (options.compatible_mode) {
-            // 检查是否与上次字体目录相同，避免多次复制文件。
-            if (state.last_fonts_dir === fonts_dir) {
-                fonts_dir = state.compatible_fonts_dir;
-            } else {
-                clear_fonts();
-                if (copy_fonts(fonts_dir)) {
-                    state.last_fonts_dir = fonts_dir;
-                    fonts_dir = state.compatible_fonts_dir;
-                    info += ' <- ' + fonts_dir;
-                } else {
-                    msg.error('copy fonts dir failed: ' + fonts_dir + ' -> ' + state.compatible_fonts_dir);
-                }
-            }
+        if (!reset) {
+            return;
         }
-        var xml = u.string_format(FONTCONFIG_DIR_XML, escape_xml(fonts_dir));
-        xml = u.string_format(FONTCONFIG_XML, xml);
-        write_fonts_conf(xml);
-        msg.info(info);
-    });
 
-    mp.add_hook('on_unload', 50, function () {
-        write_fonts_conf(u.string_format(FONTCONFIG_XML, ''), true);
+        if (options.compatible_mode) {
+            clear_fonts();
+            if (copy_fonts(source_font_dir)) {
+                fonts_dir = state.compatible_fonts_dir;
+                state.last_fonts_dir = source_font_dir;
+            } else {
+                msg.error(u.string_format("copy fonts dir failed: '%s' -> '%s'", source_font_dir, state.compatible_fonts_dir));
+            }
+        } else {
+            state.last_fonts_dir = source_font_dir;
+        }
+
+        write_fonts_conf(fonts_dir);
+        state.set_fonts_dir = true;
+
+        if (fonts_dir === source_font_dir) {
+            msg.info('Set fonts dir: ' + fonts_dir);
+        } else {
+            msg.info(u.string_format('Set fonts dir (compatible_mode): %s (%s)', fonts_dir, source_font_dir));
+        }
     });
 
     mp.register_event('shutdown', function () {
-        if (options.compatible_mode) {
-            clear_fonts();
-        }
+        write_fonts_conf('', true);
+        clear_fonts();
     });
 })();

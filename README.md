@@ -150,7 +150,7 @@ script-opts-append="auto-load-fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 * 重新使用 Windows 内置的磁盘管理重新格式化分区
 * 将文件名包含非英文字符的字体文件重命名为只包含英文字符文件名。
-* 启用兼容模式
+* 使用兼容模式
 
 **兼容模式:** 兼容模式主要用于解决一些性能问题和 Windows 某些分区上的错误，脚本在兼容模式下加载字体文件时会将 `fonts` 文件夹复制到指定位置，然后使用新位置进行加载。默认位置为配置目录的 `.fonts` 目录，如果配置目录所在分区也存在兼容性问题，你还可以自定义兼容目录位置。
 
@@ -159,6 +159,8 @@ script-opts-append="auto-load-fonts-compatible_mode=yes" # 启用 Auto Load Font
 兼容模式: `auto-load-fonts-compatible_mode=[yes|no] # 默认关闭`
 
 兼容目录: `auto-load-fonts-compatible_dir=D:\fonts-cache # 设置兼容目录为 D:\fonts-cache`
+
+> Auto Load Fonts 支持设置项实时更新，可以配合 `profile-cond` 按需开启兼容模式。
 
 > 小提示：如果所有分区都不兼容又不想拆分现有分区，可以使用 [ImDisk](https://sourceforge.net/projects/imdisk-toolkit/) 等软件创建内存盘。
 
