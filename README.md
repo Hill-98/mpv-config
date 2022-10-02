@@ -49,7 +49,6 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 * 退出时保存对当前文件的部分设置
 * 始终启用缓存 (1G)
 * 模糊匹配外部音频文件
-* 自动检测 icc 配置文件
 * 垂直同步
 * 增强的去带参数
 * 字幕字体: 文泉驿微米黑
