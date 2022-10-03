@@ -5,44 +5,51 @@
 'use strict';
 
 var state = {
-    /** @type {boolean} */
-    idle: mp.get_property_native('idle'),
+    /** @type {string} */
+    idle: '',
     /** @type {boolean} */
     idle_changed: false,
+    no_observe_idle: true,
 };
 
 /**
  * @param {string} name
  * @param {string} value
  */
-function observe_idle(name, value) {
+function idle_observer(name, value) {
+    if (state.no_observe_idle) {
+        return;
+    }
     state.idle = value;
 }
 
 /**
  * @param {string} value
+ * @param {boolean} no_observe
  */
-function set_idle(value) {
-    mp.unobserve_property(observe_idle);
-    mp.set_property_native('idle', value);
-    setTimeout(function () {
-        mp.observe_property('idle', 'native', observe_idle);
-    }, 100);
+function set_idle(value, no_observe) {
+    if (no_observe) {
+        state.no_observe_idle = true;
+    }
+    mp.set_property('idle', value);
+    state.no_observe_idle = false;
 }
 
-mp.add_hook('on_unload', 50, function () {
-    if (!state.idle_changed) {
+mp.add_hook('on_load', 99, function () {
+    if (state.idle_changed) {
         set_idle(state.idle);
     }
     state.idle_changed = false;
 });
 
-mp.add_hook('on_load_fail', 50, function () {
+mp.add_hook('on_load_fail', 99, function () {
     if (mp.get_property_native('terminal')) {
         return;
     }
-    set_idle('yes');
-    state.idle_changed = true;
+    if (mp.get_property('idle') !== 'yes') {
+        set_idle('yes', true);
+        state.idle_changed = true;
+    }
 });
 
-mp.observe_property('idle', 'native', observe_idle);
+mp.observe_property('idle', 'string', idle_observer);
