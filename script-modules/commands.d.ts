@@ -44,6 +44,6 @@ export function restore_profile(profile: string): null | undefined;
 
 export function subprocess(args: string[], options?: object): Readonly<SubprocessResult> | undefined
 
-export function subprocess_async(args: string[], callback: AsyncCommandCallback<Readonly<SubprocessResult>>): AsyncCommandResult
+export function subprocess_async(args: string[], callback?: AsyncCommandCallback<Readonly<SubprocessResult>>): AsyncCommandResult
 
-export function subprocess_async(args: string[], options: object, callback: AsyncCommandCallback<Readonly<SubprocessResult>>): AsyncCommandResult
+export function subprocess_async(args: string[], options?: object, callback?: AsyncCommandCallback<Readonly<SubprocessResult>>): AsyncCommandResult

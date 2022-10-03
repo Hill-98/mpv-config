@@ -79,8 +79,8 @@ function subprocess(args, options) {
 }
 
 function subprocess_async(args, options, callback) {
-    var cb = typeof callback === 'undefined' ? options : callback;
-    var opt = typeof callback === 'undefined' ? undefined : options;
+    var cb = u.default_value(callback, typeof options === 'function' ? options : function () {} );
+    var opt = typeof options === 'object' ? options : undefined;
     var obj = JSON.parse(JSON.stringify(opt || {
         playback_only: false,
         capture_stdout: true,
