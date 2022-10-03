@@ -38,7 +38,7 @@ export function expand_path(path: string): string | undefined;
 
 export function keypress(key: string): null | undefined
 
-export function loadfile(file: string, mode?: 'replace' | 'append' | 'append-play', options?: {[key: string]: unknown}): null | undefined
+export function loadfile(file: string, mode?: 'replace' | 'append' | 'append-play'): null | undefined
 
 export function restore_profile(profile: string): null | undefined;
 

@@ -59,8 +59,8 @@ function keypress(key) {
     return command_native('keypress', key);
 }
 
-function loadfile(file, mode, options) {
-    return command_native('loadfile', file, mode, options);
+function loadfile(file, mode) {
+    return command_native('loadfile', file, mode);
 }
 
 function restore_profile(profile) {
