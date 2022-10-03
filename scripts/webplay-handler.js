@@ -18,13 +18,13 @@ var state = {
 function parse_url(url) {
     var decode = function decode(value) {
         return decodeURIComponent(value.replace(/\+/g, '%20'));
-    }
+    };
     var trim_map = function trim_map(value) {
         return value.trim();
-    }
+    };
     var empty_filter = function empty_filter(value) {
         return value !== '';
-    }
+    };
 
     var results = {};
     var params = url.replace(PROTOCOL_PREFIX, '').split('&').map(trim_map).filter(empty_filter);
@@ -77,7 +77,7 @@ mp.add_hook('on_load', 40, function () {
     msg.info('WebPlay: ' + (referer || link));
     mp.set_property_native('stream-open-filename', link);
     mp.set_property_native('file-local-options/save-position-on-quit', save_on_quit);
-    mp.set_property_native('file-local-options/title', title);
+    mp.set_property_native('file-local-options/force-media-title', title);
 });
 
 mp.register_event('file-loaded', function () {
