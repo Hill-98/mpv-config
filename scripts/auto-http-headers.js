@@ -11,7 +11,7 @@ var HttpHeaders = require('../script-modules/HttpHeaders');
 var http_prefix_regex = new RegExp('^https?:\/\/');
 var protocols = [
     'ytdl',
-].map(function (v) { return new RegExp('^' + v + ':(\/\/)?') });
+].map(function (v) { return new RegExp('^' + v + ':(\/\/)?'); });
 
 mp.add_hook('on_load', 99, function () {
     /** @type {string} */
@@ -19,7 +19,7 @@ mp.add_hook('on_load', 99, function () {
     if (url.indexOf('webplay:?') === 0) {
         url = mp.get_property_native('stream-open-filename');
     }
-    protocols.forEach(function (regex) { return url = url.replace(regex, ''); })
+    protocols.forEach(function (regex) { return url = url.replace(regex, ''); });
     if (!http_prefix_regex.test(url)) {
         return;
     }

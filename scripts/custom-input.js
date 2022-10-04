@@ -6,7 +6,7 @@ var u = require('../script-modules/utils');
 var custom_input_conf = commands.expand_path('~~/input.local.conf');
 var options = {
     enable: false,
-}
+};
 mp.options.read_options(options, 'custom-input');
 
 /**
@@ -30,6 +30,6 @@ if (options.enable && u.file_exist(custom_input_conf)) {
     var str = lines.map(handle_input_line).join('\n');
     if (!u.file_exist(path) || utils.read_file(path) !== str) {
         utils.write_file('file://' + path, str);
-        mp.osd_message('输入文件已更改，请重启。')
+        mp.osd_message('输入文件已更改，请重启。');
     }
 }

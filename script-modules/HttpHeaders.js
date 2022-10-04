@@ -49,7 +49,7 @@ var GlobalHttpHeaders = {
      */
     del: function del(name, value) {
         var headers = this.get(name);
-        headers = headers.filter(function (v) { return value === undefined ? true : value === v });
+        headers = headers.filter(function (v) { return value === undefined ? true : value === v; });
         for (var i = 0; i < headers.length; i++) {
             var result = mp.command_native(['change-list', 'file-local-options/http-header-fields', 'remove', headers[i].original]);
             if (result !== null) {
@@ -65,7 +65,7 @@ var GlobalHttpHeaders = {
     get: function get(name) {
         var _name = name.toLowerCase();
         var headers = this.list();
-        var results = headers.filter(function (v) { return v.name === _name });
+        var results = headers.filter(function (v) { return v.name === _name; });
         return results;
     },
     /**

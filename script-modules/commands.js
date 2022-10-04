@@ -79,7 +79,7 @@ function subprocess(args, options) {
 }
 
 function subprocess_async(args, options, callback) {
-    var cb = u.default_value(callback, typeof options === 'function' ? options : function () {} );
+    var cb = u.default_value(callback, typeof options === 'function' ? options : function () { });
     var opt = typeof options === 'object' ? options : undefined;
     var obj = JSON.parse(JSON.stringify(opt || {
         playback_only: false,

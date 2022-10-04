@@ -19,10 +19,10 @@ function absolute_path(path) {
  * @returns {Array}
  */
 function arguments2array(args) {
-    return Array.prototype.slice.call(args).filter(function (v) { return v !== undefined });
+    return Array.prototype.slice.call(args).filter(function (v) { return v !== undefined; });
 }
 
-function default_value (value, default_value) {
+function default_value(value, default_value) {
     return value === undefined ? default_value : value;
 }
 

@@ -9,7 +9,7 @@ var u = require('../script-modules/utils');
 var state = {
     os: u.detect_os(),
     pid: mp.get_property_native('pid'),
-}
+};
 
 mp.register_event('file-loaded', function () {
     if (state.os !== 'linux' || mp.get_property_native('fullscreen') || mp.get_property_native('geometry') || mp.get_property_native('force-window') !== 'immediate') {

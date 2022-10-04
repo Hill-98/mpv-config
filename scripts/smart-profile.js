@@ -33,7 +33,7 @@ function switch_profile_state(profile) {
     }
     state = !state;
     stat[profile] = state;
-    return state
+    return state;
 }
 
 /**

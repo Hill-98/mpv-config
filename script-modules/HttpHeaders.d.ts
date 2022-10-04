@@ -33,9 +33,9 @@ declare class HttpHeaders {
 
     list(name: string): Omit<Header, 'original'>[];
 
-    static global: globalHttpHeaders ;
+    static global: globalHttpHeaders;
 
-    static parse(header: string): Header
+    static parse(header: string): Header;
 }
 
-export = HttpHeaders
+export = HttpHeaders;
