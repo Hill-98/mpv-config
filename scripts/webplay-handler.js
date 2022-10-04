@@ -42,7 +42,7 @@ mp.add_hook('on_load', 40, function () {
     state.start = null;
     /** @type {string} */
     var path = mp.get_property_native('path');
-    if (path.indexOf(PROTOCOL_PREFIX) !== 0) {
+    if (path.indexOf(PROTOCOL_PREFIX) !== 0 || mp.get_property_native('playback-abort')) {
         return;
     }
     var save_on_quit = mp.get_property_native('save-position-on-quit');

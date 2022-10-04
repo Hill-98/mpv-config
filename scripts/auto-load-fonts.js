@@ -141,6 +141,10 @@ mp.observe_property('sub-font-provider', 'native', function (name, value) {
 
 (function () {
     mp.add_hook('on_load', 50, function () {
+        if (mp.get_property_native('playback-abort')) {
+            return;
+        }
+
         var path = mp.get_property_native('path');
         var spaths = utils.split_path(path);
         var fonts_dir = u.absolute_path(utils.join_path(spaths[0], 'fonts'));

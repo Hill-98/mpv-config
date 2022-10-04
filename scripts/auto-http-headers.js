@@ -14,6 +14,10 @@ var protocols = [
 ].map(function (v) { return new RegExp('^' + v + ':(\/\/)?'); });
 
 mp.add_hook('on_load', 99, function () {
+    if (mp.get_property_native('playback-abort')) {
+        return;
+    }
+
     /** @type {string} */
     var url = mp.get_property_native('path');
     if (url.indexOf('webplay:?') === 0) {
