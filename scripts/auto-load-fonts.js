@@ -23,6 +23,7 @@ var options = {
 };
 var state = {
     compatible_fonts_dir: '',
+    fontconfig_enabled: false,
     fonts_conf: commands.expand_path('~~/.fonts.conf'),
     /** @type {string|null} */
     last_fonts_dir: null,
@@ -134,26 +135,30 @@ mp.options.read_options(options, 'auto-load-fonts', function () {
 });
 update_options();
 
+mp.observe_property('sub-font-provider', 'native', function (name, value) {
+    state.fontconfig_enabled = value === 'fontconfig';
+});
+
 (function () {
     mp.add_hook('on_load', 50, function () {
-        if (!options.enable || mp.get_property_native('sub-font-provider') !== 'fontconfig') {
-            return;
-        }
-
         var path = mp.get_property_native('path');
         var spaths = utils.split_path(path);
         var fonts_dir = u.absolute_path(utils.join_path(spaths[0], 'fonts'));
         var source_font_dir = fonts_dir;
-        var reset = state.last_fonts_dir !== source_font_dir;
-
-        if (!u.dir_exist(fonts_dir)) {
-            // 如果没有字体目录并且设置字体目录，那么写入空的配置文件。
+        var font_dir_exist = u.dir_exist(fonts_dir);
+        if (font_dir_exist && (!options.enable || !state.fontconfig_enabled)) {
+            msg.warn('The font directory exists, but the script is not enabled.');
+            return;
+        }
+        // 如果没有字体目录并且之前设置了字体目录，那么写入清空配置文件。
+        if (!font_dir_exist) {
             if (state.set_fonts_dir) {
                 write_fonts_conf('', true);
                 state.set_fonts_dir = false;
             }
             return;
         }
+        var reset = state.last_fonts_dir !== source_font_dir;
         if (!reset) {
             return;
         }
