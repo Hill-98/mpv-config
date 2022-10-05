@@ -25,11 +25,13 @@ var state = {
     compatible_fonts_dir: '',
     fontconfig_enabled: false,
     fonts_conf: commands.expand_path('~~/.fonts.conf'),
-    is_windows: u.detect_os() === 'windows',
+    is_windows: false,
     /** @type {string|null} */
     last_fonts_dir: null,
+    os: u.detect_os(),
     set_fonts_dir: false,
 };
+state.is_windows = state.os === 'windows';
 
 /**
  * @param {string} str
@@ -87,7 +89,7 @@ function copy_fonts(dir) {
 }
 
 function update_options() {
-    if (options.compatible_mode && !state.is_windows) {
+    if (options.compatible_mode && !state.os) {
         options.compatible_mode = false;
         msg.warn('Unknown OS detected, compatibility mode disabled.');
     }
