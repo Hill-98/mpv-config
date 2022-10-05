@@ -78,7 +78,7 @@ function copy_fonts(dir) {
     if (state.is_windows) {
         args = ['Robocopy.exe', dir, state.compatible_fonts_dir, '/S', '/R:1'];
         process = commands.subprocess(args);
-        return process.status < 8;
+        return process.status >= 0 && process.status < 8;
     } else {
         args = ['cp', '-p', '-r', dir, state.compatible_fonts_dir];
         process = commands.subprocess(args);
