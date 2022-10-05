@@ -2,7 +2,7 @@
  * 自动设置 fontconfig 以加载播放文件路径下 fonts 文件夹内的字体文件
  *
  * 需要 sub-font-provider=fontconfig 和
- * fonts.conf 添加 <include ignore_missing="yes">%CONFIG_DIR%/.fonts.conf</include> 行。
+ * fonts.conf 添加 <include ignore_missing="yes">%CONFIG_DIR%/.fonts.conf</include> 行 (%CONFIG_DIR% 替换为 mpv 配置目录)。
  *
  * compatible_mode (兼容模式) 主要用于解决一些性能问题和 Windows 某些分区上的错误
  */
@@ -25,19 +25,10 @@ var state = {
     compatible_fonts_dir: '',
     fontconfig_enabled: false,
     fonts_conf: commands.expand_path('~~/.fonts.conf'),
+    is_windows: u.detect_os() === 'windows',
     /** @type {string|null} */
     last_fonts_dir: null,
-    os: u.detect_os(),
     set_fonts_dir: false,
-};
-
-/**
- * @param {string[]} command
- * @returns {string[]}
- */
-function powershell_command(command) {
-    var commands = command.map(function (c) { return c.indexOf(' ') === -1 ? c : u.string_format('"%s"', c); });
-    return ['powershell.exe', '-Command', commands.join(' ')];
 };
 
 /**
@@ -58,8 +49,8 @@ function clear_fonts() {
         return;
     }
     var args = [];
-    if (state.os === 'windows') {
-        args = powershell_command(['Remove-Item', '-Path', state.compatible_fonts_dir, '-Recurse']);
+    if (state.is_windows) {
+        args = ['cmd.exe', '/c', 'rmdir', '/S', '/Q', state.compatible_fonts_dir];
     } else {
         args = ['rm', '-r', state.compatible_fonts_dir];
     }
@@ -74,8 +65,8 @@ function copy_fonts(dir) {
     var args = [];
     var process = null;
     if (!u.dir_exist(options.compatible_dir)) {
-        if (state.os === 'windows') {
-            args = powershell_command(['New-Item', '-Path', options.compatible_dir, '-ItemType', 'Directory']);
+        if (state.is_windows) {
+            args = ['cmd.exe', '/c', 'mkdir', options.compatible_dir];
         } else {
             args = ['mkdir', '-p', options.compatible_dir];
         }
@@ -84,22 +75,25 @@ function copy_fonts(dir) {
             return false;
         }
     }
-    if (state.os === 'windows') {
-        args = powershell_command(['Copy-Item', '-Path', dir, '-Destination', state.compatible_fonts_dir, '-Recurse']);
+    if (state.is_windows) {
+        args = ['Robocopy.exe', dir, state.compatible_fonts_dir, '/S', '/R:1'];
+        process = commands.subprocess(args);
+        return process.status < 8;
     } else {
         args = ['cp', '-p', '-r', dir, state.compatible_fonts_dir];
+        process = commands.subprocess(args);
+        return process.status === 0;
     }
-    process = commands.subprocess(args);
-    return process.status === 0;
 }
 
 function update_options() {
-    if (options.compatible_mode && !state.os) {
+    if (options.compatible_mode && !state.is_windows) {
         options.compatible_mode = false;
         msg.warn('Unknown OS detected, compatibility mode disabled.');
     }
-    options.compatible_dir = commands.expand_path(options.compatible_dir);
+    options.compatible_dir = u.format_windows_path(commands.expand_path(options.compatible_dir), state.is_windows);
     var compatible_fonts_dir = utils.join_path(options.compatible_dir, mp.get_script_name() + '-' + mp.get_property_native('pid'));
+    compatible_fonts_dir = u.format_windows_path(compatible_fonts_dir, state.is_windows);
     if (state.compatible_fonts_dir && state.compatible_fonts_dir !== compatible_fonts_dir) {
         clear_fonts();
     }
@@ -147,7 +141,7 @@ mp.observe_property('sub-font-provider', 'native', function (name, value) {
 
         var path = mp.get_property_native('path');
         var spaths = utils.split_path(path);
-        var fonts_dir = u.absolute_path(utils.join_path(spaths[0], 'fonts'));
+        var fonts_dir = u.format_windows_path(u.absolute_path(utils.join_path(spaths[0], 'fonts')), state.is_windows);
         var source_font_dir = fonts_dir;
         var font_dir_exist = u.dir_exist(fonts_dir);
         if (font_dir_exist && (!options.enable || !state.fontconfig_enabled)) {

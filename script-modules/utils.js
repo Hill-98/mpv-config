@@ -53,6 +53,15 @@ function detect_os() {
 }
 
 /**
+ * @param {string} dir
+ * @returns {boolean}
+ */
+function dir_exist(dir) {
+    var info = utils.file_info(dir);
+    return typeof info === 'object' && info.is_dir;
+}
+
+/**
  * @param {*} value
  * @returns {boolean}
  */
@@ -70,21 +79,17 @@ function empty(value) {
 }
 
 /**
- * @param {string} dir
- * @returns {boolean}
- */
-function dir_exist(dir) {
-    var info = utils.file_info(dir);
-    return typeof info === 'object' && info.is_dir;
-}
-
-/**
  * @param {string} file
  * @returns {boolean}
  */
 function file_exist(file) {
     var info = utils.file_info(file);
     return typeof info === 'object' && info.is_file;
+}
+
+function format_windows_path(path, is_windows) {
+    var w = default_value(is_windows, true);
+    return w ? path.replace('/', '\\') : path;
 }
 
 /**
@@ -142,9 +147,10 @@ module.exports = {
     arguments2array: arguments2array,
     default_value: default_value,
     detect_os: detect_os,
-    empty: empty,
     dir_exist: dir_exist,
+    empty: empty,
     file_exist: file_exist,
+    format_windows_path: format_windows_path,
     read_file_lines: read_file_lines,
     string_format: string_format,
 };
