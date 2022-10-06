@@ -87,9 +87,8 @@ function file_exist(file) {
     return typeof info === 'object' && info.is_file;
 }
 
-function format_windows_path(path, is_windows) {
-    var w = default_value(is_windows, true);
-    return w ? path.replace('/', '\\') : path;
+function format_windows_path(path) {
+    return path.replace('/', '\\');
 }
 
 /**

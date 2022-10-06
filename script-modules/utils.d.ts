@@ -12,7 +12,7 @@ export function empty(value: any): boolean;
 
 export function file_exist(file: string): boolean;
 
-export function format_windows_path(path: string, is_windows?: boolean): string;
+export function format_windows_path(path: string): string;
 
 export function read_file_lines(file: string, ignore_comments?: boolean): string[] | undefined;
 
