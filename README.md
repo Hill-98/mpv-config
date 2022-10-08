@@ -146,7 +146,9 @@ script-opts-append="auto-load-fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 自动设置 fontconfig 以加载播放文件路径下 `fonts` 文件夹内的字体文件
 
-由于 Windows 的 NTFS 分区路径字符编码不统一 (mpv-player/mpv#10679)，在某些分区上会遇到无法加载文件名包含非英文字符的字体文件，遇到此问题可以用以下几种方法解决：
+由于 Windows 的 NTFS 分区路径字符编码不统一 (mpv-player/mpv#10679)，fontconfig 在某些分区上无法加载文件名包含非英文字符的字体文件，遇到此问题可以用以下几种方法解决：
+
+> https://github.com/shinchiro/mpv-winbuild-cmake 最新构建版本已修复 Windows 分区兼容性问题，不再需要以下解决方法。如果你使用的是其他构建版本，可以继续使用以下解决方法。
 
 * 重新使用 Windows 内置的磁盘管理重新格式化分区
 * 将文件名包含非英文字符的字体文件重命名为只包含英文字符文件名。
