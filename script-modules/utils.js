@@ -1,7 +1,8 @@
 'use strict';
 
+var commands = require('../script-modules/commands');
 var utils = mp.utils;
-var windows_path_regex = new RegExp('^[A-Za-z]:');
+var windows_path_regex = new RegExp('^([A-Za-z]:)|(\\\\)');
 
 /**
  * @param {string} path
@@ -34,18 +35,13 @@ function detect_os() {
     if (typeof home === 'string' && windows_path_regex.test(home)) {
         return 'windows';
     }
-    var process = mp.command_native({
-        name: 'subprocess',
-        capture_stdout: true,
-        playback_only: false,
-        args: ['uname'],
-    });
+    var process = commands.subprocess(['uname', '-s']);
     if (process.status === 0) {
-        var os = process.stdout;
-        if (os.indexOf('Linux') !== -1) {
+        var os = process.stdout.trim();
+        if (os === 'Linux') {
             return 'linux';
         }
-        if (os.indexOf('Darwin') !== -1) {
+        if (os === 'Darwin') {
             return 'macos';
         }
     }
@@ -87,6 +83,10 @@ function file_exist(file) {
     return typeof info === 'object' && info.is_file;
 }
 
+/**
+ * @param {string} path
+ * @returns {string}
+ */
 function format_windows_path(path) {
     return path.replace('/', '\\');
 }

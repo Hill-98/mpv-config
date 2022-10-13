@@ -1,9 +1,19 @@
 'use strict';
 
-var u = require('../script-modules/utils');
+/**
+ * @param {Array} args
+ * @returns {Array}
+ */
+var arguments2array = function arguments2array(args) {
+    return Array.prototype.slice.call(args).filter(function (v) { return v !== undefined; });
+};
+
+var default_value = function default_value(value, default_value) {
+    return value === undefined ? default_value : value;
+};
 
 function command_native() {
-    var args = u.arguments2array(arguments);
+    var args = arguments2array(arguments);
     if (args.length === 1 && typeof args[0] === 'object') {
         return mp.command_native(args[0]);
     }
@@ -11,7 +21,7 @@ function command_native() {
 }
 
 function command_native_async() {
-    var args = u.arguments2array(arguments);
+    var args = arguments2array(arguments);
     var callback = args.pop();
     var result = undefined;
     if (args.length === 1 && typeof args[0] === 'object') {
@@ -30,7 +40,7 @@ function apply_profile(profile) {
 
 function change_list(name) {
     var change_list_command = function change_list_command(name, operator) {
-        var args = u.arguments2array(arguments).slice(2);
+        var args = arguments2array(arguments).slice(2);
         return command_native('change-list', name, operator, args[0]);
     };
     var obj = {
@@ -79,7 +89,7 @@ function subprocess(args, options) {
 }
 
 function subprocess_async(args, options, callback) {
-    var cb = u.default_value(callback, typeof options === 'function' ? options : function () { });
+    var cb = default_value(callback, typeof options === 'function' ? options : function () { });
     var opt = typeof options === 'object' ? options : undefined;
     var obj = JSON.parse(JSON.stringify(opt || {
         playback_only: false,
