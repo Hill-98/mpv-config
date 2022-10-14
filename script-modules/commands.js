@@ -34,6 +34,10 @@ function command_native_async() {
     };
 }
 
+function audio_add(url) {
+    return command_native('audio-add', url);
+}
+
 function apply_profile(profile) {
     return command_native('apply-profile', profile);
 }
@@ -102,6 +106,7 @@ function subprocess_async(args, options, callback) {
 }
 
 module.exports = {
+    audio_add: audio_add,
     apply_profile: apply_profile,
     change_list: change_list,
     expand_path: expand_path,

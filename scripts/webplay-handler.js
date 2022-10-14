@@ -4,6 +4,7 @@ var PROTOCOL_PREFIX = 'webplay:?';
 
 var msg = mp.msg;
 var commands = require('../script-modules/commands');
+var HttpHeaders = require('../script-modules/HttpHeaders');
 var state = {
     /** @type {number|null} */
     start: null,
@@ -55,29 +56,39 @@ mp.add_hook('on_load', 40, function () {
     }
 
     var params = parse_url(path);
-    var link = params.link;
-    // 重新加载以交给对应解析程序。
+    var url = params.url;
+    // 让其他脚本解析
     if (params.parse === '1') {
-        msg.info('WebPlay: ' + link);
-        commands.loadfile(link);
+        msg.info('WebPlay: ' + url);
+        commands.loadfile(url);
         return;
     }
 
-    // 保存的设置有一致性
-    var referer = params.referer;
-    if (!is_reload && referer) {
+    // save-position-on-quit 一致性，否则下次读取不到这次的设置。
+    if (!is_reload && url) {
         state.url = path;
-        commands.loadfile('webplay:?' + referer);
+        commands.loadfile('webplay:?' + url);
         return;
     }
 
-    var title = params.title || referer || link;
+    var title = params.title || url;
     var start = parseInt(params.start);
     state.start = start >= 0 ? start : null;
-    msg.info('WebPlay: ' + (referer || link));
-    mp.set_property_native('stream-open-filename', link);
+
+    var http_headers = new HttpHeaders();
+    if (!HttpHeaders.global.has('referer')) {
+        http_headers.add('referer', url);
+    }
+
+    mp.set_property_native('stream-open-filename', params.video);
     mp.set_property_native('file-local-options/save-position-on-quit', save_on_quit);
     mp.set_property_native('file-local-options/force-media-title', title);
+
+    if (params.audio) {
+        commands.audio_add(params.audio);
+    }
+
+    msg.info('WebPlay: ' + url);
 });
 
 mp.register_event('file-loaded', function () {

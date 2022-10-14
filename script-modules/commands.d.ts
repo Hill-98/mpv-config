@@ -30,6 +30,8 @@ interface AsyncCommandResult {
 
 type AsyncCommandCallback<T> = (success: boolean, result: T | undefined, error: string | undefined) => void;
 
+export function audio_add(url: string): null | undefined;
+
 export function apply_profile(profile: string): null | undefined;
 
 export function change_list(path: string): ChangeList;
