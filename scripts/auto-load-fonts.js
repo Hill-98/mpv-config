@@ -143,7 +143,7 @@ function write_fonts_conf(fonts_dir, require_exist) {
     utils.write_file('file://' + state.fonts_conf, data);
 }
 
-mp.options.read_options(options, 'auto-load-fonts', function () {
+mp.options.read_options(options, 'auto_load_fonts', function () {
     if (!options.enable) {
         state.set_fonts_dir = false;
         clear_fonts();

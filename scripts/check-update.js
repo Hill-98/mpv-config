@@ -11,7 +11,7 @@ var options = {
     check_mpv_interval: 1,
     http_proxy: '',
 };
-mp.options.read_options(options, 'check-update');
+mp.options.read_options(options, 'check_update');
 var state = {
     http_proxy: options.http_proxy || mp.get_property_native('http_proxy') || utils.getenv('http_proxy'),
     os: u.detect_os(),

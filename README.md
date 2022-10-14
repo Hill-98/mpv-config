@@ -126,7 +126,7 @@ Ctrl+p 填充黑边使视频比例与当前窗口比例相同 (解决视频比�
 1. 在 `local.conf` 文件加入以下行:
 ```
 input-conf="~~/.input.conf"
-script-opts-append="custom-input-enable=yes"
+script-opts-append="custom_input-enable=yes"
 ```
 2. 在配置目录创建 `input.local.conf` 文件并加入以下行:
 ```
@@ -137,7 +137,7 @@ script-opts-append="custom-input-enable=yes"
 
 如果你需要自定义脚本设置项，可以在 `local.conf` 使用 `script-opts-append` 设置:
 ```
-script-opts-append="auto-load-fonts-compatible_mode=yes" # 启用 Auto Load Fonts 兼容模式
+script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Fonts 兼容模式
 ```
 
 ## 特色功能
@@ -158,9 +158,9 @@ script-opts-append="auto-load-fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 **设置项:**
 
-兼容模式: `auto-load-fonts-compatible_mode=[yes|no] # 默认关闭`
+兼容模式: `auto_load_fonts-compatible_mode=[yes|no] # 默认关闭`
 
-兼容目录: `auto-load-fonts-compatible_dir=D:\fonts-cache # 设置兼容目录为 D:\fonts-cache`
+兼容目录: `auto_load_fonts-compatible_dir=D:\fonts-cache # 设置兼容目录为 D:\fonts-cache`
 
 > Auto Load Fonts 支持设置项实时更新，可以配合 `profile-cond` 按需开启兼容模式。
 
@@ -182,15 +182,15 @@ script-opts-append="auto-load-fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 **设置项:**
 
-配置文件检查间隔: `check-update-check_config_interval=3 # 每 3 天检查一次配置文件更新`。
+配置文件检查间隔: `check_update-check_config_interval=3 # 每 3 天检查一次配置文件更新`。
 
-mpv 新版本检查: `check-update-check_mpv_update=[yes|no] # 默认关闭`。
+mpv 新版本检查: `check_update-check_mpv_update=[yes|no] # 默认关闭`。
 
-mpv 检查间隔: `check-update-check_mpv_interval=3 # 每 3 天检查一次 mpv 更新`
+mpv 检查间隔: `check_update-check_mpv_interval=3 # 每 3 天检查一次 mpv 更新`
 
-mpv 检查源: `check-update-check_mpv_repo=shinchiro/mpv-winbuild-cmake # 设置检查源为 https://github.com/shinchiro/mpv-winbuild-cmake`
+mpv 检查源: `check_update-check_mpv_repo=shinchiro/mpv-winbuild-cmake # 设置检查源为 https://github.com/shinchiro/mpv-winbuild-cmake`
 
-HTTP 代理: `check-update-http_proxy=http://127.0.0.1:8080 # 设置 HTTP 代理为 http://127.0.0.1:8080` 行。
+HTTP 代理: `check_update-http_proxy=http://127.0.0.1:8080 # 设置 HTTP 代理为 http://127.0.0.1:8080` 行。
 
 ### [WebPlay](scripts/webplay-handler.js)
 

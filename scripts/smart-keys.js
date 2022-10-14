@@ -1,1 +1,0 @@
-var msg = mp.msg;

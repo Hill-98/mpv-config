@@ -7,7 +7,7 @@ var custom_input_conf = commands.expand_path('~~/input.local.conf');
 var options = {
     enable: false,
 };
-mp.options.read_options(options, 'custom-input');
+mp.options.read_options(options, 'custom_input');
 
 /**
  * @param {string} line
