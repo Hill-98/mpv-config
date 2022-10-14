@@ -192,6 +192,18 @@ mpv 检查源: `check_update-check_mpv_repo=shinchiro/mpv-winbuild-cmake # 设�
 
 HTTP 代理: `check_update-http_proxy=http://127.0.0.1:8080 # 设置 HTTP 代理为 http://127.0.0.1:8080` 行。
 
+### [Format Title](scripts/format-title.js)
+
+提取文件名的信息并格式化，然后设置为当前文件的媒体标题。
+
+比如文件名 `[VCB-Studio] Re Zero kara Hajimeru Isekai Seikatsu [01][Ma10p_1080p][x265_flac_aac]` 会被格式化为 `Re Zero kara Hajimeru Isekai Seikatsu [01]`。
+
+如果文件名无法被格式化，那么什么都不会发生。
+
+**设置项:**
+
+禁用: `format_title-enable=no`
+
 ### [WebPlay](scripts/webplay-handler.js)
 
 为 mpv 新增 `webplay` 协议，用于从浏览器调用 mpv 播放媒体。
