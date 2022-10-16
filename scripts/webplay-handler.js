@@ -39,7 +39,7 @@ function parse_url(url) {
     return results;
 }
 
-mp.add_hook('on_load', 40, function () {
+mp.add_hook('on_load', 10, function () {
     state.start = null;
     /** @type {string} */
     var path = mp.get_property_native('path');
@@ -64,10 +64,10 @@ mp.add_hook('on_load', 40, function () {
         return;
     }
 
-    // save-position-on-quit 一致性，否则下次读取不到这次的设置。
+    // 因为原始链接包含大量信息，即使从同一个页面调用，链接也可能变化，所以需要格式化链接并重新加载。
     if (!is_reload && url) {
         state.url = path;
-        commands.loadfile('webplay:?' + url);
+        commands.loadfile(PROTOCOL_PREFIX + url);
         return;
     }
 
@@ -76,13 +76,11 @@ mp.add_hook('on_load', 40, function () {
     state.start = start >= 0 ? start : null;
 
     var http_headers = new HttpHeaders();
-    if (!HttpHeaders.global.has('referer')) {
-        http_headers.add('referer', url);
-    }
+    http_headers.add('referer', url);
 
-    mp.set_property_native('stream-open-filename', params.video);
     mp.set_property_native('file-local-options/save-position-on-quit', save_on_quit);
     mp.set_property_native('file-local-options/force-media-title', title);
+    mp.set_property_native('stream-open-filename', params.video);
 
     if (params.audio) {
         commands.audio_add(params.audio);
