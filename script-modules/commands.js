@@ -1,11 +1,22 @@
 'use strict';
 
 /**
- * @param {Array} args
+ * @param {IArguments} args
  * @returns {Array}
  */
 var arguments2array = function arguments2array(args) {
     return Array.prototype.slice.call(args).filter(function (v) { return v !== undefined; });
+};
+
+var trim_object = function trim_object(obj) {
+    var keys = Object.keys(obj);
+    var result = Object.create(null);
+    keys.forEach(function (key) {
+        if (obj[key] !== undefined) {
+            result[key] = obj[key];
+        }
+    });
+    return result;
 };
 
 var default_value = function default_value(value, default_value) {
@@ -15,7 +26,7 @@ var default_value = function default_value(value, default_value) {
 function command_native() {
     var args = arguments2array(arguments);
     if (args.length === 1 && typeof args[0] === 'object') {
-        return mp.command_native(args[0]);
+        return mp.command_native(trim_object(args[0]));
     }
     return mp.command_native(args);
 }
@@ -25,7 +36,7 @@ function command_native_async() {
     var callback = args.pop();
     var result = undefined;
     if (args.length === 1 && typeof args[0] === 'object') {
-        result = mp.command_native_async(args[0], callback);
+        result = mp.command_native_async(trim_object(args[0]), callback);
     } else {
         result = mp.command_native_async(args, callback);
     }
@@ -34,8 +45,14 @@ function command_native_async() {
     };
 }
 
-function audio_add(url) {
-    return command_native('audio-add', url);
+function audio_add(url, flags, title, lang) {
+    return command_native({
+        name: 'audio-add',
+        url: url,
+        flags: flags,
+        title: title,
+        lang: lang,
+    });
 }
 
 function apply_profile(profile) {
@@ -73,8 +90,8 @@ function keypress(key) {
     return command_native('keypress', key);
 }
 
-function loadfile(file, mode) {
-    return command_native('loadfile', file, mode);
+function loadfile(file, flags) {
+    return command_native('loadfile', file, flags);
 }
 
 function restore_profile(profile) {

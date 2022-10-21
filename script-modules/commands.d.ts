@@ -25,12 +25,14 @@ interface SubprocessResult {
 }
 
 interface AsyncCommandResult {
-    abort: () => void;
+    abort(): void;
 }
+
+type AddCommandFlags = 'select' | 'auto' | 'cached';
 
 type AsyncCommandCallback<T> = (success: boolean, result: T | undefined, error: string | undefined) => void;
 
-export function audio_add(url: string): null | undefined;
+export function audio_add(url: string, flags?: AddCommandFlags, title?: string, lang?: string): null | undefined;
 
 export function apply_profile(profile: string): null | undefined;
 
@@ -40,7 +42,7 @@ export function expand_path(path: string): string | undefined;
 
 export function keypress(key: string): null | undefined;
 
-export function loadfile(file: string, mode?: 'replace' | 'append' | 'append-play'): null | undefined;
+export function loadfile(file: string, flags?: 'replace' | 'append' | 'append-play'): null | undefined;
 
 export function restore_profile(profile: string): null | undefined;
 

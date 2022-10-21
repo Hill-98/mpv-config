@@ -83,7 +83,7 @@ mp.add_hook('on_load', 10, function () {
     mp.set_property_native('stream-open-filename', params.video);
 
     if (params.audio) {
-        commands.audio_add(params.audio);
+        commands.audio_add(params.audio, 'select', 'audio');
     }
 
     msg.info('WebPlay: ' + url);
