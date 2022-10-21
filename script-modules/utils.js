@@ -16,7 +16,7 @@ function absolute_path(path) {
 }
 
 /**
- * @param {Array} args
+ * @param {IArguments} args
  * @returns {Array}
  */
 function arguments2array(args) {
