@@ -22,3 +22,6 @@
 [submodule "git-modules/VideoPlayerCode-mpv-tools"]
 	path = git-modules/VideoPlayerCode-mpv-tools
 	url = https://github.com/VideoPlayerCode/mpv-tools.git
+[submodule "git-modules/mpv-javascript-http"]
+	path = git-modules/mpv-javascript-http
+	url = https://github.com/Hill-98/mpv-javascript-http.git

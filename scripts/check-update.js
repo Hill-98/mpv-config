@@ -3,6 +3,7 @@
 var msg = mp.msg;
 var utils = mp.utils;
 var commands = require('../script-modules/commands');
+var HttpClient = require('../script-modules/HttpClient');
 var u = require('../script-modules/utils');
 var options = {
     check_config_interval: 7,
@@ -16,8 +17,17 @@ var state = {
     http_proxy: options.http_proxy || mp.get_property_native('http_proxy') || utils.getenv('http_proxy'),
     os: u.detect_os(),
 };
+
+if (!HttpClient.available) {
+    msg.error('检查更新不可用: 未找到 curl');
+    exit();
+}
+
+var http = new HttpClient({
+    timeout: 5,
+    proxy: state.http_proxy,
+});
 var tools = {
-    curl: check_executable(state.os === 'windows' ? 'curl.exe' : 'curl'),
     git: check_executable(state.os === 'windows' ? 'git.exe' : 'git'),
 };
 
@@ -31,7 +41,6 @@ function check_executable(name) {
     return process.status === 0 ? process.stdout.trim() : undefined;
 }
 
-
 /**
  * @param {number} last_time
  * @param {number} interval
@@ -39,57 +48,6 @@ function check_executable(name) {
  */
 function check_interval(last_time, interval) {
     return Date.now() - last_time >= interval;
-}
-
-/**
- * @typedef {Object} HttpResponse
- * @property {string} data
- * @property {string} error
- * @property {number} http_code
- * @property {number} status
- */
-
-/**
- * @typedef {Object} RequestOptions
- * @property {string} url
- * @property {string[]} headers
- */
-
-/**
- * @callback RequestCallback
- * @param {HttpResponse} response
- */
-
-/**
- * @param {string|RequestOptions} url
- * @param {string} headers
- * @param {RequestCallback} callback
- */
-function http_get_request(url, callback) {
-    var options = typeof url === 'object' ? url : { url: url };
-    var cb = callback || function () { };
-    var args = [tools.curl, '--connect-timeout', '5', '--location', '--max-time', '120', '--no-progress-meter', '--write-out', '%{http_code}'];
-    if (state.http_proxy) {
-        args.push('--proxy', state.http_proxy);
-    }
-    if (Array.isArray(options.headers)) {
-        options.headers.forEach(function (header) { args.push('--header', header); });
-    }
-    args.push(options.url);
-    return commands.subprocess_async(args, function (success, result, error) {
-        if (!success) {
-            cb({ error: error, status: -1 });
-            return;
-        }
-        var data = result.stdout.substring(0, result.stdout.length - 3);
-        var http_code = parseInt(result.stdout.substring(result.stdout.length - 3));
-        cb({
-            data: data,
-            error: result.stderr,
-            http_code: http_code,
-            status: result.status,
-        });
-    });
 }
 
 /**
@@ -168,22 +126,21 @@ function check_config_update() {
     };
 
     if (!cache_valid || check_interval(cache.last_check_update_time, check_update_interval)) {
-        http_get_request({
-            url: 'https://api.github.com/repos/Hill-98/mpv-config/commits/main',
-            headers: ['Accept: application/vnd.github+json'],
-        }, function (response) {
-            if (response.http_code !== 200) {
-                msg.verbose(response.error);
+        http.get('https://api.github.com/repos/Hill-98/mpv-config/commits/main', {
+            headers: {
+                'Accept': 'application/vnd.github+json',
+            },
+        }, function (err, response) {
+            if (err || response.status_code !== 200) {
+                msg.verbose(err || response.status_text);
                 msg.error('检查配置文件更新失败: 未获取到最新版本');
                 return;
             }
-            try {
-                var json = JSON.parse(response.data);
-            } catch (ex) {
-                msg.verbose(ex.message);
+            if (typeof response.data !== 'object') {
                 msg.error('检查配置文件更新失败: 数据解析错误');
                 return;
             }
+            var json = response.data;
             var remote_commit_time = Date.parse(json.commit.committer.date);
             compare_version(local_commit_time, remote_commit_time);
             var cache = {
@@ -225,22 +182,21 @@ function check_mpv_update() {
     var local_version = matches[1];
 
     if (!cache_valid || check_interval(cache.last_check_update_time, check_update_interval) || cache.local_version !== local_version || cache.remote_repo !== remote_repo) {
-        http_get_request({
-            url: u.string_format('https://api.github.com/repos/%s/releases/latest', remote_repo),
-            headers: ['Accept: application/vnd.github+json'],
-        }, function (response) {
-            if (response.http_code !== 200) {
-                msg.verbose(response.error);
+        http.get(u.string_format('https://api.github.com/repos/%s/releases/latest', remote_repo), {
+            headers: {
+                'Accept': 'application/vnd.github+json',
+            },
+        }, function (err, response) {
+            if (err || response.status_code !== 200) {
+                msg.verbose(err || response.status_text);
                 msg.error('检查 mpv 更新失败: 未获取到最新版本');
                 return;
             }
-            try {
-                var json = JSON.parse(response.data);
-            } catch (ex) {
-                msg.verbose(ex.message);
+            if (typeof response.data !== 'object') {
                 msg.error('检查 mpv 更新失败: 数据解析错误');
                 return;
             }
+            var json = response.data;
             var not_found = true;
             var assets_prefix = 'mpv-x86_64-';
             for (var i = 0; i < json.assets.length; i++) {
@@ -276,13 +232,7 @@ function check_mpv_update() {
     }
 }
 
-(function () {
-    if (!tools.curl) {
-        msg.error('检查更新失败: 未找到 curl');
-        return;
-    }
-    check_config_update();
-    if (options.check_mpv_update) {
-        check_mpv_update();
-    }
-})();
+check_config_update();
+if (options.check_mpv_update) {
+    check_mpv_update();
+}
