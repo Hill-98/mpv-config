@@ -21,6 +21,21 @@ var u = require('../script-modules/utils');
 /** @type {Object.<string, StatObj>} */
 var stat = {};
 var glsl_shaders = commands.change_list('glsl-shaders');
+var osd = mp.create_osd_overlay('ass-events');
+/** @type {number|null} */
+var osd_timer = null;
+
+function osd_message(message, timeout) {
+    if (osd_timer !== null) {
+        clearTimeout(osd_timer);
+    }
+    osd.data = '{\\a7}' + message;
+    osd.update();
+    osd_timer = setTimeout(function () {
+        osd_timer = null;
+        osd.remove();
+    }, timeout * 1000);
+}
 
 /**
  * @param {string} profile
@@ -83,7 +98,7 @@ function uninstall_shaders(identifier) {
 function smart_shaders_handler(identifier, display_name, paths, profile) {
     if (identifier === '<clear>') {
         Object.keys(stat).forEach(uninstall_shaders);
-        mp.osd_message('所有着色器已卸载', 2);
+        osd_message('所有着色器已卸载', 2);
         return;
     }
 
@@ -96,7 +111,7 @@ function smart_shaders_handler(identifier, display_name, paths, profile) {
         });
         text += '(不包括配置文件预加载的着色器)\n';
         text += '查看着色器详细信息: 打开统计信息然后按数字键 2';
-        mp.osd_message(text, 5);
+        osd_message(text, 5);
         return;
     }
 
@@ -124,7 +139,7 @@ function smart_shaders_handler(identifier, display_name, paths, profile) {
     var loaded_obj = stat[identifier];
     if (loaded_obj) {
         uninstall_shaders(identifier);
-        mp.osd_message(loaded_obj.display_name + ' 着色器已卸载', 2);
+        osd_message(loaded_obj.display_name + ' 着色器已卸载', 2);
         var equal = shaders.join('|') === loaded_obj.shaders.join('|');
         if (equal) {
             return;
@@ -132,7 +147,7 @@ function smart_shaders_handler(identifier, display_name, paths, profile) {
     }
 
     install_shaders(identifier, display_name, shaders, profile);
-    mp.osd_message(display_name + ' 着色器已加载', 2);
+    osd_message(display_name + ' 着色器已加载', 2);
 }
 
 mp.register_script_message('smart-shaders', smart_shaders_handler);
