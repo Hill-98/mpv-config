@@ -28,18 +28,8 @@ var http = new HttpClient({
     proxy: state.http_proxy,
 });
 var tools = {
-    git: check_executable(state.os === 'windows' ? 'git.exe' : 'git'),
+    git: u.which('git'),
 };
-
-/**
- * @param {string} name
- * @returns {string|undefined}
- */
-function check_executable(name) {
-    var where = state.os === 'windows' ? 'where.exe' : 'which';
-    var process = commands.subprocess([where, name]);
-    return process.status === 0 ? process.stdout.trim() : undefined;
-}
 
 /**
  * @param {number} last_time

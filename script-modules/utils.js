@@ -48,6 +48,8 @@ function detect_os() {
     return undefined;
 }
 
+var os = detect_os();
+
 /**
  * @param {string} dir
  * @returns {boolean}
@@ -141,6 +143,34 @@ function string_format(str) {
     return result;
 }
 
+/**
+ * @param {string} name
+ * @param {boolean} auto_append_exe
+ * @returns {string|undefined}
+ */
+function which(name, auto_append_exe) {
+    var _name = default_value(name, '');
+    if (_name.trim() === '') {
+        return undefined;
+    }
+    var path = utils.getenv('PATH') || utils.getenv('Path') || utils.getenv('path');
+    if (path === undefined) {
+        return undefined;
+    }
+    var append_exe = default_value(auto_append_exe, true);
+    if (append_exe && os === 'windows' && _name.indexOf('.exe') === -1) {
+        _name += '.exe';
+    }
+    var paths = path.split(os === 'windows' ? ';' : ':');
+    for (var i = 0; i < paths.length; i++) {
+        var executable = utils.join_path(paths[i], _name);
+        if (file_exist(executable)) {
+            return absolute_path(executable);
+        }
+    }
+    return undefined;
+}
+
 module.exports = {
     absolute_path: absolute_path,
     arguments2array: arguments2array,
@@ -152,4 +182,5 @@ module.exports = {
     format_windows_path: format_windows_path,
     read_file_lines: read_file_lines,
     string_format: string_format,
+    which: which,
 };

@@ -17,3 +17,5 @@ export function format_windows_path(path: string): string;
 export function read_file_lines(file: string, ignore_comments?: boolean): string[] | undefined;
 
 export function string_format(str: string, ...args: string[]): string;
+
+export function which(name: string, auto_append_exe: boolean): string | undefined;
