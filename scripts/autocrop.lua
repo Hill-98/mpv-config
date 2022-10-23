@@ -1,3 +1,5 @@
+-- LICENSE: https://github.com/mpv-player/mpv/blob/master/LICENSE.GPL
+
 --[[
 This script uses the lavfi cropdetect filter to automatically
 insert a crop filter with appropriate parameters for the
