@@ -11,8 +11,12 @@ var state = {
     pid: mp.get_property_native('pid'),
 };
 
+if (state.os !== 'linux') {
+    exit();
+}
+
 mp.register_event('file-loaded', function () {
-    if (state.os !== 'linux' || mp.get_property_native('fullscreen') || mp.get_property_native('geometry') || mp.get_property_native('force-window') !== 'immediate') {
+    if (mp.get_property_native('fullscreen') || mp.get_property_native('geometry') || mp.get_property_native('force-window') !== 'immediate') {
         return;
     }
     var process = commands.subprocess(['/bin/sh', '-c', u.string_format('wmctrl -l -p | grep -w %s | head -1 | cut  -d " " -f 1', state.pid)]);
