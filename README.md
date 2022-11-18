@@ -86,6 +86,8 @@ Alt+UP   字幕位置向上
 Alt+DOWN 字幕位置向下
 Alt+RIGHT 字幕延迟增加
 Alt+LEFT  字幕延迟减少
+Alt+Shift+RIGHT 音频延迟增加
+Alt+Shift+LEFT  音频延迟减少
 Shift+RIGHT 快进 60 秒
 Shift+LEFT  倒退 60 秒
 PAGE DOWN 播放列表上一个
