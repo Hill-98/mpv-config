@@ -1,3 +1,7 @@
+/**
+ * 格式化文件名为清晰可读的标题
+ */
+
 'use strict';
 
 var is_protocol_regex = new RegExp('^\w+:\/\/|^\w+:\?');
@@ -6,18 +10,18 @@ var options = {
 };
 mp.options.read_options(options, 'format_title');
 
-if (!options.enable) {
-    exit();
-}
-
 /**
- * Example: [VCB-Studio] Re Zero kara Hajimeru Isekai Seikatsu [01][Ma10p_1080p][x265_flac_aac]
+ * Examples:
+ *   [VCB-Studio] Re Zero kara Hajimeru Isekai Seikatsu [01][Ma10p_1080p][x265_flac_aac]
+ *   [VCB-Studio] Yama no Susume Second Season [06.5(OVA)][Ma10p_1080p][x265_flac]
+ *
+ * Result: Yama no Susume Second Season [06.5(OVA)]
  *
  * @param {string} filename
  * @returns {string|undefined}
  */
 function formatter_a(filename) {
-    var regex = /^\[.+?\]\[?(.+?)\]?(\[\d+\])/;
+    var regex = /^\[.+?\]\[?(.+?)\]?(\[\d+(\.5)?(\(OVA\))?\])/;
     var results = filename.match(regex);
     if (results === null) {
         return undefined;
@@ -29,6 +33,8 @@ function formatter_a(filename) {
 
 /**
  * Example: [VCB-Studio] Re Zero kara Hajimeru Isekai Seikatsu Hyouketsu no Kizuna [Ma10p_1080p][x265_flac]
+ *
+ * Result: Re Zero kara Hajimeru Isekai Seikatsu Hyouketsu no Kizuna
  *
  * @param {string} filename
  * @returns {string|undefined}
@@ -46,6 +52,8 @@ function formatter_b(filename) {
 /**
  * Example: 5.Centimeters.Per.Second.2007.1080p.BluRay.x264
  *
+ * Result: 5 Centimeters Per Second
+ *
  * @param {string} filename
  * @returns {string|undefined}
  */
@@ -61,6 +69,8 @@ function formatter_c(filename) {
 
 /**
  * Example: Cyberpunk.Edgerunners.S01E10.My.Moon.My.Man.1080p
+ *
+ * Result: Cyberpunk Edgerunners: My Moon My Man [10]
  *
  * @param {string} filename
  * @returns {string|undefined}
@@ -89,6 +99,7 @@ function formatter_d(filename) {
 /**
  * Example: Jimmy.Fallon.2022.10.13.Trevor.Noah.1080p
  *
+ * Result: Jimmy Fallon: Trevor.Noah [2022.10.13]
  * @param {string} filename
  * @returns {string|undefined}
  */
@@ -118,6 +129,10 @@ var formatters = [
 ];
 
 mp.add_hook('on_load', 99, function () {
+    if (!options.enable) {
+        return;
+    }
+
     var filename = mp.get_property_native('filename/no-ext');
     if (mp.get_property_native('force-media-title') !== '' || mp.get_property_native('filename') !== mp.get_property_native('media-title') || is_protocol_regex.test(mp.get_property_native('path'))) {
         return;
