@@ -99,6 +99,23 @@ function format_path(path) {
 }
 
 /**
+ * @param {string} path
+ * @returns {string|undefined}
+ */
+function get_available_fonts_dir(path) {
+    var fonts_dir;
+    var fonts_dirs = ['fonts', 'Fonts', 'FONTS', '字体'];
+    for (var i = 0; i < fonts_dirs.length; i++) {
+        var dir = u.absolute_path(utils.join_path(path, fonts_dirs[i]));
+        if (u.dir_exist(dir)) {
+            fonts_dir = format_path(dir);
+            break;
+        }
+    }
+    return fonts_dir;
+}
+
+/**
  * @returns {string}
  */
 function get_compatible_fonts_dir() {
@@ -162,24 +179,30 @@ mp.observe_property('sub-font-provider', 'native', function (name, value) {
         if (mp.get_property_native('playback-abort')) {
             return;
         }
-
+        var sub_paths = mp.get_property_native('sub-file-paths') || [];
         var path = mp.get_property_native('path');
         var spaths = utils.split_path(path);
-        var fonts_dir = format_path(u.absolute_path(utils.join_path(spaths[0], 'fonts')));
-        var source_fonts_dir = fonts_dir;
-        var fonts_dir_exist = u.dir_exist(fonts_dir);
-        if (fonts_dir_exist && (!options.enable || !state.fontconfig_enabled)) {
-            msg.warn('The font directory exists, but the script is not enabled.');
+        var current_dir = spaths[0];
+        var fonts_dir = get_available_fonts_dir(current_dir);
+
+        for (var i = 0; !fonts_dir && i < sub_paths.length; i++) {
+            fonts_dir = get_available_fonts_dir(utils.join_path(current_dir, sub_paths[i]));
+        }
+
+        if (fonts_dir && (!options.enable || !state.fontconfig_enabled)) {
+            msg.warn('The fonts directory exists, but the script is not enabled.');
             return;
         }
         // 如果没有字体目录并且之前设置了字体目录，那么写入清空配置文件。
-        if (!fonts_dir_exist) {
+        if (!fonts_dir) {
             if (state.set_fonts_dir) {
                 write_fonts_conf('', true);
                 state.set_fonts_dir = false;
             }
             return;
         }
+
+        var source_fonts_dir = fonts_dir;
         var reset = state.last_fonts_dir !== source_fonts_dir;
         if (!reset) {
             return;
