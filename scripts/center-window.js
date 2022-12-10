@@ -4,7 +4,7 @@
  */
 
 var commands = require('../script-modules/commands');
-var event = require('../script-modules/EventHelper');
+var once = require('../script-modules/OnceHelper');
 var u = require('../script-modules/utils');
 var state = {
     os: u.detect_os(),
@@ -24,7 +24,7 @@ mp.register_event('file-loaded', function () {
         return;
     }
     var wid = process.stdout.trim();
-    event.once('playback-restart', function () {
+    once.event('playback-restart', function () {
         var d_height = mp.get_property_native('display-height');
         var d_width = mp.get_property_native('display-width');
         var w_height = mp.get_property_native('osd-height');
