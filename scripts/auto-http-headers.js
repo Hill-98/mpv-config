@@ -8,10 +8,11 @@
 var msg = mp.msg;
 var HttpHeaders = require('../script-modules/HttpHeaders');
 
-var http_prefix_regex = new RegExp('^https?:\/\/');
+var http_prefix_regex = /^https?:\/\//;
 var protocols = [
     'ytdl',
 ].map(function (v) { return new RegExp('^' + v + ':(\/\/)?'); });
+var url_regex = /https?:\/\/[\w\.-]+/;
 
 mp.add_hook('on_load', 99, function () {
     if (mp.get_property_native('playback-abort')) {
@@ -26,7 +27,7 @@ mp.add_hook('on_load', 99, function () {
     }
     var http_headers = new HttpHeaders();
     var headers = [];
-    var matches = url.match(/https?:\/\/[\w\.-]+/);
+    var matches = url.match(url_regex);
     if (matches !== null) {
         headers.push('origin: ' + matches[0]);
     }

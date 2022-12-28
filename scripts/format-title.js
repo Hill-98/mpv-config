@@ -4,7 +4,7 @@
 
 'use strict';
 
-var is_protocol_regex = new RegExp('^\w+:\/\/|^\w+:\?');
+var is_protocol_regex = /^\w+:\/\/|^\w+:\?/;
 var options = {
     enable: true,
 };

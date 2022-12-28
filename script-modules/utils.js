@@ -2,7 +2,7 @@
 
 var commands = require('../script-modules/commands');
 var utils = mp.utils;
-var windows_path_regex = new RegExp('^([A-Za-z]:)|(\\\\)');
+var windows_path_regex = /^[A-Z]:|^\\\\/i;
 
 /**
  * @param {string} path
