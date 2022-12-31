@@ -56,6 +56,20 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 
 **极速模式:** 卸载所有着色器、还原占用性能的配置文件、开启硬件解码。(适合低性能设备播放 4K60FPS 等视频文件时开启)
 
+**HDR 视频播放:**
+
+如果你使用的是非 HDR 显示设备，那么你播放 HDR 视频时不需要做任何事，mpv 会自动将 HDR 转换为 SDR。
+
+如果你使用的是 HDR 显示设备，需要使用 `gpu-next` 输出驱动并开启 HDR 直通才能获得最佳体验，你可以在 `local.conf` 文件写入以下配置。不过 `gpu-next` 目前与部分着色器存在兼容性问题，比如 Anime4K，如果遇到兼容性问题，你可以回退到 `gpu` 输出驱动。
+
+`local.conf`:
+```
+vo=gpu-next
+target-colorspace-hint=yes # HDR 直通
+```
+
+> 如果使用的是 HDR 显示设备，需要先在系统设置里开启 HDR。Linux 目前无论是 X11 还是 Wayland 均不支持 HDR。
+
 **默认保存的文件设置:**
 ```conf
 af 音频过滤器
@@ -67,6 +81,7 @@ deband 去带
 panscan 平移和扫描
 pause 暂停状态
 speed 播放速度
+audio-delay 音频延迟
 video-rotate 视频旋转
 video-sync 垂直同步
 video-zoom 视频缩放
@@ -151,7 +166,7 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 由于 Windows 的 NTFS 分区路径字符编码不统一 (mpv-player/mpv#10679)，fontconfig 在某些分区上无法加载文件名包含非英文字符的字体文件，遇到此问题可以用以下几种方法解决：
 
-> https://github.com/shinchiro/mpv-winbuild-cmake 最新构建版本已修复 Windows 分区兼容性问题，不再需要以下解决方法。如果你使用的是其他构建版本，可以继续使用以下解决方法。
+> https://github.com/shinchiro/mpv-winbuild-cmake 最新版本已修复 Windows 分区兼容性问题，不再需要以下解决方法。如果你使用的是其他版本，可以继续使用以下解决方法。
 
 * 重新使用 Windows 内置的磁盘管理重新格式化分区
 * 将文件名包含非英文字符的字体文件重命名为只包含英文字符文件名。
@@ -177,7 +192,7 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 ### [Check Update](scripts/check-update.js)
 
-自动检查配置文件更新，还支持 mpv 新版本检查，默认检查源 : [mpv-winbuild-cmake/releases](https://github.com/shinchiro/mpv-winbuild-cmake)。
+自动检查配置文件更新，还支持 mpv 新版本检查，默认检查源 : [shinchiro/mpv-winbuild-cmake](https://github.com/shinchiro/mpv-winbuild-cmake)。
 
 配置文件默认每 7 天检查一次， mpv 默认每 1 天检查一次。
 
@@ -193,7 +208,7 @@ mpv 检查间隔: `check_update-check_mpv_interval=3 # 每 3 天检查一次 mpv
 
 mpv 检查源: `check_update-check_mpv_repo=shinchiro/mpv-winbuild-cmake # 设置检查源为 https://github.com/shinchiro/mpv-winbuild-cmake`
 
-HTTP 代理: `check_update-http_proxy=http://127.0.0.1:8080 # 设置 HTTP 代理为 http://127.0.0.1:8080` 行。
+HTTP 代理: `check_update-http_proxy=http://127.0.0.1:8080 # 设置 HTTP 代理为 http://127.0.0.1:8080` 
 
 ### [Format Title](scripts/format-title.js)
 
