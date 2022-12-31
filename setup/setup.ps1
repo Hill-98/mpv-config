@@ -44,7 +44,10 @@ function AddProgramID([string]$Identifier, [string]$Name, [string]$Icon, [string
     # Playlist
     @{ ContentType = "application/vnd.apple.mpegurl"; Ext = "m3u"; OpenWith = $PLAYLIST_IDENTIFIER; PerceivedType = "text" },
     @{ ContentType = "application/vnd.apple.mpegurl"; Ext = "m3u8"; OpenWith = $PLAYLIST_IDENTIFIER; PerceivedType = "text" },
-    @{ ContentType = "application/vnd.apple.mpegurl"; Ext = "vlc"; OpenWith = $PLAYLIST_IDENTIFIER; PerceivedType = "text" }
+    @{ ContentType = "application/vnd.apple.mpegurl"; Ext = "vlc"; OpenWith = $PLAYLIST_IDENTIFIER; PerceivedType = "text" },
+    # Other
+    @{ Ext = "bdmv"; OpenWith = $VIDEO_IDENTIFIER },
+    @{ Ext = "mpls"; OpenWith = $VIDEO_IDENTIFIER }
 )
 [array]$PROTOCOLS = @(
     @{ Prefix = "webplay"; OpenWith = $WEBPLAY_IDENTIFIER }
@@ -144,8 +147,12 @@ foreach ($fileType in $FILETYPES) {
     Write-Output "Register file type: $($fileType.Ext)"
     [RegistryKey]$typeReg = [Registry]::CurrentUser.CreateSubKey("Software\Classes\.$($fileType.Ext)", $true)
     $typeReg.SetValue($null, $fileType.OpenWith)
-    $typeReg.SetValue("Content Type", $fileType.ContentType)
-    $typeReg.SetValue("PerceivedType", $fileType.PerceivedType)
+    if ($fileType.ContentType) {
+        $typeReg.SetValue("Content Type", $fileType.ContentType)
+    }
+    if ($fileType.PerceivedType) {
+        $typeReg.SetValue("PerceivedType", $fileType.PerceivedType)
+    }
     $typeReg.CreateSubKey("OpenWithProgids").SetValue($fileType.OpenWith, "")
     $typeReg.Close()
     [Registry]::CurrentUser.CreateSubKey("$APP_CAP_REG_PATH\FileAssociations", $true).SetValue(".$($fileType.Ext)", $fileType.OpenWith)
