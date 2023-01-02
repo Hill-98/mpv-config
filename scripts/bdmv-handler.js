@@ -24,8 +24,8 @@ mp.add_hook('on_load', 20, function () {
 
     /** @type {string} */
     var filename = mp.get_property_native('filename');
-    var is_bdmv = filename.lastIndexOf('.bdmv') === filename.length - 5;
-    var is_mpls = filename.lastIndexOf('.mpls') === filename.length - 5;
+    var is_bdmv = filename.length >= 5 && filename.substring(filename.length - 5) === '.bdmv';
+    var is_mpls = filename.length >= 5 && filename.substring(filename.length - 5) === '.mpls';
     if (!is_bdmv && !is_mpls) {
         return;
     }
@@ -80,7 +80,7 @@ mp.add_hook('on_load', 99, function () {
     if (u.dir_exist(meta_dl_dir)) {
         /** @type {string[]} */
         var langs = mp.get_property_native('slang').filter(function (s) { return s.length === 3; });
-
+        langs.push('eng');
         var filename_regex = /bdmt_([a-z]{3})\.xml/i;
         var files = utils.readdir(meta_dl_dir, 'files');
         for (var i = 0; i < files.length; i++) {
