@@ -5,11 +5,9 @@
 'use strict';
 
 var state = {
-    /** @type {string} */
     idle: '',
-    /** @type {boolean} */
     idle_changed: false,
-    no_observe_idle: true,
+    no_observe_idle: false,
 };
 
 /**
@@ -32,10 +30,12 @@ function set_idle(value, no_observe) {
         state.no_observe_idle = true;
     }
     mp.set_property('idle', value);
-    state.no_observe_idle = false;
+    setTimeout(function () {
+        state.no_observe_idle = false;
+    }, 100);
 }
 
-mp.add_hook('on_load', 99, function () {
+mp.add_hook('on_preloaded', 99, function () {
     if (state.idle_changed) {
         set_idle(state.idle);
     }
