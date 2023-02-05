@@ -226,4 +226,4 @@ HTTP 代理: `check_update-http_proxy=http://127.0.0.1:8080 # 设置 HTTP 代理
 
 为 mpv 新增 `webplay` 协议，用于从浏览器调用 mpv 播放媒体。
 
-可以配合油猴脚本 [WebPlay for ytdl](https://greasyfork.org/zh-CN/scripts/451443) 使用。
+可以配合油猴脚本 [WebPlay for ytdl](https://github.com/Hill-98/userscripts/raw/main/webplay-ytdl.user.js) 使用。
