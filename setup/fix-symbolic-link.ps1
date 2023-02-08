@@ -1,6 +1,7 @@
 using namespace System.IO
 
 [array]$items = @(
+    @{ Link = "scripts\uosc_shared"; Target = "..\git-modules\uosc\scripts\uosc_shared" },
     @{ Link = "shaders\ACNet"; Target = "..\git-modules\ACNetGLSL\glsl" }
 )
 [string]$MPV_CONFIG_DIR = [Path]::GetDirectoryName($PSScriptRoot)
