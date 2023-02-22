@@ -81,30 +81,108 @@ function write_cache(name, data) {
     return true;
 }
 
-function check_config_update() {
+/**
+ * @returns {number|null}
+ */
+function get_config_local_version() {
     var local_version_file = commands.expand_path('~~/.commit_time');
-    var cache = read_cache('config');
-    var cache_valid = typeof cache.last_check_update_time === 'number' && typeof cache.remote_commit_time === 'number';
-    var check_update_interval = parse_interval(options.check_config_interval);
-    var local_commit_time = undefined;
-
+    var result = null;
     if (u.file_exist(local_version_file)) {
-        local_commit_time = parseInt(utils.read_file(local_version_file));
+        result = parseInt(utils.read_file(local_version_file));
     } else if (tools.git) {
         var process = commands.subprocess([tools.git, '-C', commands.expand_path('~~/'), 'log', '-1', '--format=%ct']);
         if (process.status === 0) {
-            var t = parseInt(process.stdout);
-            local_commit_time = t ? t * 1000 : undefined;
+            result = parseInt(process.stdout) * 1000;
         }
     }
-    if (!local_commit_time) {
-        msg.warn('检查配置文件更新失败: 未获取到本地版本');
+    return result === NaN ? null : result;
+}
+
+/**
+ * @returns {string|null}
+ */
+function get_mpv_local_version() {
+    var mpv_version = mp.get_property_native('mpv-version').trim();
+    var matches = mpv_version.match(/-g([a-z0-9-]{7})/);
+    return matches === null ? null : matches[1];
+}
+
+/**
+ * @param {Function} cb
+ */
+function get_config_remote_version(cb) {
+    http.get('https://api.github.com/repos/Hill-98/mpv-config/commits/main', {
+        headers: {
+            'Accept': 'application/vnd.github+json',
+        },
+    }, function (err, response) {
+        if (err || response.status_code !== 200) {
+            msg.verbose(err || response.status_text);
+            cb('未获取到最新版本');
+            return;
+        }
+        if (typeof response.data !== 'object') {
+            cb('获取到的数据格式无效');
+            return;
+        }
+        cb(null, Date.parse(response.data.commit.committer.date));
+    });
+}
+
+/**
+ * @param {string} remote_repo
+ * @param {Function} cb
+ */
+function get_mpv_remote_version(remote_repo, cb) {
+    http.get(u.string_format('https://api.github.com/repos/%s/releases/latest', remote_repo), {
+        headers: {
+            'Accept': 'application/vnd.github+json',
+        },
+    }, function (err, response) {
+        if (err || response.status_code !== 200) {
+            msg.verbose(err || response.status_text);
+            cb('未获取到最新版本');
+            return;
+        }
+        if (typeof response.data !== 'object') {
+            cb('获取到的数据格式无效');
+            return;
+        }
+        var json = response.data;
+        for (var i = 0; i < json.assets.length; i++) {
+            /** @type {string} */
+            var name = json.assets[i].name;
+            if (name.indexOf('mpv-x86_64-') !== 0) {
+                continue;
+            }
+            var name_matches = name.match(/-([\w]+-git-[a-z0-9]{7})/);
+            var version_matches = name.match(/-git-([a-z0-9-]{7})/);
+            if (version_matches !== null) {
+                cb(null, {
+                    name: name_matches === null ? null : name_matches[1],
+                    version: version_matches[1],
+                });
+                return;
+            }
+        }
+        cb('未找到指定的远程版本');
+    });
+}
+
+function check_config_update(force) {
+    var cache = read_cache('config');
+    var cache_valid = typeof cache.last_check_update_time === 'number' && typeof cache.remote_commit_time === 'number';
+    var check_update_interval = parse_interval(options.check_config_interval);
+    var local_commit_time = get_config_local_version();
+
+    if (local_commit_time === null) {
+        msg.error('检查配置文件更新失败: 未获取到本地版本');
         return;
     }
 
     var compare_version = function compare_version(a, b) {
         if (a >= b) {
-            return;
+            return false;
         }
         var date = new Date(b);
         var osd = mp.create_osd_overlay('ass-events');
@@ -113,54 +191,42 @@ function check_config_update() {
         setTimeout(function () {
             osd.remove();
         }, 3000);
+        return true;
     };
 
-    if (!cache_valid || check_interval(cache.last_check_update_time, check_update_interval)) {
-        http.get('https://api.github.com/repos/Hill-98/mpv-config/commits/main', {
-            headers: {
-                'Accept': 'application/vnd.github+json',
-            },
-        }, function (err, response) {
-            if (err || response.status_code !== 200) {
-                msg.verbose(err || response.status_text);
-                msg.error('检查配置文件更新失败: 未获取到最新版本');
+    if (force || !cache_valid || check_interval(cache.last_check_update_time, check_update_interval)) {
+        get_config_remote_version(function (err, remote_commit_time) {
+            if (err) {
+                msg.error('检查配置文件更新失败: ' + err);
                 return;
             }
-            if (typeof response.data !== 'object') {
-                msg.error('检查配置文件更新失败: 数据解析错误');
-                return;
-            }
-            var json = response.data;
-            var remote_commit_time = Date.parse(json.commit.committer.date);
-            compare_version(local_commit_time, remote_commit_time);
+            var has_new = compare_version(local_commit_time, remote_commit_time);
             var cache = {
                 last_check_update_time: Date.now(),
                 remote_commit_time: remote_commit_time,
             };
             write_cache('config', cache);
+            if (!has_new && force) {
+                msg.info('本地配置文件版本已经是最新的了');
+                return;
+            }
         });
     } else {
         compare_version(local_commit_time, cache.remote_commit_time);
     }
 }
 
-function check_mpv_update() {
+function check_mpv_update(force) {
     var cache = read_cache('mpv');
     var cache_valid = typeof cache.last_check_update_time === 'number' && typeof cache.local_version === 'string' && typeof cache.remote_version === 'string';
     /** @type {string} */
-    var mpv_version = mp.get_property_native('mpv-version').trim();
     var check_update_interval = parse_interval(options.check_mpv_interval);
+    var local_version = get_mpv_local_version();
     var remote_repo = options.check_mpv_repo;
-    var matches = mpv_version.match(/-g([a-z0-9-]{7})/);
-
-    if (matches === null) {
-        msg.warn('检查 MPV 更新失败: 未获取到本地 mpv 版本');
-        return;
-    }
 
     var compare_version = function compare_version(a, b, s) {
         if (a === b) {
-            return;
+            return false;
         }
         var osd = mp.create_osd_overlay('ass-events');
         osd.data = '检查到 mpv 新版本: ' + (s || b);
@@ -168,59 +234,41 @@ function check_mpv_update() {
         setTimeout(function () {
             osd.remove();
         }, 3000);
+        return true;
     };
-    var local_version = matches[1];
 
-    if (!cache_valid || check_interval(cache.last_check_update_time, check_update_interval) || cache.local_version !== local_version || cache.remote_repo !== remote_repo) {
-        http.get(u.string_format('https://api.github.com/repos/%s/releases/latest', remote_repo), {
-            headers: {
-                'Accept': 'application/vnd.github+json',
-            },
-        }, function (err, response) {
-            if (err || response.status_code !== 200) {
-                msg.verbose(err || response.status_text);
-                msg.error('检查 mpv 更新失败: 未获取到最新版本');
+    if (force || !cache_valid || check_interval(cache.last_check_update_time, check_update_interval) || cache.local_version !== local_version || cache.remote_repo !== remote_repo) {
+        get_mpv_remote_version(remote_repo, function (err, remote) {
+            if (err) {
+                msg.error('检查 mpv 更新失败：' + err);
                 return;
             }
-            if (typeof response.data !== 'object') {
-                msg.error('检查 mpv 更新失败: 数据解析错误');
+            var has_new = compare_version(local_version, remote.version, remote.name);
+            var cache = {
+                last_check_update_time: Date.now(),
+                local_version: local_version,
+                remote_repo: remote_repo,
+                remote_version: remote.version,
+                remote_version_name: remote.name,
+            };
+            write_cache('mpv', cache);
+            if (!has_new && force) {
+                msg.info('本地 mpv 版本已经是最新的了');
                 return;
-            }
-            var json = response.data;
-            var not_found = true;
-            var assets_prefix = 'mpv-x86_64-';
-            for (var i = 0; i < json.assets.length; i++) {
-                /** @type {string} */
-                var name = json.assets[i].name;
-                if (name.indexOf(assets_prefix) !== 0) {
-                    continue;
-                }
-                var matches = name.match(/-git-([a-z0-9-]{7})/);
-                if (matches !== null) {
-                    var remote_version = matches[1];
-                    matches = name.match(/-([\w]+-git-[a-z0-9]{7})/);
-                    var remote_version_name = matches === null ? null : matches[1];
-                    compare_version(local_version, remote_version, remote_version_name);
-                    var cache = {
-                        last_check_update_time: Date.now(),
-                        local_version: local_version,
-                        remote_repo: remote_repo,
-                        remote_version: remote_version,
-                        remote_version_name: remote_version_name,
-                    };
-                    write_cache('mpv', cache);
-                    var not_found = false;
-                    break;
-                }
-            }
-            if (not_found) {
-                msg.error('检查 mpv 更新失败: 未找到对应的远程版本');
             }
         });
     } else {
         compare_version(local_version, cache.remote_version, cache.remote_version_name);
     }
 }
+
+mp.register_script_message('check-update/config', function () {
+    check_config_update(true);
+});
+
+mp.register_script_message('check-update/mpv', function () {
+    check_mpv_update(true);
+});
 
 check_config_update();
 if (options.check_mpv_update) {
