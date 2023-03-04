@@ -1,5 +1,5 @@
 /**
- * 通过 fontconfig 或 sub-fonts-dir 加载播放文件路径下 fonts 文件夹内的字体文件
+ * 使用 fontconfig 或 sub-fonts-dir 加载播放文件路径下 fonts 文件夹内的字体文件
  *
  * 默认使用 fontconfig 方法加载，需要 mpv 支持 fontconfig 以及设置 sub-font-provider=fontconfig 并在 fonts.conf
  * 添加 <include ignore_missing="yes">%CONFIG_DIR%/.fonts.conf</include> 行 (替换 %CONFIG_DIR% 为 mpv 配置目录)。

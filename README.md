@@ -3,7 +3,7 @@
 
 ## 使用
 
-**Linux 使用方法: 如果你已经用 Linux 了，那么这应该难不倒你。**
+**Linux 使用方法: 如果你已经在使用 Linux 了，那么这应该难不倒你。**
 
 **以下为 Windows 使用方法**
 
@@ -162,7 +162,7 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 ### [Auto Load Fonts](scripts/auto-load-fonts.js)
 
-通过 **fontconfig** 或 **sub-fonts-dir** 加载播放文件路径下支持的子目录内的字体文件，`sub-fonts-dir` 方法需要 mpv 最新版本。
+使用 **fontconfig** 或 **sub-fonts-dir** 加载播放文件路径下支持的子目录内的字体文件，`sub-fonts-dir` 方法需要 mpv 最新版本。
 
 **支持的子目录:**
 * fonts
