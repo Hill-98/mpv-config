@@ -132,14 +132,15 @@ function get_compatible_fonts_dir() {
 }
 
 /**
- * @param {string} dir
+ * @param {string|null} dir
  */
 function set_fonts_dir(dir) {
+    var d = dir === null ? '' : dir;
     var method = options.method;
     if (method === 'fontconfig') {
-        write_fonts_conf(dir, !dir);
+        write_fonts_conf(d, d === '');
     } else if (method === 'native') {
-        mp.set_property_native('sub-fonts-dir', dir);
+        mp.set_property_native('sub-fonts-dir', d);
     }
 }
 
@@ -178,8 +179,9 @@ function write_fonts_conf(fonts_dir, require_exist) {
 mp.options.read_options(options, 'auto_load_fonts', function () {
     if (!options.enable) {
         state.set_fonts_dir = false;
+        mp.set_property_native('sub-fonts-dir', '');
+        write_fonts_conf('', true);
         clear_fonts();
-        set_fonts_dir('');
     }
     update_options();
 });
@@ -208,7 +210,7 @@ mp.add_hook('on_load', 50, function () {
     // 如果没有字体目录并且之前设置了字体目录，那么清空配置文件。
     if (!fonts_dir) {
         if (state.set_fonts_dir) {
-            set_fonts_dir('');
+            set_fonts_dir(null);
             state.set_fonts_dir = false;
         }
         return;
@@ -244,6 +246,6 @@ mp.add_hook('on_load', 50, function () {
 });
 
 mp.register_event('shutdown', function () {
-    write_fonts_conf('', true);
+    set_fonts_dir(null);
     clear_fonts();
 });
