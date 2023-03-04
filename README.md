@@ -162,9 +162,17 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 ### [Auto Load Fonts](scripts/auto-load-fonts.js)
 
-自动设置 fontconfig 以加载播放文件路径下 `fonts` 文件夹内的字体文件
+通过 **fontconfig** 或 **sub-fonts-dir** 加载播放文件路径下支持的子目录内的字体文件，`sub-fonts-dir` 方法需要 mpv 最新版本。
 
-由于 Windows 的 NTFS 分区路径字符编码不统一 (mpv-player/mpv#10679)，fontconfig 在某些分区上无法加载文件名包含非英文字符的字体文件，遇到此问题可以用以下几种方法解决：
+**支持的子目录:**
+* fonts
+* Fonts
+* FONTS
+* 字体
+
+> 由于 Windows 路径名不区分大小写，所以 `fonts` 和 `Fonts` 没有区别。
+
+由于 Windows 的 NTFS 分区路径字符编码不统一 (mpv-player/mpv#10679)，fontconfig 在某些分区上无法加载文件名包含非英文字符的字体文件，遇到此问题可以切换到 `native` 方法或通过以下几种方法解决：
 
 > https://github.com/shinchiro/mpv-winbuild-cmake 最新版本已修复 Windows 分区兼容性问题，不再需要以下解决方法。如果你使用的是其他版本，可以继续使用以下解决方法。
 
@@ -172,13 +180,17 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 * 将文件名包含非英文字符的字体文件重命名为只包含英文字符文件名。
 * 使用兼容模式
 
-**兼容模式:** 兼容模式主要用于解决一些性能问题和 Windows 某些分区上的错误，脚本在兼容模式下加载字体文件时会将 `fonts` 文件夹复制到指定位置，然后使用新位置进行加载。默认位置为配置目录的 `.fonts` 目录，如果配置目录所在分区也存在兼容性问题，你还可以自定义兼容目录位置。
+**兼容模式:** 兼容模式主要用于解决一些 fontconfig 的性能问题和 Windows 某些分区上的错误，脚本在兼容模式下加载字体文件时会将 `fonts` 文件夹复制到指定位置，然后使用新位置进行加载。默认位置为配置目录的 `.fonts` 目录，如果配置目录所在分区也存在兼容性问题，你还可以自定义兼容目录位置。
+
+> 兼容模式在 `native` 模式下也会生效，不过并不能带来任何改进。
 
 **设置项:**
 
 兼容模式: `auto_load_fonts-compatible_mode=[yes|no] # 默认关闭`
 
 兼容目录: `auto_load_fonts-compatible_dir=D:\fonts-cache # 设置兼容目录为 D:\fonts-cache`
+
+加载方法：`auto_load_fonts-method=[fontconfig|native] # 默认为 fontconfig 模式，设置为 native 切换到 sub-fonts-dir 方法。`
 
 > Auto Load Fonts 支持设置项实时更新，可以配合 `profile-cond` 按需开启兼容模式。
 
