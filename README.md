@@ -47,7 +47,7 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 * 特定于文件的配置文件
 * 中文音频/字幕优先 (日文、英文其次)
 * 退出时保存对当前文件的部分设置
-* 始终启用缓存 (1G)
+* 始终启用缓存 (256M)
 * 模糊匹配外部音频文件
 * 垂直同步
 * 增强的去带参数
