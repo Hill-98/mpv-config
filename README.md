@@ -198,15 +198,17 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 ### [Auto Press Key](scripts/auto-press-key.js)
 
-如果播放文件目录存在 `mpv.keys` 或 `${filename}.mpv.keys`，则在文件加载后自动按下按键，文件结束时再次按下按键。
+如果播放文件目录存在 `mpv.keys` 或 `${filename}.mpv.keys`，则在文件加载后自动按下按键，文件结束后再次按下按键。
 
-`mpv.keys`: 每行一个按键，可以是组合键，以 `#` 开头的行会被忽略。
+`mpv.keys`: 每行一个按键，可以是组合键，以 `!` 开头的按键不会在文件结束后再次按下，以 `#` 开头的行会被忽略。
 
 ### [Check Update](scripts/check-update.js)
 
 自动检查配置文件更新，还支持 mpv 新版本检查，默认检查源 : [shinchiro/mpv-winbuild-cmake](https://github.com/shinchiro/mpv-winbuild-cmake)。
 
 配置文件默认每 7 天检查一次， mpv 默认每 1 天检查一次。
+
+可以通过 `script-message check-update/config` 或 `script-message check-update/config` 命令强制检查更新。
 
 网络请求依赖于外部工具 `curl`，如果存在 `http_proxy` 环境变量或 mpv 设置项，那么请求时会自动用作 HTTP 代理，你也可以单独为这个脚本设置 HTTP 代理。
 
