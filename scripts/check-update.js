@@ -185,9 +185,11 @@ function check_config_update(force) {
             return false;
         }
         var date = new Date(b);
+        var text = '检查到配置文件新版本: ' + date.toLocaleString();
         var osd = mp.create_osd_overlay('ass-events');
-        osd.data = '检查到配置文件新版本: ' + date.toLocaleString();
+        osd.data = text;
         osd.update();
+        msg.info(text);
         setTimeout(function () {
             osd.remove();
         }, 3000);
@@ -228,9 +230,11 @@ function check_mpv_update(force) {
         if (a === b) {
             return false;
         }
+        var text = '检查到 mpv 新版本: ' + (s || b);
         var osd = mp.create_osd_overlay('ass-events');
-        osd.data = '检查到 mpv 新版本: ' + (s || b);
+        osd.data = text;
         osd.update();
+        msg.info(text);
         setTimeout(function () {
             osd.remove();
         }, 3000);
