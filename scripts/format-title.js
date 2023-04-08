@@ -15,7 +15,9 @@ mp.options.read_options(options, 'format_title');
  *   [VCB-Studio] Re Zero kara Hajimeru Isekai Seikatsu [01][Ma10p_1080p][x265_flac_aac]
  *   [VCB-Studio] Yama no Susume Second Season [06.5(OVA)][Ma10p_1080p][x265_flac]
  *
- * Result: Yama no Susume Second Season [06.5(OVA)]
+ * Result:
+ *   Re Zero kara Hajimeru Isekai Seikatsu [01]
+ *   Yama no Susume Second Season [06.5(OVA)]
  *
  * @param {string} filename
  * @returns {string|undefined}
@@ -92,8 +94,7 @@ function formatter_d(filename) {
     if (subtitle) {
         title += ': ' + subtitle.replace(/\./g, ' ').trim();
     }
-    title += ' [' + episode + ']';
-    return title;
+    return title + ' [' + episode + ']';
 }
 
 /**
@@ -116,8 +117,7 @@ function formatter_e(filename) {
     if (subtitle) {
         title += ': ' + subtitle.replace(/\./g, ' ').trim();
     }
-    title += ' [' + date + ']';
-    return title;
+    return title + ' [' + date + ']';
 }
 
 var formatters = [
@@ -132,12 +132,12 @@ mp.add_hook('on_load', 99, function () {
     if (!options.enable) {
         return;
     }
-
-    var filename = mp.get_property_native('filename/no-ext');
+    // 没有被强制设置标题并且文件没有标题属性
     if (mp.get_property_native('force-media-title') !== '' || mp.get_property_native('filename') !== mp.get_property_native('media-title') || is_protocol_regex.test(mp.get_property_native('path'))) {
         return;
     }
 
+    var filename = mp.get_property_native('filename/no-ext');
     for (var i = 0; i < formatters.length; i++) {
         var formatter = formatters[i];
         var title = formatter(filename);

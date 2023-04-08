@@ -1,5 +1,7 @@
 name: Pack
-on: [push, pull_request]
+on:
+  - push
+  - pull_request
 jobs:
   pack-zip:
     runs-on: ubuntu-latest
@@ -11,7 +13,7 @@ jobs:
           submodules: true
       - name: Install dependencies
         run: sudo apt -y install findutils zip unzip
-      - name: Pack to zip
+      - name: Delete unused files
         run: |
           cd "$GITHUB_WORKSPACE"
           echo $(($(git log -1 --format=%ct) * 1000)) > .commit_time

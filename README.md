@@ -30,6 +30,8 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 2. 执行配置脚本: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\setup.ps1`
 3. 打开 Windows 设置或控制面板设置文件关联。
 
+> 如果使用备用安装方法，更新时先执行一下 `clean.bat`，删除旧版本文件，它并不会删除自定义的配置文件。
+
 ## 说明
 
 **控制界面:** [UOSC](https://github.com/tomasklaen/uosc) (有右键菜单)
@@ -37,19 +39,19 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 **默认渲染配置 (gpu-hq-max):**
 * `gpu-hq`
 * `scale` = `ewa_lanczos`
-* 去带: 关闭
+* 去带 (deband): 关闭
 * 着色器: [`KrigBilateral`](https://gist.github.com/igv/a015fc885d5c22e6891820ad89555637), [`SSimSuperRes`](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b)
 * 垂直同步 (`tscale=oversample`)
 
 > 可以使用快捷键 `~` 回退到 `gpu-hq`，然后还可以使用快捷键 ``Alt+` `` 回退到 `default`。
 
 **默认配置:**
-* 特定于文件的配置文件
+* 特定于文件的配置文件 (`use-filedir-conf`)
 * 中文音频/字幕优先 (日文、英文其次)
-* 退出时保存对当前文件的部分设置
+* 退出时保存对当前文件的部分设置 (`save-position-on-quit`)
 * 始终启用缓存 (256M)
-* 模糊匹配外部音频文件
-* 垂直同步
+* 模糊匹配外部音频文件 (`audio-file-auto=fuzzy`)
+* 垂直同步 (`video-sync=display-resample`)
 * 增强的去带参数
 * 字幕字体: 文泉驿微米黑
 * 字幕字体提供程序: `fontconfig` (支持自动加载当前播放文件路径下 `fonts` 文件夹的字体文件，详情见[特色功能](#auto-load-fonts)。)
@@ -60,7 +62,7 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 
 如果你使用的是非 HDR 显示设备，那么你播放 HDR 视频时不需要做任何事，mpv 会自动将 HDR 转换为 SDR。
 
-如果你使用的是 HDR 显示设备，需要使用 `gpu-next` 输出驱动并开启 HDR 直通才能获得最佳体验，你可以在 `local.conf` 文件写入以下配置。不过 `gpu-next` 目前与部分着色器存在兼容性问题，比如 Anime4K，如果遇到兼容性问题，你可以回退到 `gpu` 输出驱动。
+如果你使用的是 HDR 显示设备，需要使用 `gpu-next` 输出驱动并开启 HDR 直通才能获得最佳体验，你可以在 `local.conf` 文件写入以下配置。不过 `gpu-next` 目前与部分着色器存在兼容性问题，比如 Anime4K，如果遇到兼容性问题，你可以回退到 `gpu` 输出驱动，或配置按需启用 `gpu-next`。
 
 `local.conf`:
 ```
@@ -172,17 +174,9 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 > 由于 Windows 路径名不区分大小写，所以 `fonts` 和 `Fonts` 没有区别。
 
-由于 Windows 的 NTFS 分区路径字符编码不统一 (mpv-player/mpv#10679)，fontconfig 在某些分区上无法加载文件名包含非英文字符的字体文件，遇到此问题可以切换到 `native` 方法或通过以下几种方法解决：
-
-> https://github.com/shinchiro/mpv-winbuild-cmake 最新版本已修复 Windows 分区兼容性问题，不再需要以下解决方法。如果你使用的是其他版本，可以继续使用以下解决方法。
-
-* 重新使用 Windows 内置的磁盘管理重新格式化分区
-* 将文件名包含非英文字符的字体文件重命名为只包含英文字符文件名。
-* 使用兼容模式
-
 **兼容模式:** 兼容模式主要用于解决一些 fontconfig 的性能问题和 Windows 某些分区上的错误，脚本在兼容模式下加载字体文件时会将 `fonts` 文件夹复制到指定位置，然后使用新位置进行加载。默认位置为配置目录的 `.fonts` 目录，如果配置目录所在分区也存在兼容性问题，你还可以自定义兼容目录位置。
 
-> 兼容模式在 `native` 模式下也会生效，不过并不能带来任何改进。
+> 兼容模式在 `native` 模式下也会生效，不过可能没有任何改善。
 
 **设置项:**
 
@@ -193,8 +187,6 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 加载方法：`auto_load_fonts-method=[fontconfig|native] # 默认为 fontconfig 模式，设置为 native 切换到 sub-fonts-dir 方法。`
 
 > Auto Load Fonts 支持设置项实时更新，可以配合 `profile-cond` 按需开启兼容模式。
-
-> 小提示：如果所有分区都不兼容又不想拆分现有分区，可以使用 [ImDisk](https://sourceforge.net/projects/imdisk-toolkit/) 等软件创建内存盘。
 
 ### [Auto Press Key](scripts/auto-press-key.js)
 
