@@ -48,7 +48,9 @@ mp.add_hook('on_load_fail', 99, function () {
     }
     if (mp.get_property('idle') !== 'yes') {
         set_idle('yes', true);
-        state.idle_changed = true;
+        setTimeout(function () {
+            state.idle_changed = true;
+        }, 300);
     }
 });
 
