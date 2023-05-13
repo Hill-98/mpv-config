@@ -35,7 +35,7 @@ function set_idle(value, no_observe) {
     }, 100);
 }
 
-mp.add_hook('on_preloaded', 99, function () {
+mp.add_hook('on_unload', 99, function () {
     if (state.idle_changed) {
         set_idle(state.idle);
     }
