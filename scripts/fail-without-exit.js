@@ -5,6 +5,7 @@
 'use strict';
 
 var state = {
+    end_reason: null,
     idle: '',
     idle_changed: false,
     no_observe_idle: false,
@@ -35,11 +36,15 @@ function set_idle(value, no_observe) {
     }, 100);
 }
 
-mp.add_hook('on_unload', 99, function () {
-    if (state.idle_changed) {
+mp.register_event('end-file', function (ev) {
+    state.end_reason = ev.reason;
+});
+
+mp.add_hook('on_after_end_file', 99, function () {
+    if (state.idle_changed && state.end_reason != 'error') {
         set_idle(state.idle);
+        state.idle_changed = false;
     }
-    state.idle_changed = false;
 });
 
 mp.add_hook('on_load_fail', 99, function () {
