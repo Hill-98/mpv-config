@@ -30,7 +30,7 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 2. 执行配置脚本: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\setup.ps1`
 3. 打开 Windows 设置或控制面板设置文件关联。
 
-> 如果使用备用安装方法，更新时先执行一下 `clean.bat`，删除旧版本文件，它并不会删除自定义的配置文件。
+> 如果使用备用安装方法，更新时先执行一下 `clean.bat`，删除旧版本文件，此操作不会删除自定义的配置文件。
 
 ## 说明
 
@@ -56,26 +56,24 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 * 字幕字体: 文泉驿微米黑
 * 字幕字体提供程序: `fontconfig` (支持自动加载当前播放文件路径下 `fonts` 文件夹的字体文件，详情见[特色功能](#auto-load-fonts)。)
 
-**极速模式:** 卸载所有着色器、还原占用性能的配置文件、开启硬件解码。(适合低性能设备播放 4K60FPS 等视频文件时开启)
+**极速模式:** 卸载所有着色器、还原需要高性能的配置文件、开启硬件解码。(极速模式适合低性能设备播放 4K60FPS 等视频文件时开启)
 
 **HDR 视频播放:**
 
-如果你使用的是非 HDR 显示设备，那么你播放 HDR 视频时不需要做任何事，mpv 会自动将 HDR 转换为 SDR。
+如果你的显示设备不支持 HDR，那么播放 HDR 视频不需要做任何事，mpv 会自动进行 SDR 转换。
 
-如果你使用的是 HDR 显示设备，需要使用 `gpu-next` 输出驱动并开启 HDR 直通才能获得最佳体验，你可以在 `local.conf` 文件写入以下配置。不过 `gpu-next` 目前与部分着色器存在兼容性问题，比如 Anime4K，如果遇到兼容性问题，你可以回退到 `gpu` 输出驱动，或配置按需启用 `gpu-next`。
+如果你的显示设备支持 HDR，在系统设置里开启 HDR，然后将 mpv 的视频输出驱动设置为 `gpu-next` 并启用 HDR 直通，你可以在 `local.conf` 文件添加以下配置项。`gpu-next` 与一些着色器可能存在兼容性问题（比如 Anime4K），如果遇到这类问题，可以回退到 `gpu` 视频输出驱动。
 
-`local.conf`:
-```
+`local.conf`:（添加以下行）
+```conf
 vo=gpu-next
 target-colorspace-hint=yes # HDR 直通
 ```
 
-**HDR 视频截图:** 播放 HDR 视频并截图，mpv 会为截图文件写入色彩空间标签并使用与视频相同的位深（仅支持部分图片格式），但是目前支持色彩空间、高位深和 HDR 的图片查看器少之又少，导致 HDR 截图在大部分图片查看器并不能正确的显示。如果你有显示 HDR 截图的需求，或者想把 HDR 截图分享给他人，推荐使用 Google Chrome (任何支持 HDR 的浏览器) 或 mpv 查看图片，分享给他人的时候务必以文件的形式发送，而不是使用 IM 或其他软件的发送图片功能，以及确保他人拥有正确显示 HDR 的条件。
-
-> 如果使用的是 HDR 显示设备，需要先在系统设置里开启 HDR。Linux 目前仅部分 Wayland 合成器支持 HDR。
+**HDR 视频截图:** 播放 HDR 视频并截图，mpv 会为截图文件写入色彩空间标签并使用与视频相同的位深（仅支持部分图片格式），但是目前支持色彩空间、高位深和 HDR 的图片查看器少之又少，导致 HDR 截图在大部分图片查看器并不能正确的显示。如果你有显示 HDR 截图的需求，或者想把 HDR 截图分享给他人，推荐使用 Google Chrome 或 mpv 查看图片，分享给他人务必以文件的形式发送，切勿使用 IM 或其他软件的发送图片功能，以及确保他人拥有 HDR 显示设备。
 
 **默认保存的文件设置:**
-```conf
+```txt
 af 音频过滤器
 vf 视频过滤器
 aid 音频轨道
@@ -98,7 +96,7 @@ volume 音量
 > 可以使用快捷键 `DEL` 删除当前文件保存的设置。
 
 **不完整快捷键列表:**
-```conf
+```txt
 BackSpace 重置播放速度
 Alt+= 增加字幕字体大小
 Alt+- 减小字幕字体大小
@@ -142,16 +140,16 @@ Ctrl+p 填充黑边使视频比例与当前窗口比例相同 (解决视频比�
 
 如果你需要自定义或覆盖默认设置，可以修改配置目录的 `local.conf` 文件。
 
-如果你需要修改默认加载的预设配置文件 (profile)，可以在配置文件目录创建 `profiles.local`，语法可以参考 `profiles` 文件。
+如果你需要修改默认加载的预设配置文件 (profile)，可以在配置文件目录创建 `profiles.local`，语法参考 `profiles` 文件。
 
 如果你需要自定义快捷键，并且需要继承原有快捷键配置，可以按以下步骤进行操作:
 1. 在 `local.conf` 文件加入以下行:
-```
+```conf
 input-conf="~~/.input.conf"
 script-opts-append="custom_input-enable=yes"
 ```
 2. 在配置目录创建 `input.local.conf` 文件并加入以下行:
-```
+```conf
 #@ ~~/input.conf
 ```
 3. 在 `input.local.conf` 文件设置新的快捷键
@@ -202,9 +200,9 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 配置文件默认每 7 天检查一次， mpv 默认每 1 天检查一次。
 
-可以通过 `script-message check-update/config` 或 `script-message check-update/config` 命令强制检查更新。
+可以通过 `script-message check-update/config` 或 `script-message check-update/mpv` 命令强制检查更新。
 
-网络请求依赖于外部工具 `curl`，如果存在 `http_proxy` 环境变量或 mpv 设置项，那么请求时会自动用作 HTTP 代理，你也可以单独为这个脚本设置 HTTP 代理。
+网络请求依赖于外部工具 `curl`，如果存在 `http_proxy` 环境变量或 mpv 设置项，请求时会自动将其设置为 HTTP 代理，也可以单独为这个脚本设置 HTTP 代理。
 
 **设置项:**
 
