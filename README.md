@@ -62,7 +62,7 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 
 如果你的显示设备不支持 HDR，那么播放 HDR 视频不需要做任何事，mpv 会自动进行 SDR 转换。
 
-如果你的显示设备支持 HDR，在系统设置里开启 HDR，然后将 mpv 的视频输出驱动设置为 `gpu-next` 并启用 HDR 直通，你可以在 `local.conf` 文件添加以下配置项。`gpu-next` 与一些着色器可能存在兼容性问题（比如 Anime4K），如果遇到这类问题，可以回退到 `gpu` 视频输出驱动。
+如果你的显示设备支持 HDR，在系统设置里启用 HDR，然后将 mpv 的视频输出驱动设置为 `gpu-next` 并启用 HDR 直通，你可以在 `local.conf` 文件添加以下配置项。`gpu-next` 与一些着色器可能存在兼容性问题（比如 Anime4K），如果遇到这类问题，可以回退到 `gpu` 视频输出驱动。
 
 `local.conf`:（添加以下行）
 ```conf
