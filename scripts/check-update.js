@@ -5,6 +5,7 @@ var utils = mp.utils;
 var commands = require('../script-modules/commands');
 var HttpClient = require('../script-modules/HttpClient');
 var u = require('../script-modules/utils');
+
 var options = {
     check_config_interval: 7,
     check_mpv_update: false,
@@ -14,7 +15,7 @@ var options = {
 };
 mp.options.read_options(options, 'check_update');
 var state = {
-    http_proxy: options.http_proxy || mp.get_property_native('http_proxy') || utils.getenv('http_proxy'),
+    http_proxy: options.http_proxy || mp.get_property_native('http_proxy'),
     os: u.detect_os(),
 };
 

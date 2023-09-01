@@ -202,7 +202,7 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 可以通过 `script-message check-update/config` 或 `script-message check-update/mpv` 命令强制检查更新。
 
-网络请求依赖于外部工具 `curl`，如果存在 `http_proxy` 环境变量或 mpv 设置项，请求时会自动将其设置为 HTTP 代理，也可以单独为这个脚本设置 HTTP 代理。
+网络请求依赖于外部工具 `curl`，如果 `http_proxy` mpv 配置项已设置，将自动将其设置为 HTTP 代理，也支持为这个脚本单独设置 HTTP 代理，以及 curl 会自动使用 HTTP 代理相关环境变量。
 
 **设置项:**
 
