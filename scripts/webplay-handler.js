@@ -5,6 +5,7 @@ var PROTOCOL_PREFIX = 'webplay:?';
 var msg = mp.msg;
 var commands = require('../script-modules/commands');
 var HttpHeaders = require('../script-modules/HttpHeaders');
+
 var state = {
     /** @type {number|null} */
     start: null,

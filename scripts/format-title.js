@@ -54,19 +54,20 @@ function formatter_b(filename) {
 /**
  * Example: 5.Centimeters.Per.Second.2007.1080p.BluRay.x264
  *
- * Result: 5 Centimeters Per Second
+ * Result: 5 Centimeters Per Second (2007)
  *
  * @param {string} filename
  * @returns {string|undefined}
  */
 function formatter_c(filename) {
-    var regex = /^([\w\-.]+)\.\d{4}\.\d{3,4}p/;
+    var regex = /^([\w\-.]+)\.(\d{4})\.\d{3,4}p/;
     var results = filename.match(regex);
     if (results === null) {
         return undefined;
     }
     var name = results[1];
-    return name.replace(/\./g, ' ').trim();
+    var year = results[2];
+    return name.replace(/\./g, ' ').trim() + ' (' + year + ')';
 }
 
 /**

@@ -18,12 +18,13 @@
 var msg = mp.msg;
 var commands = require('../script-modules/commands');
 var u = require('../script-modules/utils');
+
 /** @type {Object.<string, StatObj>} */
-var stat = {};
 var glsl_shaders = commands.change_list('glsl-shaders');
 var osd = mp.create_osd_overlay('ass-events');
 /** @type {number|null} */
 var osd_timer = null;
+var stat = {};
 
 function osd_message(message, timeout) {
     if (osd_timer !== null) {

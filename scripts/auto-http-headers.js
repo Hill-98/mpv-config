@@ -5,14 +5,14 @@
 
 'use strict';
 
-var msg = mp.msg;
-var HttpHeaders = require('../script-modules/HttpHeaders');
-
-var http_prefix_regex = /^https?:\/\//;
-var protocols = [
+var PREFIX_REGEX = /^https?:\/\//;
+var PROTOCOLS = [
     'ytdl',
 ].map(function (v) { return new RegExp('^' + v + ':(\/\/)?'); });
-var url_regex = /https?:\/\/[\w\.-]+/;
+var URL_REGEX = /https?:\/\/[\w\.-]+/;
+
+var msg = mp.msg;
+var HttpHeaders = require('../script-modules/HttpHeaders');
 
 mp.add_hook('on_load', 99, function () {
     if (mp.get_property_native('playback-abort')) {
@@ -21,13 +21,13 @@ mp.add_hook('on_load', 99, function () {
 
     /** @type {string} */
     var url = mp.get_property_native('path');
-    protocols.forEach(function (regex) { return url = url.replace(regex, ''); });
-    if (!http_prefix_regex.test(url)) {
+    PROTOCOLS.forEach(function (regex) { return url = url.replace(regex, ''); });
+    if (!PREFIX_REGEX.test(url)) {
         return;
     }
     var http_headers = new HttpHeaders();
     var headers = [];
-    var matches = url.match(url_regex);
+    var matches = url.match(URL_REGEX);
     if (matches !== null) {
         headers.push('origin: ' + matches[0]);
     }

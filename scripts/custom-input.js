@@ -4,6 +4,7 @@ var utils = mp.utils;
 var commands = require('../script-modules/commands');
 var u = require('../script-modules/utils');
 var custom_input_conf = commands.expand_path('~~/input.local.conf');
+
 var options = {
     enable: false,
 };

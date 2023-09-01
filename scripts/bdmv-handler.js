@@ -1,5 +1,9 @@
 'use strict';
 
+var BD_NAME_REGEX = /<di:name>(.+)<\/di:name>/;
+var TITLE_START_TAG = '<di:title>';
+var TITLE_END_TAG = '</di:title>';
+
 var commands = require('../script-modules/commands');
 var u = require('../script-modules/utils');
 var utils = mp.utils;
@@ -91,12 +95,17 @@ mp.add_hook('on_load', 99, function () {
             }
         }
 
-        var name_regex = /<di:name>(.+)<\/di:name>/;
         for (var i = 0; i < langs.length; i++) {
             var file = utils.join_path(meta_dl_dir, u.string_format('bdmt_%s.xml', langs[i]));
             if (u.file_exist(file)) {
                 var xml = utils.read_file(file);
-                var matches = xml.match(name_regex);
+                var i1 = xml.indexOf(TITLE_START_TAG);
+                var i2 = xml.indexOf(TITLE_END_TAG, i1 + 1);
+                if (i1 === -1 || i2 === -1) {
+                    continue;
+                }
+                var title_node = xml.substring(i1 + TITLE_START_TAG.length, i2);
+                var matches = title_node.match(BD_NAME_REGEX);
                 if (matches !== null) {
                     bd_name = escape_xml(matches[1]);
                     break;
