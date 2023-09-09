@@ -3,6 +3,8 @@
  * 未实现：多屏幕兼容性
  */
 
+'use strict';
+
 var commands = require('../script-modules/commands');
 var once = require('../script-modules/OnceHelper');
 var u = require('../script-modules/utils');

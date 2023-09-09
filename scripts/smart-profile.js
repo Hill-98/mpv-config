@@ -5,6 +5,8 @@
  * restore-profile 命令会还原配置文件，但如果内部状态是未加载则不进行任何操作。
  */
 
+'use strict';
+
 var msg = mp.msg;
 var commands = require('../script-modules/commands');
 var u = require('../script-modules/utils');
