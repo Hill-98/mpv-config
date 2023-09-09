@@ -3,16 +3,16 @@
 
 ## 使用
 
-**Linux 使用方法: 如果你已经在使用 Linux 了，那么这应该难不倒你。**
+**Linux 安装方法: 如果你已经在使用 Linux 了，那么这应该难不倒你。**
 
-**以下为 Windows 使用方法**
+**以下是 Windows 10+ 安装方法**
 
 ### 安装
 
 0. 启用 [Windows 开发人员模式](https://docs.microsoft.com/windows/apps/get-started/enable-your-device-for-development)、[Git LFS](https://git-lfs.github.com/) 和 Git 符号链接支持 (`git config --global --bool core.symlinks true`)
 1. 克隆存储库: `git clone --recursive https://github.com/Hill-98/mpv-config.git mpv-config`
 2. 修复 git 符号链接错误: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\fix-symbolic-link.ps1`
-3. 执行配置脚本: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\setup.ps1`
+3. 运行配置脚本: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\setup.ps1`
 4. 打开 Windows 设置或控制面板设置文件关联。
 
 ### 更新
@@ -27,7 +27,7 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 
 ### 备用安装方法
 1. 前往 GitHub Actions 下载最新打包版本: [https://github.com/Hill-98/mpv-config/actions](https://github.com/Hill-98/mpv-config/actions)
-2. 执行配置脚本: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\setup.ps1`
+2. 运行配置脚本: `mpv-config\setup\setup.bat`
 3. 打开 Windows 设置或控制面板设置文件关联。
 
 > 如果使用备用安装方法，更新时先执行一下 `clean.bat`，删除旧版本文件，此操作不会删除自定义的配置文件。
@@ -58,9 +58,19 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 
 **极速模式:** 卸载所有着色器、还原需要高性能的配置文件、开启硬件解码。(极速模式适合低性能设备播放 4K60FPS 等视频文件时开启)
 
+**4K 设备播放 1080P 视频:**
+
+4K 设备播放 1080P 或更低分辨率的视频是个比较常见的情况，比如一些电影和动漫。全屏播放这些内容时，由于显示的分辨率大于视频的分辨率，播放器会使用升采样算法将视频转换为 4K 分辨率并输出，升采样算法的质量、特点决定了升采样后视频的效果，
+
+这个配置文件默认使用的升采样算法是 [lanczos](https://mpv.io/manual/master/#options-lanczos) 配合 [`SSimSuperRes`](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b) 增强着色器，[lanczos](https://mpv.io/manual/master/#options-lanczos) 拥有中等的质量和速度，特征是比较锐利，对于大多数内容来说，这是个不错的选择，但如果是动漫，特别是日本 2D 动漫，它可能会使视频的线条看起来有些奇怪。
+
+当你觉得升采样算法导致视频看起来比较奇怪时，可以使用右键菜单或快捷键切换至其他升采样着色器，使视频画面尽可能的完美。
+
+如果你为某个视频找到了适合它的着色器，可以通过 [Auto Press Key](#auto-press-key) 功能使其播放时自动激活。
+
 **HDR 视频播放:**
 
-如果你的显示设备不支持 HDR，那么播放 HDR 视频不需要做任何事，mpv 会自动进行 SDR 转换。
+如果你的显示设备不支持 HDR，那么播放 HDR 视频不需要做任何事，mpv 会自动将其转换为 SDR。
 
 如果你的显示设备支持 HDR，在系统设置里启用 HDR，然后启用 mpv 的 HDR 直通，你可以在 `local.conf` 文件添加以下配置项。
 
@@ -68,6 +78,8 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 ```conf
 target-colorspace-hint=yes # HDR 直通
 ```
+
+> 显示设备支持 HDR 不代表它可以完美的显示 HDR 内容，只是它可以处理 HDR 信号。如果你的显示设备只是支持 HDR，没有 [VESA Display HDR](https://displayhdr.org) 等标准认证，建议不要开启 HDR 直通，而是继续让 mpv 将其转换为 SDR，即使拥有认证，我也建议只在拥有 Display HDR 600 及以上认证的显示器开启。
 
 **HDR 视频截图:** 播放 HDR 视频并截图，mpv 会为截图文件写入色彩空间标签并使用与视频相同的位深（仅支持部分图片格式），但是目前支持色彩空间、高位深和 HDR 的图片查看器少之又少，导致 HDR 截图在大部分图片查看器并不能正确的显示。如果你有显示 HDR 截图的需求，或者想把 HDR 截图分享给他人，推荐使用 Google Chrome 或 mpv 查看图片，分享给他人务必以文件的形式发送，切勿使用 IM 或其他软件的发送图片功能，以及确保他人拥有 HDR 显示设备。
 
