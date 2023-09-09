@@ -36,9 +36,9 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 
 **控制界面:** [UOSC](https://github.com/tomasklaen/uosc) (有右键菜单)
 
-**默认渲染配置 (gpu-hq-max):**
+**默认渲染配置 (gpu-hq-enhance):**
 * `gpu-hq`
-* `scale` = `ewa_lanczos`
+* `scale` = `lanczos`
 * 去带 (deband): 关闭
 * 着色器: [`KrigBilateral`](https://gist.github.com/igv/a015fc885d5c22e6891820ad89555637), [`SSimSuperRes`](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b)
 * 垂直同步 (`tscale=oversample`)
@@ -62,11 +62,10 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 
 如果你的显示设备不支持 HDR，那么播放 HDR 视频不需要做任何事，mpv 会自动进行 SDR 转换。
 
-如果你的显示设备支持 HDR，在系统设置里启用 HDR，然后将 mpv 的视频输出驱动设置为 `gpu-next` 并启用 HDR 直通，你可以在 `local.conf` 文件添加以下配置项。`gpu-next` 与一些着色器可能存在兼容性问题（比如 Anime4K），如果遇到这类问题，可以回退到 `gpu` 视频输出驱动。
+如果你的显示设备支持 HDR，在系统设置里启用 HDR，然后启用 mpv 的 HDR 直通，你可以在 `local.conf` 文件添加以下配置项。
 
 `local.conf`:（添加以下行）
 ```conf
-vo=gpu-next
 target-colorspace-hint=yes # HDR 直通
 ```
 
