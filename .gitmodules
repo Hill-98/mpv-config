@@ -25,3 +25,6 @@
 [submodule "git-modules/mpv-javascript-http"]
 	path = git-modules/mpv-javascript-http
 	url = https://github.com/Hill-98/mpv-javascript-http.git
+[submodule "git-modules/input-event"]
+	path = git-modules/input-event
+	url = https://github.com/natural-harmonia-gropius/input-event.git
