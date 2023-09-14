@@ -67,7 +67,7 @@ $topWindow.Show()
 $Env:Path += ";$MPV_CONFIG_DIR;" + [Path]::GetDirectoryName($MPV_CONFIG_DIR)
 
 try {
-    $mpv = (Get-Command -CommandType Application mpv.exe -ErrorAction Stop).Source
+    $mpv = (Get-Command -CommandType Application mpv.exe -ErrorAction Stop)[0].Source
     if ([MessageBox]::Show("已找到 mpv.exe: $mpv`n是否需要手动选择其他 mpv.exe？", "提示", [MessageBoxButton]::YesNo, [MessageBoxImage]::Question) -eq [MessageBoxResult]::Yes) {
         $mpv = ""
     }
