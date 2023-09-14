@@ -3,7 +3,7 @@ on:
   - push
   - pull_request
 jobs:
-  pack-zip:
+  pack-to-zip:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,8 +24,22 @@ jobs:
       - name: Create clean script
         run: |
           cd "$RUNNER_TEMP/mpv-config"
+          cat > clean.ps1 <<'EOF'
+          using namespace System.IO
+          function DeleteEmptyDirs([string]$Path) {
+          $dirs = [Directory]::GetDirectories($Path)
+          foreach ($dir in $dirs) { DeleteEmptyDirs -Path $dir }
+          $dirs = [Directory]::GetDirectories($Path)
+          $files = [Directory]::GetFiles($Path)
+          if ($dirs.Length -eq 0 -and $files.Length -eq 0) { [Directory]::Delete($Path) }
+          }
+          DeleteEmptyDirs -Path $PSScriptRoot
+          EOF
           echo 'CD %~dp0' > clean.bat
-          find . -type f ! -path ./clean.bat | sed -e 's|^./|DEL |g' -e 's|/|\\|g' >> clean.bat
+          find . -type f ! -path ./clean.bat ! -path ./clean.ps1 | sed -e 's|^./|DEL |g' -e 's|/|\\|g' >> clean.bat
+          echo 'PowerShell -NoLogo -NoProfile -File clean.ps1 -ExecutionPolicy RemoteSigned' >> clean.bat
+          echo 'DEL clean.ps1' >> clean.bat
+          echo 'DEL clean.bat' >> clean.bat
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
