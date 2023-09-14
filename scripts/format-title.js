@@ -4,11 +4,16 @@
 
 'use strict';
 
-var is_protocol_regex = /^\w+:\/\/|^\w+:\?/;
+var PROTOCOL_REGEX = /^\w+:\/\/|^\w+:\?/;
+
 var options = {
     enable: true,
 };
 mp.options.read_options(options, 'format_title');
+
+if (!options.enable) {
+    exit();
+}
 
 /**
  * Examples:
@@ -23,7 +28,7 @@ mp.options.read_options(options, 'format_title');
  * @returns {string|undefined}
  */
 function formatter_a(filename) {
-    var regex = /^\[.+?\]\[?(.+?)\]?(\[\d+(\.5)?(\(OVA\))?\])/;
+    var regex = /^\[.+?\]\[?(.+?)\]?(\[\d+(\.5)?(\(OVA\))?\])/i;
     var results = filename.match(regex);
     if (results === null) {
         return undefined;
@@ -52,15 +57,21 @@ function formatter_b(filename) {
 }
 
 /**
- * Example: 5.Centimeters.Per.Second.2007.1080p.BluRay.x264
+ * Examples:
+ *   5.Centimeters.Per.Second.2007.1080p.BluRay.x264
+ *   Digimon.Adventure.Last.Evolution.Kizuna.2020.JAPANESE.1080p.BluRay.x264
+ *   Barbie 2023 AMZN 4K WEBRip 2160p
  *
- * Result: 5 Centimeters Per Second (2007)
+ * Results:
+ *   5 Centimeters Per Second (2007)
+ *   Digimon Adventure Last Evolution Kizuna (2020)
+ *   Barbie (2023)
  *
  * @param {string} filename
  * @returns {string|undefined}
  */
 function formatter_c(filename) {
-    var regex = /^([\w\-.]+)\.(\d{4})\.\d{3,4}p/;
+    var regex = /^(.*)(?:\s|\.)(\d{4})((?:\s|\.)(?:\w+))?(?:\s|\.)(4K|\d{3,4}p)/i;
     var results = filename.match(regex);
     if (results === null) {
         return undefined;
@@ -79,7 +90,7 @@ function formatter_c(filename) {
  * @returns {string|undefined}
  */
 function formatter_d(filename) {
-    var regex = /^([\w\-.]+)\.S(\d+)E(\d+)\.?([\w\-.]+)?\.\d{3,4}p/;
+    var regex = /^(.*)(?:\s|\.)S(\d+)E(\d+)(?:\s|\.)?([\w\-.]+)?(?:\s|\.)\d{3,4}p/i;
     var results = filename.match(regex);
     if (results === null) {
         return undefined;
@@ -106,7 +117,7 @@ function formatter_d(filename) {
  * @returns {string|undefined}
  */
 function formatter_e(filename) {
-    var regex = /^([\w\-.]+)\.(\d{4}\.\d{2}\.\d{2})\.?([\w\-.]+)?\.\d{3,4}p/;
+    var regex = /^(.*)(?:\s|\.)(\d{4}(?:\s|\.)\d{2}(?:\s|\.)\d{2})(?:\s|\.)?([\w\-.]+)?(?:\s|\.)\d{3,4}p/i;
     var results = filename.match(regex);
     if (results === null) {
         return undefined;
@@ -130,11 +141,8 @@ var formatters = [
 ];
 
 mp.add_hook('on_load', 99, function () {
-    if (!options.enable) {
-        return;
-    }
     // 没有被强制设置标题并且文件没有标题属性
-    if (mp.get_property_native('force-media-title') !== '' || mp.get_property_native('filename') !== mp.get_property_native('media-title') || is_protocol_regex.test(mp.get_property_native('path'))) {
+    if (mp.get_property_native('force-media-title') !== '' || mp.get_property_native('filename') !== mp.get_property_native('media-title') || PROTOCOL_REGEX.test(mp.get_property_native('path'))) {
         return;
     }
 

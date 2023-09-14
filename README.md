@@ -53,7 +53,7 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 * 模糊匹配外部音频文件 (`audio-file-auto=fuzzy`)
 * 垂直同步 (`video-sync=display-resample`)
 * 增强的去带参数
-* 字幕字体: 文泉驿微米黑
+* 字幕字体: [文泉驿微米黑](http://wenq.org/wqy2/)
 * 字幕字体提供程序: `fontconfig` (支持自动加载当前播放文件路径下 `fonts` 文件夹的字体文件，详情见[特色功能](#auto-load-fonts)。)
 
 **极速模式:** 卸载所有着色器、还原需要高性能的配置文件、开启硬件解码。(极速模式适合低性能设备播放 4K60FPS 等视频文件时开启)
@@ -62,7 +62,7 @@ powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
 
 4K 显示设备播放 1080P 或更低分辨率的视频是个比较常见的情况，比如一些电影和动漫。全屏播放这些内容时，由于显示的分辨率大于视频的分辨率，播放器会使用升采样算法将视频转换为 4K 分辨率并输出，升采样算法的质量、特点决定了升采样后视频的效果，
 
-这个配置文件默认使用的升采样算法是 [lanczos](https://mpv.io/manual/master/#options-lanczos) 配合 [`SSimSuperRes`](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b) 增强着色器，[lanczos](https://mpv.io/manual/master/#options-lanczos) 拥有中等的质量和速度，特征是比较锐利，对于大多数内容来说，这是个不错的选择，但如果是动漫，特别是日本 2D 动漫，它可能会使视频的线条看起来有些奇怪。
+这个配置文件默认使用的升采样算法是 [lanczos](https://mpv.io/manual/master/#options-lanczos) 配合 [SSimSuperRes](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b) 增强着色器，[lanczos](https://mpv.io/manual/master/#options-lanczos) 拥有中等的质量和速度，特征是比较锐利，对于大多数内容来说，这是个不错的选择，但如果是动漫，特别是日本 2D 动漫，它可能会使视频的线条看起来有些奇怪。
 
 当你觉得升采样算法导致视频看起来比较奇怪时，可以使用右键菜单或快捷键切换至其他升采样着色器，使视频画面尽可能的完美。
 
@@ -229,11 +229,9 @@ HTTP 代理: `check_update-http_proxy=http://127.0.0.1:8080 # 设置 HTTP 代理
 
 ### [Format Title](scripts/format-title.js)
 
-提取文件名的信息并格式化，然后设置为当前文件的媒体标题。
+如果当前媒体文件没有内嵌媒体标题，则使用多种规则提取媒体文件名包含的信息并格式化。如果提取成功，设置为当前文件的媒体标题 (`force-media-title`)。
 
 比如文件名 `[VCB-Studio] Re Zero kara Hajimeru Isekai Seikatsu [01][Ma10p_1080p][x265_flac_aac]` 会被格式化为 `Re Zero kara Hajimeru Isekai Seikatsu [01]`。
-
-如果文件名无法被格式化，那么什么都不会发生。
 
 **设置项:**
 
