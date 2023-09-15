@@ -42,6 +42,14 @@ function check_interval(last_time, interval) {
 }
 
 /**
+ * @param {string} name
+ * @returns {string}
+ */
+function cache_path(name) {
+    return u.string_format(u.get_state_path() + '/check-update_%s.json', name);
+}
+
+/**
  * @param {number} interval
  * @returns {number}
  */
@@ -54,7 +62,7 @@ function parse_interval(interval) {
  * @returns {object}
  */
 function read_cache(name) {
-    var path = commands.expand_path(u.string_format('~/.cache/mpv/check-update_%s.json', name));
+    var path = cache_path(name);
     var result = {};
     if (u.file_exist(path)) {
         try {
@@ -71,7 +79,7 @@ function read_cache(name) {
  * @returns {boolean}
  */
 function write_cache(name, data) {
-    var path = commands.expand_path(u.string_format('~/.cache/mpv/check-update_%s.json', name));
+    var path = cache_path(name);
     try {
         utils.write_file('file://' + path, JSON.stringify(data));
     } catch (ex) {

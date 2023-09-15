@@ -1,5 +1,5 @@
 #!/bin/sh
-MPV_CACHE_DIR="$HOME/.cache/mpv"
+MPV_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/mpv"
 echo "Clear fonts cache..."
 [ -d "$MPV_CACHE_DIR/fonts" ] && rm -r "$MPV_CACHE_DIR/fonts"
 echo "Clear gpu shader cache..."

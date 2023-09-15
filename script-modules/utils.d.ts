@@ -14,6 +14,10 @@ export function file_exist(file: string): boolean;
 
 export function format_windows_path(path: string): string;
 
+export function get_cache_path(): string;
+
+export function get_state_path(): string;
+
 export function read_file_lines(file: string, ignore_comments?: boolean): string[] | undefined;
 
 export function string_format(str: string, ...args: string[]): string;
