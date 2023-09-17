@@ -28,7 +28,7 @@ function default_value(value, default_value) {
 }
 
 /**
- * @returns {string}
+ * @returns {string|undefined}
  */
 function detect_os() {
     var home = utils.getenv('USERPROFILE');
@@ -97,7 +97,7 @@ function format_windows_path(path) {
  * @returns {string}
  */
 function get_cache_path() {
-    var path = commands.expand_path(detect_os() === 'windows' ? '~/AppData/Local/mpv/' : '~~cache/');
+    var path = commands.expand_path(os === 'windows' ? '~/AppData/Local/mpv/' : '~~cache/');
     return path.substring(0, path.length - 1);
 }
 
@@ -105,7 +105,7 @@ function get_cache_path() {
  * @returns {string}
  */
 function get_state_path() {
-    var path = commands.expand_path(detect_os() === 'windows' ? '~/AppData/Local/mpv/' : '~~state/');
+    var path = commands.expand_path(os === 'windows' ? '~/AppData/Local/mpv/' : '~~state/');
     return path.substring(0, path.length - 1);
 }
 
@@ -197,7 +197,7 @@ module.exports = {
     file_exist: file_exist,
     format_windows_path: format_windows_path,
     get_cache_path: get_cache_path,
-    get_state_path: get_state_path, 
+    get_state_path: get_state_path,
     read_file_lines: read_file_lines,
     string_format: string_format,
     which: which,

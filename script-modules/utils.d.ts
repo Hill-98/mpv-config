@@ -18,8 +18,8 @@ export function get_cache_path(): string;
 
 export function get_state_path(): string;
 
-export function read_file_lines(file: string, ignore_comments?: boolean): string[] | undefined;
+export function read_file_lines(file: string, ignore_comments: boolean = true): string[] | undefined;
 
 export function string_format(str: string, ...args: string[]): string;
 
-export function which(name: string, auto_append_exe: boolean): string | undefined;
+export function which(name: string, auto_append_exe: boolean = true): string | undefined;

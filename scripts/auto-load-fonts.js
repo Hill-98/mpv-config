@@ -28,7 +28,6 @@ var options = {
 };
 var state = {
     compatible_fonts_dir: '',
-    fontconfig_enabled: false,
     fonts_conf: commands.expand_path('~~/.fonts.conf'),
     is_windows: false,
     /** @type {string|null} */
@@ -36,9 +35,17 @@ var state = {
     /** @type {string|null} */
     last_fonts_dir: null,
     os: u.detect_os(),
+    ready: false,
     set_fonts_dir: false,
 };
 state.is_windows = state.os === 'windows';
+
+/**
+ * @returns {boolean}
+ */
+function check_ready() {
+    return mp.get_property_native('sub-font-provider') === 'fontconfig' || options.method === 'native';
+}
 
 function clear_fonts() {
     if (!u.dir_exist(state.compatible_fonts_dir)) {
@@ -157,6 +164,7 @@ function update_options() {
     }
     state.last_compatible_dir = options.compatible_dir;
     state.last_fonts_dir = null;
+    state.ready = check_ready();
 }
 
 /**
@@ -188,8 +196,8 @@ mp.options.read_options(options, 'auto_load_fonts', function () {
 });
 update_options();
 
-mp.observe_property('sub-font-provider', 'native', function (_, value) {
-    state.fontconfig_enabled = value === 'fontconfig';
+mp.observe_property('sub-font-provider', 'native', function () {
+    state.ready = check_ready();
 });
 
 mp.add_hook('on_load', 50, function () {
@@ -215,7 +223,7 @@ mp.add_hook('on_load', 50, function () {
             state.set_fonts_dir = false;
         }
         return;
-    } else if (fonts_dir && (!options.enable || !state.fontconfig_enabled)) {
+    } else if (fonts_dir && (!options.enable || !state.ready)) {
         msg.warn('The fonts directory exists, but the script is not enabled.');
         return;
     }
@@ -231,7 +239,7 @@ mp.add_hook('on_load', 50, function () {
         if (copy_fonts(source_fonts_dir)) {
             fonts_dir = state.compatible_fonts_dir;
         } else {
-            msg.error(u.string_format("copy fonts dir failed: '%s' -> '%s'", source_fonts_dir, state.compatible_fonts_dir));
+            msg.error(u.string_format("Copy fonts directory failed: '%s' -> '%s'", source_fonts_dir, state.compatible_fonts_dir));
         }
     }
 
@@ -240,9 +248,9 @@ mp.add_hook('on_load', 50, function () {
     set_fonts_dir(fonts_dir);
 
     if (fonts_dir === source_fonts_dir) {
-        msg.info('Set fonts dir: ' + fonts_dir);
+        msg.info(u.string_format('Use %s to set the font directory: %s', options.method, fonts_dir));
     } else {
-        msg.info(u.string_format('Set fonts dir (compatible_mode): %s (%s)', fonts_dir, source_fonts_dir));
+        msg.info(u.string_format('Use %s to set the font directory (compatible_mode): %s (%s)', options.method, fonts_dir, source_fonts_dir));
     }
 });
 
