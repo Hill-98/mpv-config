@@ -9,28 +9,20 @@
 
 ### 安装
 
-0. 启用 [Windows 开发人员模式](https://docs.microsoft.com/windows/apps/get-started/enable-your-device-for-development)、[Git LFS](https://git-lfs.github.com/) 和 Git 符号链接支持 (`git config --global --bool core.symlinks true`)
-1. 克隆存储库: `git clone --recursive https://github.com/Hill-98/mpv-config.git mpv-config`
-2. 修复 git 符号链接错误: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\fix-symbolic-link.ps1`
-3. 运行配置脚本: `powershell -ExecutionPolicy RemoteSigned mpv-config\setup\setup.ps1`
-4. 打开 Windows 设置或控制面板设置文件关联。
+1. 前往 GitHub Actions 下载最新版本并解压: [https://github.com/Hill-98/mpv-config/actions](https://github.com/Hill-98/mpv-config/actions)
+2. 运行配置脚本: `setup\setup.bat`
+3. 打开 Windows 设置或控制面板设置文件关联。
+
+如何下载 GitHub Actions 的文件: [https://docs.github.com/actions/managing-workflow-runs/downloading-workflow-artifacts](https://docs.github.com/actions/managing-workflow-runs/downloading-workflow-artifacts)
 
 ### 更新
 
-```
-git pull
-git submodule init
-git submodule update
-powershell -ExecutionPolicy RemoteSigned setup\fix-symbolic-link.ps1
-powershell -ExecutionPolicy RemoteSigned setup\setup.ps1
-```
-
-### 备用安装方法
-1. 前往 GitHub Actions 下载最新打包版本: [https://github.com/Hill-98/mpv-config/actions](https://github.com/Hill-98/mpv-config/actions)
-2. 运行配置脚本: `mpv-config\setup\setup.bat`
+0. 运行旧版本清理脚本: `clean.bat`
+1. 前往 GitHub Actions 下载最新版本并解压到旧版本目录: [https://github.com/Hill-98/mpv-config/actions](https://github.com/Hill-98/mpv-config/actions)
+2. 运行配置脚本: `setup\setup.bat`
 3. 打开 Windows 设置或控制面板设置文件关联。
 
-> 如果使用备用安装方法，更新时先执行一下 `clean.bat`，删除旧版本文件，此操作不会删除自定义的配置文件。
+> 如果你擅长使用 Git，也可以使用 git 将此仓库克隆到本地进行安装。（需要 [Git LFS](https://git-lfs.com/) 和 [Git 符号链接](https://github.com/git-for-windows/git/wiki/Symbolic-Links)支持）
 
 ## 说明
 
