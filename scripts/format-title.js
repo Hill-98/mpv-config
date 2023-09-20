@@ -18,7 +18,7 @@ if (!options.enable) {
 /**
  * Examples:
  *   [VCB-Studio] Re Zero kara Hajimeru Isekai Seikatsu [01][Ma10p_1080p][x265_flac_aac]
- *   [VCB-Studio] Yama no Susume Second Season [06.5(OVA)][Ma10p_1080p][x265_flac_aac]
+ *   [VCB-Studio] Yama no Susume Second Season [06.5(OVA)][Ma10p_1080p][x265_flac]
  *   [Nekomoe kissaten&LoliHouse] Ryza no Atelier - 01 [WebRip 1080p HEVC-10bit AAC ASSx2]
  *   [Moozzi2] Tengen Toppa Gurren Lagann - 01 (BD 1920x1080 x.265-10Bit 2Audio)
  *
@@ -144,20 +144,31 @@ var formatters = [
     formatter_e,
 ];
 
-mp.add_hook('on_load', 99, function () {
+mp.add_hook('on_preloaded', 99, function () {
+    if (mp.get_property_native('playback-abort')) {
+        return;
+    }
+
     // 没有被强制设置标题并且文件没有标题属性
     if (mp.get_property_native('force-media-title') !== '' || mp.get_property_native('filename') !== mp.get_property_native('media-title') || PROTOCOL_REGEX.test(mp.get_property_native('path'))) {
         return;
     }
 
     var filename = mp.get_property_native('filename/no-ext');
+    var media_title = '';
     for (var i = 0; i < formatters.length; i++) {
         var formatter = formatters[i];
         var title = formatter(filename);
         if (title) {
-            mp.set_property_native('file-local-options/force-media-title', title);
-            mp.msg.info('Use formatter: ' + formatter.toString().match(/function (.+)\(/)[1]);
+            media_title = title;
             break;
         }
+    }
+
+    if (media_title === '') {
+        mp.msg.info('Do nothing');
+    } else {
+        mp.set_property_native('file-local-options/force-media-title', media_title);
+        mp.msg.info('Use formatter: ' + formatter.toString().match(/function (.+)\(/)[1]);
     }
 });

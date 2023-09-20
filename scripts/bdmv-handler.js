@@ -52,7 +52,7 @@ mp.add_hook('on_load', 20, function () {
     commands.loadfile('bd://' + title + '/' + device);
 });
 
-mp.add_hook('on_load', 99, function () {
+mp.add_hook('on_preloaded', 99, function () {
     if (mp.get_property_native('playback-abort')) {
         return;
     }
