@@ -18,24 +18,28 @@ if (!options.enable) {
 /**
  * Examples:
  *   [VCB-Studio] Re Zero kara Hajimeru Isekai Seikatsu [01][Ma10p_1080p][x265_flac_aac]
- *   [VCB-Studio] Yama no Susume Second Season [06.5(OVA)][Ma10p_1080p][x265_flac]
+ *   [VCB-Studio] Yama no Susume Second Season [06.5(OVA)][Ma10p_1080p][x265_flac_aac]
+ *   [Nekomoe kissaten&LoliHouse] Ryza no Atelier - 01 [WebRip 1080p HEVC-10bit AAC ASSx2]
+ *   [Moozzi2] Tengen Toppa Gurren Lagann - 01 (BD 1920x1080 x.265-10Bit 2Audio)
  *
  * Result:
  *   Re Zero kara Hajimeru Isekai Seikatsu [01]
  *   Yama no Susume Second Season [06.5(OVA)]
+ *   Ryza no Atelier [01]
+ *   Tengen Toppa Gurren Lagann [01]
  *
  * @param {string} filename
  * @returns {string|undefined}
  */
 function formatter_a(filename) {
-    var regex = /^\[.+?\]\[?(.+?)\]?(\[\d+(\.5)?(\(OVA\))?\])/i;
+    var regex = /^\[.+?\]\[?(.+?)\]?(?:\[(\d+(\.5)?(\(OVA\))?)\]|- (\d+))\s?[\[\(]/i;
     var results = filename.match(regex);
     if (results === null) {
         return undefined;
     }
     var name = results[1];
-    var episode = results[2];
-    return name.trim() + ' ' + episode;
+    var episode = results[2] || results[5];
+    return name.trim() + ' [' + episode + ']';
 }
 
 /**
@@ -152,6 +156,7 @@ mp.add_hook('on_load', 99, function () {
         var title = formatter(filename);
         if (title) {
             mp.set_property_native('file-local-options/force-media-title', title);
+            mp.msg.info('Use formatter: ' + formatter.toString().match(/function (.+)\(/)[1]);
             break;
         }
     }
