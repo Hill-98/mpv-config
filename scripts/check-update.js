@@ -104,7 +104,7 @@ function get_config_local_version() {
             result = parseInt(process.stdout) * 1000;
         }
     }
-    return result === NaN ? null : result;
+    return isNaN(result) ? null : result;
 }
 
 /**
