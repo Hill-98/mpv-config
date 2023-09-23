@@ -14,6 +14,7 @@ var options = {
     http_proxy: '',
 };
 mp.options.read_options(options, 'check_update');
+var checking_state = {};
 var state = {
     http_proxy: options.http_proxy || mp.get_property_native('http_proxy'),
     os: u.detect_os(),
@@ -179,13 +180,22 @@ function get_mpv_remote_version(remote_repo, cb) {
 }
 
 function check_config_update(force) {
-    var cache = read_cache('config');
+    var idx = 'config';
+
+    if (checking_state[idx] === true) {
+        mp.osd_message('正在检查配置文件是否有新版本...');
+        return;
+    }
+    checking_state[idx] = true;
+
+    var cache = read_cache(idx);
     var cache_valid = typeof cache.last_check_update_time === 'number' && typeof cache.remote_commit_time === 'number';
     var check_update_interval = parse_interval(options.check_config_interval);
     var local_commit_time = get_config_local_version();
 
     if (local_commit_time === null) {
         msg.error('检查配置文件更新失败: 未获取到本地版本');
+        checking_state[idx] = false;
         return;
     }
 
@@ -209,6 +219,7 @@ function check_config_update(force) {
         get_config_remote_version(function (err, remote_commit_time) {
             if (err) {
                 msg.error('检查配置文件更新失败: ' + err);
+                checking_state[idx] = false;
                 return;
             }
             var has_new = compare_version(local_commit_time, remote_commit_time);
@@ -216,24 +227,39 @@ function check_config_update(force) {
                 last_check_update_time: Date.now(),
                 remote_commit_time: remote_commit_time,
             };
-            write_cache('config', cache);
+            write_cache(idx, cache);
             if (!has_new && force) {
                 msg.info('本地配置文件版本已经是最新的了');
-                return;
             }
+            checking_state[idx] = false;
         });
     } else {
         compare_version(local_commit_time, cache.remote_commit_time);
+        checking_state[idx] = false;
     }
 }
 
 function check_mpv_update(force) {
-    var cache = read_cache('mpv');
+    var idx = 'mpv';
+
+    if (checking_state[idx] === true) {
+        mp.osd_message('正在检查 mpv 是否有新版本...');
+        return;
+    }
+    checking_state[idx] = true;
+
+    var cache = read_cache(idx);
     var cache_valid = typeof cache.last_check_update_time === 'number' && typeof cache.local_version === 'string' && typeof cache.remote_version === 'string';
     /** @type {string} */
     var check_update_interval = parse_interval(options.check_mpv_interval);
     var local_version = get_mpv_local_version();
     var remote_repo = options.check_mpv_repo;
+
+    if (local_version === null) {
+        msg.error('检查 MPV 更新失败: 未获取到本地版本');
+        checking_state[idx] = false;
+        return;
+    }
 
     var compare_version = function compare_version(a, b, s) {
         if (a === b) {
@@ -254,6 +280,7 @@ function check_mpv_update(force) {
         get_mpv_remote_version(remote_repo, function (err, remote) {
             if (err) {
                 msg.error('检查 mpv 更新失败：' + err);
+                checking_state[idx] = false;
                 return;
             }
             var has_new = compare_version(local_version, remote.version, remote.name);
@@ -264,14 +291,15 @@ function check_mpv_update(force) {
                 remote_version: remote.version,
                 remote_version_name: remote.name,
             };
-            write_cache('mpv', cache);
+            write_cache(idx, cache);
             if (!has_new && force) {
                 msg.info('本地 mpv 版本已经是最新的了');
-                return;
             }
+            checking_state[idx] = false;
         });
     } else {
         compare_version(local_version, cache.remote_version, cache.remote_version_name);
+        checking_state[idx] = false;
     }
 }
 
