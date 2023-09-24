@@ -8,7 +8,7 @@
 
 var utils = mp.utils;
 var commands = require('../script-modules/commands');
-var u = require('../script-modules/utils');
+var io = require('../script-modules/io');
 /** @type {Array.<string>} */
 var pressed_keys = [];
 
@@ -39,7 +39,7 @@ mp.register_event('file-loaded', function () {
         utils.join_path(dir, 'mpv.keys'),
     ];
     for (var i = 0; i < files.length; i++) {
-        var keys = u.read_file_lines(files[i]);
+        var keys = io.read_file_lines(files[i]);
         if (keys === undefined || keys.length === 0) {
             continue;
         }

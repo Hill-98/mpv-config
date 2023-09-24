@@ -9,6 +9,7 @@
 
 var msg = mp.msg;
 var commands = require('../script-modules/commands');
+var io = require('../script-modules/io');
 var u = require('../script-modules/utils');
 
 /** @type {Object.<string, boolean>} */
@@ -92,7 +93,7 @@ mp.register_script_message('smart-profile', smart_profile_handler);
     ];
     for (var i = 0; i < files.length; i++) {
         var file = files[i];
-        var profiles = u.read_file_lines(file);
+        var profiles = io.read_file_lines(file);
         if (profiles === undefined) {
             continue;
         }

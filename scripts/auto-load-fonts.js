@@ -18,6 +18,8 @@ var FONTS_SUB_DIRS = ['fonts', 'Fonts', 'FONTS', '字体'];
 var msg = mp.msg;
 var utils = mp.utils;
 var commands = require('../script-modules/commands');
+var io = require('../script-modules/io');
+var p = require('../script-modules/path');
 var u = require('../script-modules/utils');
 
 var options = {
@@ -29,16 +31,14 @@ var options = {
 var state = {
     compatible_fonts_dir: '',
     fonts_conf: commands.expand_path('~~/.fonts.conf'),
-    is_windows: false,
     /** @type {string|null} */
     last_compatible_dir: null,
     /** @type {string|null} */
     last_fonts_dir: null,
-    os: u.detect_os(),
+    os: require('../script-modules/DetectOS')(),
     ready: false,
     set_fonts_dir: false,
 };
-state.is_windows = state.os === 'windows';
 
 /**
  * @returns {boolean}
@@ -48,16 +48,10 @@ function check_ready() {
 }
 
 function clear_fonts() {
-    if (!u.dir_exist(state.compatible_fonts_dir)) {
+    if (!io.dir_exist(state.compatible_fonts_dir)) {
         return;
     }
-    var args = [];
-    if (state.is_windows) {
-        args = ['cmd.exe', '/c', 'rmdir', '/S', '/Q', state.compatible_fonts_dir];
-    } else {
-        args = ['rm', '-r', state.compatible_fonts_dir];
-    }
-    commands.subprocess(args);
+    io.remove_dir(state.compatible_fonts_dir);
 }
 
 /**
@@ -65,28 +59,10 @@ function clear_fonts() {
  * @returns {boolean}
  */
 function copy_fonts(dir) {
-    var args = [];
-    var process = null;
-    if (!u.dir_exist(options.compatible_dir)) {
-        if (state.is_windows) {
-            args = ['cmd.exe', '/c', 'mkdir', options.compatible_dir];
-        } else {
-            args = ['mkdir', '-p', options.compatible_dir];
-        }
-        process = commands.subprocess(args);
-        if (process.status !== 0) {
-            return false;
-        }
+    if (!io.dir_exist(options.compatible_dir) && !io.create_dir(options.compatible_dir)) {
+        return false;
     }
-    if (state.is_windows) {
-        args = ['Robocopy.exe', dir, state.compatible_fonts_dir, '/S', '/R:1'];
-        process = commands.subprocess(args);
-        return process.status >= 0 && process.status < 8;
-    } else {
-        args = ['cp', '-p', '-r', dir, state.compatible_fonts_dir];
-        process = commands.subprocess(args);
-        return process.status === 0;
-    }
+    return io.copy_dir(dir, state.compatible_fonts_dir);
 }
 
 /**
@@ -107,7 +83,7 @@ function escape_xml(str) {
  * @returns {string}
  */
 function format_path(path) {
-    return state.is_windows ? u.format_windows_path(path) : path;
+    return state.os === 'windows' ? p.format_windows_path(path) : path;
 }
 
 /**
@@ -117,8 +93,8 @@ function format_path(path) {
 function get_available_fonts_dir(path) {
     var fonts_dir = null;
     for (var i = 0; i < FONTS_SUB_DIRS.length; i++) {
-        var dir = u.absolute_path(utils.join_path(path, FONTS_SUB_DIRS[i]));
-        if (u.dir_exist(dir)) {
+        var dir = p.absolute_path(utils.join_path(path, FONTS_SUB_DIRS[i]));
+        if (io.dir_exist(dir)) {
             fonts_dir = format_path(dir);
             break;
         }
@@ -133,7 +109,7 @@ function get_compatible_fonts_dir() {
     var base = utils.join_path(options.compatible_dir, mp.get_script_name() + '$');
     for (var i = 1; ; i++) {
         var path = base + i;
-        if (!u.dir_exist(path)) {
+        if (!io.dir_exist(path)) {
             return path;
         }
     }
@@ -172,7 +148,7 @@ function update_options() {
  * @param {boolean} require_exist
  */
 function write_fonts_conf(fonts_dir, require_exist) {
-    var exist = u.file_exist(state.fonts_conf);
+    var exist = io.file_exist(state.fonts_conf);
     // 做一些检查，避免无用的重复写入。
     if (require_exist && !exist) {
         return;

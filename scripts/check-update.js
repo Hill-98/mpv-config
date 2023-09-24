@@ -4,6 +4,8 @@ var msg = mp.msg;
 var utils = mp.utils;
 var commands = require('../script-modules/commands');
 var HttpClient = require('../script-modules/HttpClient');
+var io = require('../script-modules/io');
+var p = require('../script-modules/path');
 var u = require('../script-modules/utils');
 
 var options = {
@@ -17,7 +19,7 @@ mp.options.read_options(options, 'check_update');
 var checking_state = {};
 var state = {
     http_proxy: options.http_proxy || mp.get_property_native('http_proxy'),
-    os: u.detect_os(),
+    os: require('../script-modules/DetectOS')(),
 };
 
 if (!HttpClient.available) {
@@ -47,7 +49,7 @@ function check_interval(last_time, interval) {
  * @returns {string}
  */
 function cache_path(name) {
-    return u.string_format(u.get_state_path() + '/check-update_%s.json', name);
+    return u.string_format(p.get_state_path() + '/check-update_%s.json', name);
 }
 
 /**
@@ -65,7 +67,7 @@ function parse_interval(interval) {
 function read_cache(name) {
     var path = cache_path(name);
     var result = {};
-    if (u.file_exist(path)) {
+    if (io.file_exist(path)) {
         try {
             result = JSON.parse(utils.read_file(path));
         } catch (ex) {
@@ -97,7 +99,7 @@ function write_cache(name, data) {
 function get_config_local_version() {
     var local_version_file = commands.expand_path('~~/.commit_time');
     var result = null;
-    if (u.file_exist(local_version_file)) {
+    if (io.file_exist(local_version_file)) {
         result = parseInt(utils.read_file(local_version_file));
     } else if (tools.git) {
         var process = commands.subprocess([tools.git, '-C', commands.expand_path('~~/'), 'log', '-1', '--format=%ct']);

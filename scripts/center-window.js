@@ -9,7 +9,7 @@ var commands = require('../script-modules/commands');
 var once = require('../script-modules/OnceHelper');
 var u = require('../script-modules/utils');
 var state = {
-    os: u.detect_os(),
+    os: require('../script-modules/DetectOS')(),
     pid: mp.get_property_native('pid'),
 };
 
