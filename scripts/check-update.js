@@ -26,7 +26,7 @@ if (!HttpClient.available) {
 }
 
 var http = new HttpClient({
-    timeout: 5,
+    timeout: mp.get_property_native('network-timeout'),
     proxy: state.http_proxy,
 });
 var tools = {
