@@ -171,15 +171,15 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 ### [Auto Load Fonts](scripts/auto-load-fonts.js)
 
-使用 **fontconfig** 或 **[sub-fonts-dir](https://mpv.io/manual/master/#options-sub-fonts-dir)** (native) 加载播放文件路径下支持的子目录内的字体文件，`native` 方法需要 mpv 最新版本。
+使用 **fontconfig** 或 **[sub-fonts-dir](https://mpv.io/manual/master/#options-sub-fonts-dir)** (native) 加载播放文件路径下字体文件夹的字体文件，`native` 加载方法需要较新版本的 mpv。如果当前 mpv 构建支持，默认使用 `native` 方法，否则使用 `fontconfig` 方法。
 
-**支持的子目录:**
+**支持的字体文件夹:**
 * fonts
 * Fonts
 * FONTS
 * 字体
 
-> 由于 Windows 路径名不区分大小写，所以 `fonts` 和 `Fonts` 没有区别。
+> 由于 Windows 路径名不区分大小写，所以 `fonts`, `Fonts`, `FONTS` 没有区别。
 
 **兼容模式:** 兼容模式主要用于解决一些 fontconfig 的性能问题和 Windows 某些分区上的错误，脚本在兼容模式下加载字体文件时会将 `fonts` 文件夹复制到指定位置，然后使用新位置进行加载。默认位置为配置目录的 `.fonts` 目录，如果配置目录所在分区也存在兼容性问题，你还可以自定义兼容目录位置。
 
@@ -191,7 +191,7 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 兼容目录: `auto_load_fonts-compatible_dir=D:\fonts-cache # 设置兼容目录为 D:\fonts-cache`
 
-加载方法：`auto_load_fonts-method=[fontconfig|native] # 默认为 fontconfig 模式，设置为 native 切换到 sub-fonts-dir 方法。`
+加载方法：`auto_load_fonts-method=[fontconfig|native] # fontconfig 或 native`
 
 > Auto Load Fonts 支持选项实时更新，可以配合 `profile-cond` 按需开启兼容模式。
 

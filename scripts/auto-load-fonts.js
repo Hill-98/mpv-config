@@ -26,10 +26,11 @@ var options = {
     enable: true,
     compatible_mode: false,
     compatible_dir: '~~/.fonts',
-    method: 'fontconfig', // fontconfig or native
+    method: mp.get_property_native('property-list').indexOf('sub-fonts-dir') !== -1 ? 'native' : 'fontconfig', // fontconfig or native
 };
 var state = {
     compatible_fonts_dir: '',
+    external_fonts_dir: null,
     fonts_conf: commands.expand_path('~~/.fonts.conf'),
     /** @type {string|null} */
     last_compatible_dir: null,
@@ -118,13 +119,58 @@ function get_compatible_fonts_dir() {
 /**
  * @param {string|null} dir
  */
-function set_fonts_dir(dir) {
+function load_fonts_dir(dir) {
     var d = dir === null ? '' : dir;
     var method = options.method;
     if (method === 'fontconfig') {
         write_fonts_conf(d, d === '');
     } else if (method === 'native') {
         mp.set_property_native('sub-fonts-dir', d);
+    }
+}
+
+/**
+ * @param {?string} dir
+ */
+function set_fonts_dir(dir) {
+    var fonts_dir = dir;
+
+    // 如果没有字体目录并且之前设置了字体目录，那么清空配置文件。
+    if (typeof fonts_dir !== 'string' || fonts_dir.trim() === '') {
+        if (state.set_fonts_dir) {
+            load_fonts_dir(null);
+            state.set_fonts_dir = false;
+        }
+        return;
+    }
+    if (fonts_dir && (!options.enable || !state.ready)) {
+        msg.warn('The fonts directory exists, but the script is not enabled.');
+        return;
+    }
+
+    var source_fonts_dir = fonts_dir;
+    if (state.last_fonts_dir === source_fonts_dir) {
+        return;
+    }
+
+    if (options.compatible_mode) {
+        clear_fonts();
+        state.compatible_fonts_dir = get_compatible_fonts_dir();
+        if (copy_fonts(source_fonts_dir)) {
+            fonts_dir = state.compatible_fonts_dir;
+        } else {
+            msg.error(u.string_format("Copy fonts directory failed: '%s' -> '%s'", source_fonts_dir, state.compatible_fonts_dir));
+        }
+    }
+
+    state.last_fonts_dir = source_fonts_dir;
+    state.set_fonts_dir = true;
+    load_fonts_dir(fonts_dir);
+
+    if (fonts_dir === source_fonts_dir) {
+        msg.info(u.string_format('Use %s to set the font directory: %s', options.method, fonts_dir));
+    } else {
+        msg.info(u.string_format('Use %s to set the font directory (compatible_mode): %s (%s)', options.method, fonts_dir, source_fonts_dir));
     }
 }
 
@@ -192,45 +238,14 @@ mp.add_hook('on_load', 50, function () {
         fonts_dir = get_available_fonts_dir(utils.join_path(current_dir, sub_paths[i]));
     }
 
-    // 如果没有字体目录并且之前设置了字体目录，那么清空配置文件。
-    if (!fonts_dir) {
-        if (state.set_fonts_dir) {
-            set_fonts_dir(null);
-            state.set_fonts_dir = false;
-        }
-        return;
-    } else if (fonts_dir && (!options.enable || !state.ready)) {
-        msg.warn('The fonts directory exists, but the script is not enabled.');
-        return;
+    if (state.external_fonts_dir) {
+        fonts_dir = state.external_fonts_dir;
     }
 
-    var source_fonts_dir = fonts_dir;
-    if (state.last_fonts_dir === source_fonts_dir) {
-        return;
-    }
-
-    if (options.compatible_mode) {
-        clear_fonts();
-        state.compatible_fonts_dir = get_compatible_fonts_dir();
-        if (copy_fonts(source_fonts_dir)) {
-            fonts_dir = state.compatible_fonts_dir;
-        } else {
-            msg.error(u.string_format("Copy fonts directory failed: '%s' -> '%s'", source_fonts_dir, state.compatible_fonts_dir));
-        }
-    }
-
-    state.last_fonts_dir = source_fonts_dir;
-    state.set_fonts_dir = true;
     set_fonts_dir(fonts_dir);
-
-    if (fonts_dir === source_fonts_dir) {
-        msg.info(u.string_format('Use %s to set the font directory: %s', options.method, fonts_dir));
-    } else {
-        msg.info(u.string_format('Use %s to set the font directory (compatible_mode): %s (%s)', options.method, fonts_dir, source_fonts_dir));
-    }
 });
 
 mp.register_event('shutdown', function () {
-    set_fonts_dir(null);
+    load_fonts_dir(null);
     clear_fonts();
 });
