@@ -54,15 +54,16 @@ function file_exist(file) {
  * @returns {string[]|undefined}
  */
 function read_file_lines(file, ignore_comments) {
-    if (!file_exist(file)) {
-        return undefined;
-    }
     var ic = ignore_comments === undefined ? true : ignore_comments;
-    var data = utils.read_file(file);
+    var data;
+    try {
+        data = utils.read_file(file);
+    } catch (err) {
+    }
     if (typeof data !== 'string') {
         return undefined;
     }
-    var lines = data.replace('\r', '').split('\n');
+    var lines = data.replace(/\r/g, '').split('\n');
     var results = lines.filter(function (v) {
         var line = v.trim();
         return line !== '' && !(ic && line.indexOf('#') === 0);
