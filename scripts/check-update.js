@@ -258,7 +258,7 @@ function check_mpv_update(force) {
     var remote_repo = options.check_mpv_repo;
 
     if (local_version === null) {
-        msg.error('检查 MPV 更新失败: 未获取到本地版本');
+        msg.error('检查 mpv 更新失败: 未获取到本地版本');
         checking_state[idx] = false;
         return;
     }

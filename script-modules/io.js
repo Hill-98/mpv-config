@@ -15,7 +15,6 @@ function copy_dir(source, dest) {
     }
     var args = ['cp', '-p', '-r', source, dest];
     return commands.subprocess(args).status === 0;
-
 }
 
 /**

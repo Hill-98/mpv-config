@@ -32,13 +32,13 @@ if (!options.enable) {
  * @returns {string|undefined}
  */
 function formatter_a(filename) {
-    var regex = /^\[.+?\]\[?(.+?)\]?(?:\[(\d+(\.5)?(\(OVA\))?)\]|- (\d+))\s?[\[\(]/i;
+    var regex = /^\[.+?\]\[?(.+?)\]?(?:\[(\d+(?:\.5)?(?:\(OVA\))?)\]|- (\d+))\s?[\[\(]/i;
     var results = filename.match(regex);
     if (results === null) {
         return undefined;
     }
     var name = results[1];
-    var episode = results[2] || results[5];
+    var episode = results[2] || results[3];
     return name.trim() + ' [' + episode + ']';
 }
 
@@ -86,9 +86,13 @@ function formatter_c(filename) {
 }
 
 /**
- * Example: Cyberpunk.Edgerunners.S01E10.My.Moon.My.Man.1080p
+ * Examples:
+ *   Cyberpunk.Edgerunners.S01E10.My.Moon.My.Man.1080p
+ *   The.Glory.S01E01.Episodio.1.1080p
  *
- * Result: Cyberpunk Edgerunners: My Moon My Man [10]
+ * Results:
+ *   Cyberpunk Edgerunners: My Moon My Man [10]
+ *   The.Glory [01]
  *
  * @param {string} filename
  * @returns {string|undefined}
@@ -108,7 +112,10 @@ function formatter_d(filename) {
         title += ' ' + season;
     }
     if (subtitle) {
-        title += ': ' + subtitle.replace(/\./g, ' ').trim();
+        subtitle = subtitle.replace(/\./g, ' ').trim();
+        if (subtitle.match(/Episodio\s\d+/i) === null) {
+            title += ': ' + subtitle;
+        }
     }
     return title + ' [' + episode + ']';
 }
@@ -155,12 +162,12 @@ mp.add_hook('on_preloaded', 99, function () {
     }
 
     var filename = mp.get_property_native('filename/no-ext');
+    var formatter = function unknown() { };
     var media_title = '';
     for (var i = 0; i < formatters.length; i++) {
-        var formatter = formatters[i];
-        var title = formatter(filename);
-        if (title) {
-            media_title = title;
+        formatter = formatters[i];
+        media_title = formatter(filename) || '';
+        if (media_title !== '') {
             break;
         }
     }
