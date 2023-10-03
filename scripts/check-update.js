@@ -15,25 +15,24 @@ var options = {
     check_mpv_interval: 1,
     http_proxy: '',
 };
-mp.options.read_options(options, 'check_update');
 var checking_state = {};
-var state = {
-    http_proxy: options.http_proxy || mp.get_property_native('http_proxy'),
-    os: require('../script-modules/DetectOS')(),
-};
 
 if (!HttpClient.available) {
     msg.error('检查更新不可用: 未找到 curl');
     exit();
 }
 
-var http = new HttpClient({
-    timeout: mp.get_property_native('network-timeout'),
-    proxy: state.http_proxy,
-});
+var http = new HttpClient();
 var tools = {
     git: u.which('git'),
 };
+
+function init_http() {
+    return new HttpClient({
+        timeout: mp.get_property_native('network-timeout'),
+        proxy: options.http_proxy || mp.get_property_native('http-proxy'),
+    });
+}
 
 /**
  * @param {number} last_time
@@ -305,6 +304,26 @@ function check_mpv_update(force) {
     }
 }
 
+function check_update() {
+    check_config_update();
+    if (options.check_mpv_update) {
+        check_mpv_update();
+    }
+}
+
+mp.options.read_options(options, 'check_update', function (list) {
+    if (list.http_proxy) {
+        http = init_http();
+    }
+    check_update();
+});
+mp.observe_property('http-proxy', 'native', function () {
+    http = init_http();
+});
+mp.observe_property('network-timeout', 'native', function () {
+    http = init_http();
+});
+
 mp.register_script_message('check-update/config', function () {
     check_config_update(true);
 });
@@ -313,7 +332,5 @@ mp.register_script_message('check-update/mpv', function () {
     check_mpv_update(true);
 });
 
-check_config_update();
-if (options.check_mpv_update) {
-    check_mpv_update();
-}
+http = init_http();
+check_update();

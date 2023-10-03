@@ -9,11 +9,7 @@ var PROTOCOL_REGEX = /^\w+:\/\/|^\w+:\?/;
 var options = {
     enable: true,
 };
-mp.options.read_options(options, 'format_title');
-
-if (!options.enable) {
-    exit();
-}
+mp.options.read_options(options, 'format_title', function () { });
 
 /**
  * Examples:
@@ -152,7 +148,7 @@ var formatters = [
 ];
 
 mp.add_hook('on_preloaded', 99, function () {
-    if (mp.get_property_native('playback-abort')) {
+    if (!options.enable || mp.get_property_native('playback-abort')) {
         return;
     }
 

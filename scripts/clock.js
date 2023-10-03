@@ -17,7 +17,7 @@ var state = {
     /** @type {number|null} */
     timeout_timer: null,
 };
-mp.options.read_options(options, 'clock');
+mp.options.read_options(options, 'clock', function () { });
 
 /**
  * @param {string|number} value
