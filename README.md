@@ -1,5 +1,5 @@
-# MPV Config
-带有一些优化体验的自制脚本的 MPV 配置文件 ([特色功能](#特色功能))
+# mpv config
+带有一些优化体验的自制脚本的 mpv 配置文件 ([特色功能](#特色功能))
 
 ## 使用
 
@@ -39,7 +39,7 @@
 * 字幕字体提供程序: `fontconfig` (支持自动加载当前播放文件路径下 `fonts` 文件夹的字体文件，详情见[特色功能](#auto-load-fonts)。)
 
 **默认视频配置 (gpu-hq-enhance):**
-* `gpu-hq`
+* profiles: `gpu-hq`
 * `scale` = `lanczos`
 * 去带 (deband): 关闭
 * 着色器: [`KrigBilateral`](https://gist.github.com/igv/a015fc885d5c22e6891820ad89555637), [`SSimSuperRes`](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b)
@@ -121,7 +121,7 @@ PAGE UP   播放列表下一个
 ] 下一帧
 < 减少播放速度
 > 增加播放速度
-A 显示字幕轨道列表
+A 显示音频轨道列表
 C 显示章节列表
 d 切换去带
 f 切换全屏
@@ -132,8 +132,8 @@ p 显示播放进度
 P 显示播放列表
 r 旋转视频
 R 从头开始播放视频
-s 截图 (默认保存至桌面)
-S 显示音频轨道列表
+s 截图
+S 显示字幕轨道列表
 t 显示系统时间
 v 开启/关闭 垂直同步 (默认开启)
 V 显示视频轨道列表
@@ -141,26 +141,29 @@ Ctrl+c 切换自动裁剪黑边
 Ctrl+p 填充黑边使视频比例与当前窗口比例相同 (解决视频比例大于屏幕比例时字幕位置偏高)
 ```
 
+> 快捷键区分大小写，可以在键盘未开启大写锁定时使用 `Shift + 字母` 触发对应大写快捷键。
+
 ## 自定义配置
 
 **为了方便自定义配置，我编写了一些辅助脚本，既可以自定义配置，又不会覆盖原有的配置文件，方便后续更新。**
 
-如果你需要自定义或覆盖默认选项，可以修改配置目录的 `local.conf` 文件。
+如果你需要自定义选项，可以修改配置目录的 `local.conf` 文件。
 
-如果你需要修改默认加载的预设配置文件 (profile)，可以在配置文件目录创建 `profiles.local`，语法参考 `profiles` 文件。
+如果你需要修改默认加载的 profile，可以在配置文件目录创建 `profiles.local`，语法参考 `profiles` 文件。
 
-如果你需要自定义快捷键，并且需要继承原有快捷键配置，可以按以下步骤进行操作:
-1. 在 `local.conf` 文件加入以下行:
+如果你需要自定义快捷键，并且想要继承默认快捷键，按以下步骤操作:
+
+1. `local.conf` 开头添加行:
 ```conf
 input-conf="~~/.input.conf"
 script-opts-append="custom_input-enable=yes"
 ```
-2. 在配置目录创建 `input.local.conf` 文件并加入以下行:
+2. 在配置目录创建 `input.local.conf` 文件并添加行:
 ```conf
 #@ ~~/input.conf
 ```
 3. 在 `input.local.conf` 文件设置新的快捷键
-4. 每次更改文件后，启动 mpv 并退出，新的快捷键将在下次启动时生效。
+4. 每次更改文件后，启动一次 mpv 然后退出，新的快捷键将在下次启动时生效。
 
 如果你需要自定义脚本选项，可以在 `local.conf` 使用 `script-opts-append` 设置:
 ```
