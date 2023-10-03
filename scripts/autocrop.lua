@@ -79,7 +79,6 @@ read_options(options)
 
 local label_prefix = mp.get_script_name()
 local labels = {
-    crop = string.format("%s-crop", label_prefix),
     cropdetect = string.format("%s-cropdetect", label_prefix)
 }
 
@@ -87,6 +86,8 @@ timers = {
     auto_delay = nil,
     detect_crop = nil
 }
+
+local hwdec_backup
 
 local command_prefix = options.suppress_osd and 'no-osd' or ''
 
@@ -109,14 +110,18 @@ function is_enough_time(seconds)
     return playtime_remaining and time_needed < playtime_remaining
 end
 
-function is_cropable()
-    for _, track in pairs(mp.get_property_native('track-list')) do
-        if track.type == 'video' and track.selected then
-            return not track.albumart
-        end
+function is_cropable(time_needed)
+    if mp.get_property_native('current-tracks/video/image') ~= false then
+        mp.msg.warn("autocrop only works for videos.")
+        return false
     end
 
-    return false
+    if not is_enough_time(time_needed) then
+        mp.msg.warn("Not enough time to detect crop.")
+        return false
+    end
+
+    return true
 end
 
 function remove_filter(label)
@@ -127,36 +132,41 @@ function remove_filter(label)
     return false
 end
 
+function restore_hwdec()
+    if hwdec_backup then
+        mp.set_property("hwdec", hwdec_backup)
+        hwdec_backup = nil
+    end
+end
+
 function cleanup()
 
-    -- Remove all existing filters.
-    for key, value in pairs(labels) do
-        remove_filter(value)
-    end
+    -- Remove existing filter.
+    remove_filter(labels.cropdetect)
 
     -- Kill all timers.
     for index, timer in pairs(timers) do
         if timer then
             timer:kill()
-            timer = nil
+            timers[index] = nil
         end
     end
+
+    restore_hwdec()
 end
 
 function detect_crop()
+    local time_needed = options.detect_seconds
 
-    -- If it's not cropable, exit.
-    if not is_cropable() then
-        mp.msg.warn("autocrop only works for videos.")
+    if not is_cropable(time_needed) then
         return
     end
 
-    -- Verify if there is enough time to detect crop.
-    local time_needed = options.detect_seconds
-
-    if not is_enough_time(time_needed) then
-        mp.msg.warn("Not enough time to detect crop.")
-        return
+    local hwdec_current = mp.get_property("hwdec-current")
+    if hwdec_current:find("-copy$") == nil and hwdec_current ~= "no" and
+       hwdec_current ~= "crystalhd" and hwdec_current ~= "rkmpp" then
+        hwdec_backup = mp.get_property("hwdec")
+        mp.set_property("hwdec", "auto-copy-safe")
     end
 
     -- Insert the cropdetect filter.
@@ -190,6 +200,8 @@ function detect_end()
         timers.detect_crop:kill()
         timers.detect_crop = nil
     end
+
+    restore_hwdec()
 
     local meta = {}
 
@@ -226,7 +238,6 @@ function detect_end()
     else
         mp.msg.error("Got empty crop data.")
         mp.msg.info("You might need to increase detect_seconds.")
-        return
     end
 
     apply_crop(meta)
@@ -235,32 +246,19 @@ end
 function apply_crop(meta)
 
     -- Verify if it is necessary to crop.
-    local is_effective = meta.x > 0 or meta.y > 0
-        or meta.w < meta.max_w or meta.h < meta.max_h
+    local is_effective = meta.w and meta.h and meta.x and meta.y and
+                         (meta.x > 0 or meta.y > 0
+                         or meta.w < meta.max_w or meta.h < meta.max_h)
 
     if not is_effective then
-        mp.msg.info("No area detected for cropping.")
+        -- Clear any existing crop.
+        mp.command(string.format("%s set file-local-options/video-crop ''", command_prefix))
         return
     end
-
-    -- Verify it is not over cropped.
-    local is_excessive = meta.w < meta.min_w and meta.h < meta.min_h
-
-    if is_excessive then
-        mp.msg.info("The area to be cropped is too large.")
-        mp.msg.info("You might need to decrease detect_min_ratio.")
-        return
-    end
-
-    -- Remove existing crop.
-    remove_filter(labels.crop)
 
     -- Apply crop.
-    mp.command(
-        string.format("%s vf pre @%s:lavfi-crop=w=%s:h=%s:x=%s:y=%s",
-            command_prefix, labels.crop, meta.w, meta.h, meta.x, meta.y
-        )
-    )
+    mp.command(string.format("%s set file-local-options/video-crop %sx%s+%s+%s",
+                             command_prefix, meta.w, meta.h, meta.x, meta.y))
 end
 
 function on_start()
@@ -284,8 +282,7 @@ function on_start()
         -- Verify if there is enough time for autocrop.
         local time_needed = options.auto_delay + options.detect_seconds
 
-        if not is_enough_time(time_needed) then
-            mp.msg.warn("Not enough time for autocrop.")
+        if not is_cropable(time_needed) then
             return
         end
 
@@ -312,7 +309,8 @@ function on_toggle()
     end
 
     -- Cropped => Remove it.
-    if remove_filter(labels.crop) then
+    if mp.get_property("video-crop") ~= "" then
+        mp.command(string.format("%s set file-local-options/video-crop ''", command_prefix))
         return
     end
 
@@ -322,7 +320,7 @@ function on_toggle()
         return
     end
 
-    -- Neither => Do delectcrop.
+    -- Neither => Detect crop.
     detect_crop()
 end
 
