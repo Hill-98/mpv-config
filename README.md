@@ -41,9 +41,9 @@
 **默认视频配置 (gpu-hq-enhance):**
 * profiles: `gpu-hq`
 * `scale` = `lanczos`
-* 去带 (deband): 关闭
 * 着色器: [`KrigBilateral`](https://gist.github.com/igv/a015fc885d5c22e6891820ad89555637), [`SSimSuperRes`](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b)
 * 垂直同步 (`tscale=oversample`)
+* 10 位色深视频禁用去带 (deband)
 
 > 可以使用快捷键 `~` 回退到 `gpu-hq`，然后还可以使用快捷键 ``Alt+` `` 回退到 `default`。
 
@@ -212,7 +212,7 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 可以通过 `script-message check-update/config` 或 `script-message check-update/mpv` 命令强制检查更新。
 
-网络请求依赖于外部工具 `curl`，如果 mpv 选项 `http_proxy` 已设置，会自动设置为 HTTP 代理，也支持为这个脚本单独设置 HTTP 代理，以及 curl 会自动使用 HTTP 代理相关环境变量。
+网络请求依赖于外部工具 `curl`，如果 mpv 选项 `http-proxy` 已设置，会自动设置为 HTTP 代理，也支持为这个脚本单独设置 HTTP 代理，以及 curl 会自动使用 HTTP 代理相关环境变量。
 
 **选项:**
 
