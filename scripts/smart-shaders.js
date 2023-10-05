@@ -88,7 +88,9 @@ function chroma_shader_to_end() {
 }
 
 function install_shaders(identifier, display_name, shaders, profile) {
-    shaders.forEach(glsl_shaders.append);
+    shaders.forEach(function (v) {
+        glsl_shaders.append(v);
+    });
     apply_profile(profile);
     stat[identifier] = {
         'shaders': shaders,
@@ -106,7 +108,9 @@ function uninstall_shaders(identifier) {
         return;
     }
     var loaded_shaders = obj.shaders;
-    loaded_shaders.forEach(glsl_shaders.remove);
+    loaded_shaders.forEach(function (v) {
+        glsl_shaders.remove(v);
+    });
     restore_profile(obj.profile);
     stat[identifier] = null;
 }
@@ -119,7 +123,7 @@ function uninstall_shaders(identifier) {
  */
 function smart_shaders_handler(identifier, display_name, paths, profile) {
     if (identifier === '<clear>') {
-        Object.keys(stat).forEach(uninstall_shaders);
+        Object.keys(stat).forEach(function (v) { uninstall_shaders(v); });
         osd_message('已卸载所有已加载的着色器', 2);
         return;
     }
