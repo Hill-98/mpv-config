@@ -19,11 +19,11 @@ var msg = mp.msg;
 var commands = require('../script-modules/commands');
 var u = require('../script-modules/utils');
 
-/** @type {Object.<string, StatObj>} */
 var glsl_shaders = commands.change_list('glsl-shaders');
 var osd = mp.create_osd_overlay('ass-events');
 /** @type {number|null} */
 var osd_timer = null;
+/** @type {Object.<string, StatObj>} */
 var stat = {};
 
 function osd_message(message, timeout) {
@@ -66,6 +66,27 @@ function paths2shaders(paths) {
     return paths.split(';').filter(function (v) { return v.trim() !== ''; });
 }
 
+function chroma_shader_to_end() {
+    var added_shaders = [];
+    var shaders = mp.get_property_native('glsl-shaders');
+
+    Object.keys(stat).forEach(function (k) { stat[k].shaders.forEach(function (v) { added_shaders.push(v); }); });
+    shaders.forEach(function (shader) {
+        if (added_shaders.indexOf(shader) !== -1) {
+            return;
+        }
+        var shader_path = commands.expand_path(shader);
+        try {
+            if (mp.utils.read_file(shader_path).match(/^\/\/!HOOK CHROMA$/m) !== null) {
+                msg.warn(u.string_format("move '%s' shader glsl-shaders to end", shader));
+                glsl_shaders.remove(shader);
+                glsl_shaders.append(shader);
+            }
+        } catch (ex) {
+        }
+    });
+}
+
 function install_shaders(identifier, display_name, shaders, profile) {
     shaders.forEach(glsl_shaders.append);
     apply_profile(profile);
@@ -99,7 +120,7 @@ function uninstall_shaders(identifier) {
 function smart_shaders_handler(identifier, display_name, paths, profile) {
     if (identifier === '<clear>') {
         Object.keys(stat).forEach(uninstall_shaders);
-        osd_message('所有着色器已卸载', 2);
+        osd_message('已卸载所有已加载的着色器', 2);
         return;
     }
 
@@ -148,6 +169,7 @@ function smart_shaders_handler(identifier, display_name, paths, profile) {
     }
 
     install_shaders(identifier, display_name, shaders, profile);
+    chroma_shader_to_end();
     osd_message(display_name + ' 着色器已加载', 2);
 }
 
