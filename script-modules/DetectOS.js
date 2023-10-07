@@ -1,3 +1,5 @@
+'use strict';
+
 var commands = require('../script-modules/commands');
 
 function know_platform(platform) {

@@ -1,3 +1,5 @@
+'use strict';
+
 var commands = require('./commands');
 var os = require('./DetectOS')();
 var utils = mp.utils;

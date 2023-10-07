@@ -36,7 +36,7 @@ export function audio_add(url: string, flags?: AddCommandFlags, title?: string, 
 
 export function apply_profile(profile: string): null | undefined;
 
-export function change_list(path: string): ChangeList;
+export function change_list(name: string): ChangeList;
 
 export function expand_path(path: string): string | undefined;
 
