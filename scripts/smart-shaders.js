@@ -112,7 +112,7 @@ function uninstall_shaders(identifier) {
         glsl_shaders.remove(v);
     });
     restore_profile(obj.profile);
-    stat[identifier] = null;
+    delete stat[identifier];
 }
 
 /**
@@ -129,7 +129,7 @@ function smart_shaders_handler(identifier, display_name, paths, profile) {
     }
 
     if (identifier === '<show>') {
-        var keys = Object.keys(stat).filter(function (key) { return !u.empty(stat[key]); });
+        var keys = Object.keys(stat);
         var text = u.string_format('当前已加载的着色器 : %s\n', keys.length);
         keys.forEach(function (key) {
             var obj = stat[key];
