@@ -1,5 +1,5 @@
 @ECHO OFF
-SET MPV_CACHE_DIR=%USERPROFILE%\AppData\Local\mpv
+SET MPV_CACHE_DIR=%USERPROFILE%\AppData\Local\mpv\cache
 ECHO Clear fonts cache...
 IF EXIST %LOCALAPPDATA%\fontconfig\cache ( RMDIR /S /Q %LOCALAPPDATA%\fontconfig\cache )
 ECHO Clear gpu shader cache...

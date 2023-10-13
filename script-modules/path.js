@@ -30,7 +30,7 @@ function format_windows_path(path) {
 function get_cache_path() {
     if (os === 'windows') {
         var localappdata = utils.getenv('LOCALAPPDATA');
-        return format_windows_path(utils.join_path(localappdata, 'mpv'));
+        return format_windows_path(utils.join_path(localappdata, 'mpv/cache'));
     }
     var path = commands.expand_path('~~cache/');
     return trim_path(path);
