@@ -11,6 +11,7 @@
 /profiles.local
 /TODO
 
+.idea
 .vscode
 node_modules
 package.json
