@@ -9,16 +9,16 @@
 
 ### 安装
 
-1. 前往 GitHub Actions 下载最新版本并解压: [https://github.com/Hill-98/mpv-config/actions](https://github.com/Hill-98/mpv-config/actions)
+1. 前往 GitHub Actions 下载最新版本并解压: <https://github.com/Hill-98/mpv-config/actions>
 2. 运行配置脚本: `setup\setup.bat`
 3. 打开 Windows 设置或控制面板设置文件关联。
 
-如何下载 GitHub Actions 的文件: [https://docs.github.com/actions/managing-workflow-runs/downloading-workflow-artifacts](https://docs.github.com/actions/managing-workflow-runs/downloading-workflow-artifacts)
+如何下载 GitHub Actions 的文件: <https://docs.github.com/actions/managing-workflow-runs/downloading-workflow-artifacts>
 
 ### 更新
 
 0. 运行旧版本清理脚本: `clean.bat`
-1. 前往 GitHub Actions 下载最新版本并解压到旧版本目录: [https://github.com/Hill-98/mpv-config/actions](https://github.com/Hill-98/mpv-config/actions)
+1. 前往 GitHub Actions 下载最新版本并解压到旧版本目录: <https://github.com/Hill-98/mpv-config/actions>
 2. 运行配置脚本: `setup\setup.bat`
 3. 打开 Windows 设置或控制面板设置文件关联。
 
@@ -203,6 +203,24 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 如果播放文件目录存在 `mpv.keys` 或 `${filename}.mpv.keys`，则在文件加载后自动按下按键，文件结束后再次按下按键。
 
 `mpv.keys`: 每行一个按键，可以是组合键，以 `!` 开头的按键不会在文件结束后再次按下，以 `#` 开头的行会被忽略。
+
+### [Best Display Fps](scripts/best-display-fps)
+
+自动将显示设备刷新率设置为支持范围内最适合视频帧率的刷新率，比如视频帧率为 30 FPS，显示设备如果支持 30Hz 刷新率，那么就设置为 30Hz，如果不支持 30Hz，但是支持 60 Hz，就设置为 60Hz，因为 60 是 30 的倍数。
+
+目前仅支持 Windows，不支持 Linux。与其他类似脚本不同的是，此脚本在 Windows 不依赖第三方工具，相关操作使用 PowerShell + Win32 API 实现。
+
+> 正常情况不推荐使用这个脚本，因为默认的垂直同步已经足够了。除非你有强迫症或者是为了节能想关闭垂直同步。
+
+**选项:**
+
+启用: `best_display_fps-enable=yes # 默认禁用`
+
+切换显示器后的延迟: `best_display_fps-change_display_delay=3000 # 将 mpv 移动至另一个显示器后，延迟多少毫秒执行更改刷新率等操作。`
+
+文件结束后的延迟: `best_display_fps-end_file_delay=3000 # 文件结束后，延迟多少毫秒执行还原刷新率等操作。`
+
+刷新率更改时暂停等待时间: `best_display_fps-pause_wait_delay=2000 # 更改显示器刷新率时，将暂停播放，在指定毫秒后恢复播放。`
 
 ### [Check Update](scripts/check-update.js)
 
