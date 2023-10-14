@@ -216,11 +216,11 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 启用: `best_display_fps-enable=yes # 默认禁用`
 
-切换显示器后的延迟: `best_display_fps-change_display_delay=3000 # 将 mpv 移动至另一个显示器后，延迟多少毫秒执行更改刷新率等操作。`
+切换显示设备后的延迟: `best_display_fps-change_display_delay=3000 # mpv 移至另一个显示设备后，延迟多少毫秒执行更改刷新率等操作。`
 
 文件结束后的延迟: `best_display_fps-end_file_delay=3000 # 文件结束后，延迟多少毫秒执行还原刷新率等操作。`
 
-刷新率更改时暂停等待时间: `best_display_fps-pause_wait_delay=2000 # 更改显示器刷新率时，将暂停播放，在指定毫秒后恢复播放。`
+更改刷新率时暂停等待时间: `best_display_fps-pause_wait_delay=2000 # 更改刷新率时，将暂停播放，然后在指定毫秒后恢复播放。`
 
 ### [Check Update](scripts/check-update.js)
 
