@@ -1,3 +1,4 @@
 *.local.*
+*.local/
 test.js
 test.lua
