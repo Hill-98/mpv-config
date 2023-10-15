@@ -123,9 +123,14 @@ function auto_refresh_rate() {
     if (best_refresh_rate === refresh_rate.current) {
         return true;
     }
-    if (best_refresh_rate !== 0 && call_refresh_rate(display, best_refresh_rate)) {
-        state.display = display;
-        state.before_refresh_rate = refresh_rate.current;
+    if (best_refresh_rate === 0) {
+        return false;
+    }
+    if (call_refresh_rate(display, best_refresh_rate)) {
+        if (state.before_refresh_rate === 0) {
+            state.display = display;
+            state.before_refresh_rate = refresh_rate.current;
+        }
         msg.info(u.string_format('Monitor (%s) refresh rate is set to %s.', display, best_refresh_rate));
         return true;
     } else {
