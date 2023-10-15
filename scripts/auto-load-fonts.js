@@ -9,7 +9,6 @@ var FONTCONFIG_DIR_XML_TEMPLATE = '<dir>%s</dir>';
 var FONTS_SUB_DIRS = ['fonts', 'Fonts', 'FONTS', '字体'];
 
 var msg = mp.msg;
-var utils = mp.utils;
 var commands = require('../script-modules/commands');
 var io = require('../script-modules/io');
 var p = require('../script-modules/path');
@@ -84,7 +83,7 @@ function format_path(path) {
 function get_available_fonts_dir(path) {
     var fonts_dir = null;
     for (var i = 0; i < FONTS_SUB_DIRS.length; i++) {
-        var dir = p.absolute_path(utils.join_path(path, FONTS_SUB_DIRS[i]));
+        var dir = p.absolute_path(p.join_path(path, FONTS_SUB_DIRS[i]));
         if (io.dir_exist(dir)) {
             fonts_dir = format_path(dir);
             break;
@@ -97,7 +96,7 @@ function get_available_fonts_dir(path) {
  * @returns {string}
  */
 function get_compatible_fonts_dir() {
-    var base = utils.join_path(options.compatible_dir, mp.get_script_name() + '$');
+    var base = p.join_path(options.compatible_dir, mp.get_script_name() + '$');
     for (var i = 1; ; i++) {
         var path = base + i;
         if (!io.dir_exist(path)) {
@@ -199,10 +198,10 @@ function write_fonts_conf(fonts_dir, require_exist) {
     }
     var xml = fonts_dir === '' ? '' : u.string_format(FONTCONFIG_DIR_XML_TEMPLATE, escape_xml(fonts_dir));
     var data = u.string_format(FONTCONFIG_XML_TEMPLATE, xml);
-    if (exist && utils.read_file(state.fonts_conf) === data) {
+    if (exist & io.read_file(state.fonts_conf) === data) {
         return;
     }
-    utils.write_file('file://' + state.fonts_conf, data);
+    io.write_file(state.fonts_conf, data);
 }
 
 mp.options.read_options(options, 'auto_load_fonts', function () {
@@ -227,13 +226,13 @@ mp.add_hook('on_load', 50, function () {
 
     var fonts_dir = null;
     var path = mp.get_property_native('path');
-    var spaths = utils.split_path(path);
+    var spaths = p.split_path(path);
     var current_dir = spaths[0];
     var sub_paths = mp.get_property_native('sub-file-paths') || [];
     sub_paths.unshift('');
 
     for (var i = 0; !fonts_dir && i < sub_paths.length; i++) {
-        fonts_dir = get_available_fonts_dir(utils.join_path(current_dir, sub_paths[i]));
+        fonts_dir = get_available_fonts_dir(p.join_path(current_dir, sub_paths[i]));
     }
 
     if (state.external_fonts_dir) {

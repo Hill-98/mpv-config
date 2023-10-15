@@ -1,7 +1,6 @@
 'use strict';
 
 var msg = mp.msg;
-var utils = mp.utils;
 var commands = require('../script-modules/commands');
 var HttpClient = require('../script-modules/HttpClient');
 var io = require('../script-modules/io');
@@ -68,7 +67,7 @@ function read_cache(name) {
     var result = {};
     if (io.file_exist(path)) {
         try {
-            result = JSON.parse(utils.read_file(path));
+            result = JSON.parse(io.read_file(path));
         } catch (ex) {
         }
     }
@@ -83,7 +82,7 @@ function read_cache(name) {
 function write_cache(name, data) {
     var path = cache_path(name);
     try {
-        utils.write_file('file://' + path, JSON.stringify(data));
+        io.write_file(path, JSON.stringify(data));
     } catch (ex) {
         msg.verbose(ex.message);
         msg.warn(u.string_format('缓存文件写入失败 (%s)', name));
@@ -99,7 +98,7 @@ function get_config_local_version() {
     var local_version_file = commands.expand_path('~~/.commit_time');
     var result = null;
     if (io.file_exist(local_version_file)) {
-        result = parseInt(utils.read_file(local_version_file));
+        result = parseInt(io.read_file(local_version_file));
     } else if (tools.git) {
         var process = commands.subprocess([tools.git, '-C', commands.expand_path('~~/'), 'log', '-1', '--format=%ct']);
         if (process.status === 0) {

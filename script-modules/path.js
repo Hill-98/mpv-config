@@ -63,6 +63,23 @@ function get_state_path() {
 }
 
 /**
+ * @param {string} p1
+ * @param {string} p2
+ * @returns {string}
+ */
+function join_path(p1, p2) {
+    return utils.join_path(p1, p2);
+}
+
+/**
+ * @param {string} path
+ * @returns {[string, string]}
+ */
+function split_path(path) {
+    return utils.split_path(path);
+}
+
+/**
  * @param {string} path
  * @returns {string}
  */
@@ -70,11 +87,14 @@ function trim_path(path) {
     return /[\/\\]$/.test(path) ? path.substring(0, path.length - 1) : path;
 }
 
+
 module.exports = {
     absolute_path: absolute_path,
     format_windows_path: format_windows_path,
     get_cache_path: get_cache_path,
     get_desktop_path: get_desktop_path,
     get_state_path: get_state_path,
+    join_path: join_path,
+    split_path: split_path,
     trim_path: trim_path,
 };

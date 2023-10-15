@@ -50,6 +50,24 @@ function file_exist(file) {
 }
 
 /**
+ * @param {string} dir
+ * @param {string=} filter
+ * @returns {string[]|undefined}
+ */
+function read_dir(dir, filter) {
+    return utils.readdir(dir, filter);
+}
+
+/**
+ * @param {string} file
+ * @param {number} max
+ * @returns {string}
+ */
+function read_file(file, max) {
+    return utils.read_file(file, max);
+}
+
+/**
  * @param {string} file
  * @param {boolean} ignore_comments
  * @returns {string[]|undefined}
@@ -84,11 +102,23 @@ function remove_dir(dir) {
     return commands.subprocess(args).status === 0;
 }
 
+/**
+ * @param {string} file
+ * @param {string} str
+ * @returns {void}
+ */
+function write_file(file, str) {
+    return utils.write_file('file://' + file, str);
+}
+
 module.exports = {
     copy_dir: copy_dir,
     create_dir: create_dir,
     dir_exist: dir_exist,
     file_exist: file_exist,
+    read_dir: read_dir,
+    read_file: read_file,
     read_file_lines: read_file_lines,
     remove_dir: remove_dir,
+    write_file: write_file,
 };

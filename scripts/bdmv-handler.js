@@ -8,7 +8,6 @@ var commands = require('../script-modules/commands');
 var io = require('../script-modules/io');
 var p = require('../script-modules/path');
 var u = require('../script-modules/utils');
-var utils = mp.utils;
 
 /**
  * @param {string} str
@@ -40,12 +39,12 @@ mp.add_hook('on_load', 20, function () {
     var title = is_mpls ? 'mpls/' + mp.get_property_native('filename/no-ext') : 'first';
 
     var path = p.absolute_path(mp.get_property_native('path'));
-    var parent_dir = utils.split_path(path)[0];
+    var parent_dir = p.split_path(path)[0];
     var last_dir = '';
     do {
         last_dir = parent_dir;
-        parent_dir = utils.split_path(parent_dir.substring(0, parent_dir.length - 1))[0];
-        if (io.dir_exist(utils.join_path(parent_dir, 'BDMV'))) {
+        parent_dir = p.split_path(parent_dir.substring(0, parent_dir.length - 1))[0];
+        if (io.dir_exist(p.join_path(parent_dir, 'BDMV'))) {
             device = parent_dir;
             break;
         }
@@ -82,13 +81,13 @@ mp.add_hook('on_preloaded', 99, function () {
 
     var bd_name = '';
 
-    var meta_dl_dir = utils.join_path(device, 'BDMV/META/DL');
+    var meta_dl_dir = p.join_path(device, 'BDMV/META/DL');
     if (io.dir_exist(meta_dl_dir)) {
         /** @type {string[]} */
         var langs = mp.get_property_native('slang').filter(function (s) { return s.length === 3; });
         langs.push('eng');
         var filename_regex = /bdmt_([a-z]{3})\.xml/i;
-        var files = utils.readdir(meta_dl_dir, 'files');
+        var files = io.read_dir(meta_dl_dir, 'files');
         for (var i = 0; i < files.length; i++) {
             var file = files[i];
             var matches = file.match(filename_regex);
@@ -98,9 +97,9 @@ mp.add_hook('on_preloaded', 99, function () {
         }
 
         for (var i = 0; i < langs.length; i++) {
-            var file = utils.join_path(meta_dl_dir, u.string_format('bdmt_%s.xml', langs[i]));
+            var file = p.join_path(meta_dl_dir, u.string_format('bdmt_%s.xml', langs[i]));
             if (io.file_exist(file)) {
-                var xml = utils.read_file(file);
+                var xml = io.read_file(file);
                 var i1 = xml.indexOf(TITLE_START_TAG);
                 var i2 = xml.indexOf(TITLE_END_TAG, i1 + 1);
                 if (i1 === -1 || i2 === -1) {
