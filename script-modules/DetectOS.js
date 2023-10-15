@@ -1,7 +1,5 @@
 'use strict';
 
-var commands = require('../script-modules/commands');
-
 function know_platform(platform) {
     return ['darwin', 'linux', 'windows'].indexOf(platform) !== -1;
 }
@@ -19,7 +17,13 @@ function detect_os() {
     if (/^[A-Z]:\\/i.test(home)) {
         return 'windows';
     }
-    var process = commands.subprocess(['uname', '-s']);
+    var process = mp.command_native({
+        name: 'subprocess',
+        args: ['uname', '-s'],
+        capture_stdout: true,
+        capture_stderr: true,
+        playback_only: false,
+    });
     if (process.status === 0) {
         var os = process.stdout.trim().toLowerCase();
         if (know_platform(os)) {

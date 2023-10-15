@@ -41,7 +41,7 @@ function get_cache_path() {
  */
 function get_desktop_path() {
     if (os === 'linux') {
-        var process = commands.subprocess('/bin/sh', '-c', 'source ~/.config/user-dirs.dirs && echo -n $XDG_DESKTOP_DIR');
+        var process = commands.subprocess(['/bin/sh', '-c', 'source ~/.config/user-dirs.dirs && echo -n $XDG_DESKTOP_DIR']);
         if (process.status == 0) {
             return process.stdout;
         }
