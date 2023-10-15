@@ -16,7 +16,7 @@ var format_windows_path = function format_windows_path(path) {
 function copy_dir(source, dest) {
     if (os === 'windows') {
         var args = ['Robocopy.exe', format_windows_path(source), format_windows_path(dest), '/S', '/R:1'];
-        process = commands.subprocess(args);
+        var process = commands.subprocess(args);
         return process.status >= 0 && process.status < 8;
     }
     var args = ['cp', '-p', '-r', source, dest];
