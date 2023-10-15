@@ -28,6 +28,7 @@ var state = {
     end_change_timer: null,
     os: require('../../script-modules/DetectOS')(),
     observe_change_timer: null,
+    observe_display_names_first: true,
 };
 
 if (state.os !== 'windows') {
@@ -170,6 +171,10 @@ function restore_refresh_rate() {
 }
 
 function observe_display_names() {
+    if (state.observe_display_names_first === true || mp.get_property_native('stream-open-filename') === undefined) {
+        state.observe_display_names_first = false;
+        return;
+    }
     clear_observe_change_timer();
     state.observe_change_timer = setTimeout(function () {
         pause_wait(function () {
@@ -208,6 +213,7 @@ function on_update_options() {
         clear_end_change_timer();
         clear_observe_change_timer();
         restore_refresh_rate();
+        state.observe_display_names_first = true;
     }
 }
 
