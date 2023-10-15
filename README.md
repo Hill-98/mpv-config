@@ -76,31 +76,35 @@ target-colorspace-hint=yes # HDR 直通
 
 **HDR 视频截图:** 播放 HDR 视频并截图，mpv 会为截图文件写入色彩空间标签并使用与视频相同的位深（仅支持部分图片格式），但是目前支持色彩空间、高位深和 HDR 的图片查看器少之又少，导致 HDR 截图在大部分图片查看器并不能正确的显示。如果你有显示 HDR 截图的需求，或者想把 HDR 截图分享给他人，推荐使用 [Google Chrome](https://chrome.google.com) 或 mpv 查看图片，分享给他人务必以文件的形式发送，切勿使用 IM 或其他软件的发送图片功能，以及确保他人拥有 HDR 显示设备。
 
-### 默认保存的文件选项:
+### 退出时默认保存的选项:
 
 ```txt
 af 音频过滤器
-vf 视频过滤器
 aid 音频轨道
-sid 字幕轨道
-vid 视频轨道
-deband 去带
-panscan 平移和扫描
-pause 暂停状态
-speed 播放速度
 audio-delay 音频延迟
-video-rotate 视频旋转
-video-sync 垂直同步
-video-zoom 视频缩放
+deband 去带
+hwdec 硬件解码
+mute 静音
+panscan 平移与扫描
+pause 暂停
+sid 字幕轨道
+speed 播放速度
+start 播放进度
 sub-delay 字幕延迟
 sub-font-size 字幕字体大小
 sub-pos 字幕位置
+vf 视频过滤器
+vid 视频轨道
+video-rotate 视频旋转
+video-sync 视频同步模式 (垂直同步)
+video-zoom 视频缩放
 volume 音量
+volume-max 音量上限
 ```
 
-> 当文件播放时，这些选项如果被更改，并且文件播放没有结束，mpv 正常退出时，将保存更改的选项，在下次播放此文件时应用这些更改。
+> 正常退出 mpv 时，如果文件没有播放完毕，将为文件保存这些选项，下次播放这个文件时应用这些选项。
 
-> 可以使用快捷键 `DEL` 删除当前文件保存的选项。
+> 可以使用快捷键 `DEL` 清除保存的选项。
 
 ### 不完整快捷键列表:
 ```txt
