@@ -4,6 +4,10 @@ var commands = require('./commands');
 var os = require('./DetectOS')();
 var utils = mp.utils;
 
+var format_windows_path = function format_windows_path(path) {
+    return path.replace(/\//g, '\\');
+};
+
 /**
  * @param {string} source
  * @param {string} dest
@@ -11,7 +15,7 @@ var utils = mp.utils;
  */
 function copy_dir(source, dest) {
     if (os === 'windows') {
-        var args = ['Robocopy.exe', source, dest, '/S', '/R:1'];
+        var args = ['Robocopy.exe', format_windows_path(source), format_windows_path(dest), '/S', '/R:1'];
         process = commands.subprocess(args);
         return process.status >= 0 && process.status < 8;
     }
@@ -26,7 +30,7 @@ function copy_dir(source, dest) {
 function create_dir(dir) {
     var args = ['mkdir', '-p', dir];
     if (os === 'windows') {
-        args = ['cmd.exe', '/c', 'mkdir', dir];
+        args = ['cmd.exe', '/c', 'mkdir', format_windows_path(dir)];
     }
     return commands.subprocess(args).status === 0;
 }
@@ -97,7 +101,7 @@ function read_file_lines(file, ignore_comments) {
 function remove_dir(dir) {
     var args = ['rm', '-r', dir];
     if (os === 'windows') {
-        args = ['cmd.exe', '/c', 'rmdir', '/S', '/Q', dir];
+        args = ['cmd.exe', '/c', 'rmdir', '/S', '/Q', format_windows_path(dir)];
     }
     return commands.subprocess(args).status === 0;
 }
