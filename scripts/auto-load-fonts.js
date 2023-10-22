@@ -1,5 +1,5 @@
 /**
- * 使用 fontconfig 或 sub-fonts-dir 加载播放文件路径下 fonts 文件夹内的字体文件
+ * Use fontconfig or sub-fonts-dir to load the font files in the fonts folder under the playback file path
  */
 
 'use strict';

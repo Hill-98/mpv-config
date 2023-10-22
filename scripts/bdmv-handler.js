@@ -1,3 +1,7 @@
+/**
+ * Load bdmv and mpls files, and read some metadata of Blu-ray disc.
+ */
+
 'use strict';
 
 var BD_NAME_REGEX = /<di:name>(.+)<\/di:name>/;

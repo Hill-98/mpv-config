@@ -1,10 +1,9 @@
 /**
- * 用法: script-message smart-shaders <identifier> <display_name> <shaders> [profile]
+ * If the identifiers are the same, the shaders with the same identifier will be unloaded before loading the shaders.
  *
- * 方便切换具有相同功能的着色器集合
- *
- * 加载/卸载 着色器集合并用标识符记录，如果标识符之前已被用于加载其他着色器，则先卸载已加载的着色器，如果着色器和已加载的一致，则卸载着色器。
+ * Use: script-message smart-shaders <identifier> <display_name> <shaders> [apply_profile]
  */
+'use strict';
 
 /**
  * @typedef {Object} StatObj
@@ -12,8 +11,6 @@
  * @property {string[]} shaders
  * @property {profile=} profile
  */
-
-'use strict';
 
 var msg = mp.msg;
 var commands = require('../script-modules/commands');

@@ -1,8 +1,11 @@
 /**
- * 自动加载配置目录下 profiles 或 profiles.local 文件，文件内容为要加载的配置文件列表。
- * smart-profile 命令会使用内部状态决定对配置文件执行加载还是还原操作。
- * apply-profile 命令会加载配置文件，但如果内部状态是已加载则不进行任何操作。
- * restore-profile 命令会还原配置文件，但如果内部状态是未加载则不进行任何操作。
+ * Load the profiles or profiles.local file in the configuration directory with
+ * the profiles that need to be applied by default.
+ *
+ * Use:
+ *   script-message smart-profile <profile>: Decide whether to apply or restore profile based on internal state.
+ *   script-message apply-profile <profile>: Apply profile, but do nothing if the internal state is loaded.
+ *   script-message restore-profile <profile>: Restore profile, but do nothing if the internal state is unloaded.
  */
 
 'use strict';
@@ -71,7 +74,7 @@ function smart_profile_handler(profile, display_name, restored_message) {
     }
     var name = restored_message === undefined ? u.default_value(display_name, profile) : profile;
     var messages = {
-        loaded: restored_message === undefined ? name + ' 配置文件已加载' : display_name,
+        loaded: restored_message === undefined ? name + ' 配置文件应用' : display_name,
         restored: u.default_value(restored_message, name + ' 配置文件已还原'),
     };
     var state = switch_profile_state(profile);

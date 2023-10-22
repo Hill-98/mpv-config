@@ -1,6 +1,6 @@
 /**
- * 在右上角显示当前系统时间，并在一定时间后隐藏。
- * script-binding clock
+ * The current system time is displayed in the upper right corner and hidden after a certain period of time.
+ * Use: script-binding clock
  */
 
 'use strict';

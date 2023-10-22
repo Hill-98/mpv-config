@@ -1,5 +1,5 @@
 /**
- * 格式化文件名为清晰可读的标题
+ * Extracts the filename's information about the media and, if successful, sets it as the media title.
  */
 
 'use strict';

@@ -1,3 +1,10 @@
+/**
+ * Auto set the display device refresh rate to the most appropriate refresh rate
+ * within the supported range for the video frame rate.
+ *
+ * The default is disabled.
+ */
+
 'use strict';
 
 var MATCH_RESULTS = Object.freeze({

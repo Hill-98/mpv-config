@@ -1,5 +1,5 @@
 /**
- * 如果 idle=no，则文件加载失败时不自动退出。
+ * If idle=no, mpv will not quit when loading fails.
  */
 
 'use strict';

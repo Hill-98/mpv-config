@@ -1,6 +1,5 @@
 /**
- * 加载 http(s) 或 ytdl 协议时自动设置一些 HTTP HEADER
- * 用于解决部分网站无法正常播放的问题
+ * Auto set some http headers for http(s) and ytlp protocols
  */
 
 'use strict';

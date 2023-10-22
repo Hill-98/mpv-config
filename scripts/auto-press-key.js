@@ -1,7 +1,7 @@
 /**
- * 如果播放文件目录存在 mpv.keys 或 ${filename}.mpv.keys
- * 则在文件加载后自动按下按键，文件结束时再次按下按键。
- * 主要用于配合 smart-shaders 实现着色器自动加载
+ * If mpv.keys or ${filename}.mpv.keys exists in the playback file directory, the
+ * keys in the keys file will be pressed automatically after the file is loaded, and
+ * will be pressed again after the file ends.
  */
 
 'use strict';

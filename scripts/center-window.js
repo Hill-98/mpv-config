@@ -1,6 +1,6 @@
 /**
- * 解决一些 X11 窗口管理器设置 force-window=immediate 后默认不居中窗口。
- * 未实现：多屏幕兼容性
+ * Fix for some X11 window managers not center window by default after set force-window=immediate.
+ * Not implemented: multi-screen compatibility
  */
 
 'use strict';
