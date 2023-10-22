@@ -39,15 +39,21 @@ function formatter_a(filename) {
 }
 
 /**
- * Example: [VCB-Studio] Re Zero kara Hajimeru Isekai Seikatsu Hyouketsu no Kizuna [Ma10p_1080p][x265_flac]
+ * Examples:
+ *   [VCB-Studio] Re Zero kara Hajimeru Isekai Seikatsu Hyouketsu no Kizuna [Ma10p_1080p][x265_flac]
+ *   [FYSub][Pocket_Monsters_Movie23-COCO][BDRip][HEVC_FLAC_PSG][1080P_Ma10P](8CE0BE78)
+ *   [AI-Raws] すずめの戸締まり (UHD HEVC SDR 3840x1608 yuv420p10le FLAC 字幕)[BB52FF32]
  *
- * Result: Re Zero kara Hajimeru Isekai Seikatsu Hyouketsu no Kizuna
+ * Results:
+ *   Re Zero kara Hajimeru Isekai Seikatsu Hyouketsu no Kizuna
+ *   Pocket_Monsters_Movie23-COCO
+ *   すずめの戸締まり
  *
  * @param {string} filename
  * @returns {string|undefined}
  */
 function formatter_b(filename) {
-    var regex = /^\[.+?\]\[?(.+?)\]?\[/;
+    var regex = /^\[.+?\]\[?(.+?)\]?[\[\(]/;
     var results = filename.match(regex);
     if (results === null) {
         return undefined;
