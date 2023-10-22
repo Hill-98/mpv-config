@@ -9,7 +9,7 @@ var PROTOCOL_REGEX = /^\w+:\/\/|^\w+:\?/;
 var options = {
     enable: true,
 };
-mp.options.read_options(options, 'format_title', function () { });
+mp.options.read_options(options, 'format_filename', function () { });
 
 /**
  * Examples:

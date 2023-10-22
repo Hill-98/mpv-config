@@ -296,6 +296,6 @@ HTTP 代理: `check_update-http_proxy=http://127.0.0.1:8080 # 设置 HTTP 代理
 
 [VideoPlayerCode/mpv-tools](https://github.com/VideoPlayerCode/mpv-tools)
 
-感谢 [JetBrains](https://jb.gg/OpenSourceSupport) 提供 JetBrains IDE 开源许可证.
+感谢 [JetBrains](https://www.jetbrains.com) 提供 JetBrains IDE [开源许可证](https://jb.gg/OpenSourceSupport)
 
-<a href="https://jb.gg/OpenSourceSupport" target="_blank"><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="JetBrains Logo (Main) logo." width="256px" height="256px"></a>
+<a href="https://jb.gg/OpenSourceSupport"><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="JetBrains Logo (Main) logo." width="256px" height="256px"></a>
