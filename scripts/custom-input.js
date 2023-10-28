@@ -33,3 +33,5 @@ if (options.enable && io.file_exist(custom_input_conf)) {
         mp.osd_message('输入文件已更改，请重启。');
     }
 }
+
+exit();

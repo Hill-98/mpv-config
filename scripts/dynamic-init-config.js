@@ -22,3 +22,5 @@ set_default_option('icc-cache-dir', utils.join_path(path.get_cache_path(), 'icc'
 set_default_option('gpu-shader-cache-dir', utils.join_path(path.get_cache_path(), 'gpu-shader'), '');
 set_default_option(property_list.indexOf('watch-later-dir') !== -1 ? 'watch-later-dir' : 'watch-later-directory', utils.join_path(path.get_state_path(), 'watch-later'), '');
 set_default_option(property_list.indexOf('screenshot-dir') !== -1 ? 'screenshot-dir' : 'screenshot-directory', path.get_desktop_path(), ['', '~~desktop/']);
+
+exit();
