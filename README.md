@@ -248,7 +248,7 @@ mpv 检查源: `check_update-check_mpv_repo=shinchiro/mpv-winbuild-cmake # 设�
 
 HTTP 代理: `check_update-http_proxy=http://127.0.0.1:8080 # 设置 HTTP 代理为 http://127.0.0.1:8080` 
 
-### [Format Title](scripts/format-title.js)
+### [Format Filename](scripts/format-filename.js)
 
 如果当前媒体文件没有内嵌媒体标题，则使用多种规则提取媒体文件名包含的信息并格式化。如果提取成功，设置为当前文件的媒体标题 (`force-media-title`)。
 
@@ -256,7 +256,7 @@ HTTP 代理: `check_update-http_proxy=http://127.0.0.1:8080 # 设置 HTTP 代理
 
 **选项:**
 
-禁用: `format_title-enable=no`
+禁用: `format_filename-enable=no`
 
 ### [WebPlay](scripts/webplay-handler.js)
 

@@ -2,7 +2,7 @@
  * Auto set the display device refresh rate to the most appropriate refresh rate
  * within the supported range for the video frame rate.
  *
- * The default is disabled.
+ * The script default is disabled.
  */
 
 'use strict';
@@ -15,9 +15,10 @@ var MATCH_RESULTS = Object.freeze({
 });
 
 var commands = require('../../script-modules/commands');
+var io = require('../../script-modules/io');
+var p = require('../../script-modules/path');
 var u = require('../../script-modules/utils');
 var msg = mp.msg;
-var utils = mp.utils;
 
 var options = {
     enable: false,
@@ -27,7 +28,7 @@ var options = {
 };
 var scripts = {
     // TODO: Linux 实现
-    windows: utils.join_path(utils.split_path(mp.get_script_file())[0], 'refresh-rate.ps1'),
+    windows: p.join_path(p.split_path(mp.get_script_file())[0], 'refresh-rate.ps1'),
 };
 var state = {
     before_refresh_rate: 0,
@@ -36,11 +37,9 @@ var state = {
     os: require('../../script-modules/DetectOS')(),
     observe_change_timer: null,
     observe_display_names_first: true,
+    pid: mp.get_property_native('pid'),
+    pid_file: p.join_path(p.get_state_path(), mp.get_script_name() + '.pid'),
 };
-
-if (state.os !== 'windows') {
-    msg.warn('Currently only Windows operating systems are supported.');
-}
 
 /**
  * @typedef {Object} RefreshRateResult
@@ -229,8 +228,30 @@ function on_update_options() {
     }
 }
 
+if (state.os !== 'windows') {
+    msg.warn('Currently only Windows operating systems are supported.');
+}
+
+if (io.file_exist(state.pid_file)) {
+    var pid = 0;
+    try {
+        pid = parseInt(io.read_file_lines(state.pid_file).shift());
+    } catch (ex) {
+        msg.error(u.string_format('Failed to read pid file (%s), script is disabled.', state.pid_file));
+        msg.verbose(ex);
+        exit();
+    }
+    if (!isNaN(pid) && u.pid_exists(pid)) {
+        msg.warn(u.string_format('Another mpv process is running (pid: %s), script is disabled.', pid));
+        exit();
+    }
+}
+
+io.write_file(state.pid_file, state.pid.toString());
+
 mp.register_event('shutdown', function () {
     restore_refresh_rate();
+    io.remove_file(state.pid_file);
 });
 
 mp.options.read_options(options, 'best_display_fps', on_update_options);

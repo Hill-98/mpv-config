@@ -14,4 +14,6 @@ export function read_file_lines(file: string, ignore_comments: boolean = true): 
 
 export function remove_dir(dir: string): boolean;
 
+export function remove_file(file: string): boolean;
+
 export function write_file(file: string, str: string): void;

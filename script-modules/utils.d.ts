@@ -4,6 +4,8 @@ export function default_value(value: any, default_value: any): any;
 
 export function empty(value: any): boolean;
 
+export function pid_exists(pid: number): boolean;
+
 export function string_format(str: string, ...args: string[]): string;
 
 export function which(name: string, auto_append_exe: boolean = true): string | undefined;

@@ -8,6 +8,10 @@ var format_windows_path = function format_windows_path(path) {
     return path.replace(/\//g, '\\');
 };
 
+var cmd_commands = function cmd_commands(commands) {
+    return ['cmd.exe', '/c'].concat(commands);
+};
+
 /**
  * @param {string} source
  * @param {string} dest
@@ -30,7 +34,7 @@ function copy_dir(source, dest) {
 function create_dir(dir) {
     var args = ['mkdir', '-p', dir];
     if (os === 'windows') {
-        args = ['cmd.exe', '/c', 'mkdir', format_windows_path(dir)];
+        args = cmd_commands(['mkdir', format_windows_path(dir)]);
     }
     return commands.subprocess(args).status === 0;
 }
@@ -101,7 +105,19 @@ function read_file_lines(file, ignore_comments) {
 function remove_dir(dir) {
     var args = ['rm', '-r', dir];
     if (os === 'windows') {
-        args = ['cmd.exe', '/c', 'rmdir', '/S', '/Q', format_windows_path(dir)];
+        args = cmd_commands(['rmdir', '/S', '/Q', format_windows_path(dir)]);
+    }
+    return commands.subprocess(args).status === 0;
+}
+
+/**
+ * @param {string} file
+ * @returns {boolean}
+ */
+function remove_file(file) {
+    var args = ['rm', file];
+    if (os === 'windows') {
+        args = cmd_commands(['DEL', format_windows_path(file)]);
     }
     return commands.subprocess(args).status === 0;
 }
@@ -124,5 +140,6 @@ module.exports = {
     read_file: read_file,
     read_file_lines: read_file_lines,
     remove_dir: remove_dir,
+    remove_file: remove_file,
     write_file: write_file,
 };

@@ -1,6 +1,7 @@
 'use strict';
 
 var os = require('./DetectOS')();
+var commands = require('./commands');
 var p = require('./path');
 var utils = mp.utils;
 
@@ -31,6 +32,18 @@ function empty(value) {
         return true;
     }
     return false;
+}
+
+/**
+ * @param {number} pid
+ * @returns {boolean}
+ */
+function pid_exists(pid) {
+    var args = ['ps', '--pid=' + pid.toString()];
+    if (os === 'windows') {
+        args = ['PowerShell.exe', '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Restricted', '-Command', 'Get-Process', '-Id', pid.toString()];
+    }
+    return commands.subprocess(args).status === 0;
 }
 
 /**
@@ -94,6 +107,7 @@ module.exports = {
     arguments2array: arguments2array,
     default_value: default_value,
     empty: empty,
+    pid_exists: pid_exists,
     string_format: string_format,
     which: which,
 };
