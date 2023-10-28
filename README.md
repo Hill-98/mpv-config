@@ -170,8 +170,8 @@ script-opts-append="custom_input-enable=yes"
 4. 每次更改文件后，启动一次 mpv 然后退出，新的快捷键将在下次启动时生效。
 
 如果你需要自定义脚本选项，可以在 `local.conf` 使用 `script-opts-append` 设置:
-```
-script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Fonts 兼容模式
+```conf
+script-opts-append="check_update-check_mpv_update=yes" # 启用 mpv 新版本检查更新
 ```
 
 ## 特色功能
@@ -194,13 +194,11 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 **选项:**
 
-兼容模式: `auto_load_fonts-compatible_mode=[yes|no] # 默认关闭`
+兼容模式: `auto_load_fonts-compatible_mode=[yes|no] # 默认: no`
 
-兼容目录: `auto_load_fonts-compatible_dir=D:\fonts-cache # 设置兼容目录为 D:\fonts-cache`
+兼容目录: `auto_load_fonts-compatible_dir=[path] # 兼容模式使用的临时字体目录。默认: ~~/.fonts`
 
-加载方法：`auto_load_fonts-method=[fontconfig|native] # fontconfig 或 native`
-
-> Auto Load Fonts 支持选项实时更新，可以配合 `profile-cond` 按需开启兼容模式。
+加载方法：`auto_load_fonts-method=[fontconfig|native] # 默认: 当前支持的最佳方法`
 
 ### [Auto Press Key](scripts/auto-press-key.js)
 
@@ -218,13 +216,13 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 **选项:**
 
-启用: `best_display_fps-enable=yes # 默认禁用`
+启用: `best_display_fps-enable=[yes|no] # 默认: no`
 
-切换显示设备后的延迟: `best_display_fps-change_display_delay=3000 # mpv 移至另一个显示设备后，延迟多少毫秒执行更改刷新率等操作。`
+切换显示设备后的延迟: `best_display_fps-change_display_delay=[number] # mpv 移至另一个显示设备后，延迟多少毫秒执行更改刷新率等操作。默认: 3000`
 
-文件结束后的延迟: `best_display_fps-end_file_delay=3000 # 文件结束后，延迟多少毫秒执行还原刷新率等操作。`
+文件结束后的延迟: `best_display_fps-end_file_delay=[number] # 文件结束后，延迟多少毫秒执行还原刷新率等操作。默认: 3000`
 
-更改刷新率时暂停等待时间: `best_display_fps-pause_wait_delay=2000 # 更改刷新率时，将暂停播放，然后在指定毫秒后恢复播放。`
+更改刷新率时暂停等待时间: `best_display_fps-pause_wait_delay=[number] # 更改刷新率时，将暂停播放，然后在指定毫秒后恢复播放。默认: 2000`
 
 ### [Check Update](scripts/check-update.js)
 
@@ -238,15 +236,15 @@ script-opts-append="auto_load_fonts-compatible_mode=yes" # 启用 Auto Load Font
 
 **选项:**
 
-配置文件检查间隔: `check_update-check_config_interval=3 # 每 3 天检查一次配置文件更新`。
+配置文件检查间隔: `check_update-check_config_interval=[number] # 每 N 天检查一次配置文件更新。默认: 3`
 
-mpv 新版本检查: `check_update-check_mpv_update=[yes|no] # 默认关闭`。
+mpv 新版本检查: `check_update-check_mpv_update=[yes|no] # 默认: on`。
 
-mpv 检查间隔: `check_update-check_mpv_interval=3 # 每 3 天检查一次 mpv 更新`
+mpv 检查间隔: `check_update-check_mpv_interval=[number] # 每 N 天检查一次 mpv 版本更新。默认: 1`
 
-mpv 检查源: `check_update-check_mpv_repo=shinchiro/mpv-winbuild-cmake # 设置检查源为 https://github.com/shinchiro/mpv-winbuild-cmake`
+mpv 检查源: `check_update-check_mpv_repo=[mpv-build-github-repo] # GitHub 上的 mpv 构建仓库。默认: shinchiro/mpv-winbuild-cmake (https://github.com/shinchiro/mpv-winbuild-cmake)`
 
-HTTP 代理: `check_update-http_proxy=http://127.0.0.1:8080 # 设置 HTTP 代理为 http://127.0.0.1:8080` 
+HTTP 代理: `check_update-http_proxy=[http-proxy] # 检查更新时使用的 HTTP 代理。默认: 无` 
 
 ### [Format Filename](scripts/format-filename.js)
 
@@ -256,7 +254,7 @@ HTTP 代理: `check_update-http_proxy=http://127.0.0.1:8080 # 设置 HTTP 代理
 
 **选项:**
 
-禁用: `format_filename-enable=no`
+启用: `format_filename-enable=[yes|no] # 默认: yes`
 
 ### [WebPlay](scripts/webplay-handler.js)
 
