@@ -3,6 +3,8 @@
 var path = require('../script-modules/path');
 var utils = mp.utils;
 
+var property_list = mp.get_property_native('property-list');
+
 /**
  * @param {string} option
  * @param {*} value
@@ -18,5 +20,5 @@ function set_default_option(option, value, default_values) {
 
 set_default_option('icc-cache-dir', utils.join_path(path.get_cache_path(), 'icc'), '');
 set_default_option('gpu-shader-cache-dir', utils.join_path(path.get_cache_path(), 'gpu-shader'), '');
-set_default_option('watch-later-directory', utils.join_path(path.get_state_path(), 'watch-later'), '');
-set_default_option('screenshot-directory', path.get_desktop_path(), ['', '~~desktop/']);
+set_default_option(property_list.indexOf('watch-later-dir') !== -1 ? 'watch-later-dir' : 'watch-later-directory', utils.join_path(path.get_state_path(), 'watch-later'), '');
+set_default_option(property_list.indexOf('screenshot-dir') !== -1 ? 'screenshot-dir' : 'screenshot-directory', path.get_desktop_path(), ['', '~~desktop/']);
