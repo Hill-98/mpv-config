@@ -13,11 +13,7 @@ var state = {
     pid: mp.get_property_native('pid'),
 };
 
-if (state.os !== 'linux') {
-    exit();
-}
-
-mp.register_event('file-loaded', function () {
+function on_file_loaded() {
     if (mp.get_property_native('fullscreen') || mp.get_property_native('geometry') || mp.get_property_native('force-window') !== 'immediate') {
         return;
     }
@@ -37,4 +33,11 @@ mp.register_event('file-loaded', function () {
             commands.subprocess_async(['/bin/sh', '-c', u.string_format('wmctrl -i -r %s -e 0,%s,%s,-1,-1', wid, x, y)]);
         }
     });
-});
+}
+
+mp.register_event('file-loaded', on_file_loaded);
+
+if (state.os !== 'linux') {
+    mp.unregister_event(on_file_loaded);
+    exit();
+}

@@ -16,12 +16,8 @@ var options = {
 };
 var checking_state = {};
 
-if (!HttpClient.available) {
-    msg.error('检查更新不可用: 未找到 curl');
-    exit();
-}
-
-var http = new HttpClient();
+/** @type {null|HttpClient} */
+var http = null;
 var tools = {
     git: u.which('git'),
 };
@@ -310,26 +306,33 @@ function check_update() {
     }
 }
 
-mp.options.read_options(options, 'check_update', function (list) {
-    if (list.http_proxy) {
+if (HttpClient.available) {
+    mp.options.read_options(options, 'check_update', function (list) {
+        if (list.http_proxy) {
+            http = init_http();
+        }
+        check_update();
+    });
+    mp.observe_property('http-proxy', 'native', function () {
         http = init_http();
-    }
+    });
+    mp.observe_property('network-timeout', 'native', function () {
+        http = init_http();
+    });
+
+    mp.register_script_message('check-update/config', function () {
+        check_config_update(true);
+    });
+
+    mp.register_script_message('check-update/mpv', function () {
+        check_mpv_update(true);
+    });
+
+    http = init_http();
     check_update();
-});
-mp.observe_property('http-proxy', 'native', function () {
-    http = init_http();
-});
-mp.observe_property('network-timeout', 'native', function () {
-    http = init_http();
-});
+} else {
+    msg.error('检查更新不可用: 未找到 curl');
+    exit();
+}
 
-mp.register_script_message('check-update/config', function () {
-    check_config_update(true);
-});
 
-mp.register_script_message('check-update/mpv', function () {
-    check_mpv_update(true);
-});
-
-http = init_http();
-check_update();

@@ -34,6 +34,7 @@ var state = {
     before_refresh_rate: 0,
     display: null,
     end_change_timer: null,
+    exit: false,
     os: require('../../script-modules/DetectOS')(),
     observe_change_timer: null,
     observe_display_names_first: true,
@@ -236,23 +237,27 @@ if (io.file_exist(state.pid_file)) {
     var pid = 0;
     try {
         pid = parseInt(io.read_file_lines(state.pid_file).shift());
+        if (!isNaN(pid) && u.pid_exists(pid)) {
+            msg.warn(u.string_format('Another mpv process is running (pid: %s), script is disabled.', pid));
+            state.exit = true;
+        }
     } catch (ex) {
         msg.error(u.string_format('Failed to read pid file (%s), script is disabled.', state.pid_file));
         msg.verbose(ex);
-        exit();
-    }
-    if (!isNaN(pid) && u.pid_exists(pid)) {
-        msg.warn(u.string_format('Another mpv process is running (pid: %s), script is disabled.', pid));
-        exit();
+        state.exit = true;
     }
 }
 
-io.write_file(state.pid_file, state.pid.toString());
+if (state.exit) {
+    exit();
+} else {
+    io.write_file(state.pid_file, state.pid.toString());
 
-mp.register_event('shutdown', function () {
-    restore_refresh_rate();
-    io.remove_file(state.pid_file);
-});
+    mp.register_event('shutdown', function () {
+        restore_refresh_rate();
+        io.remove_file(state.pid_file);
+    });
 
-mp.options.read_options(options, 'best_display_fps', on_update_options);
-on_update_options();
+    mp.options.read_options(options, 'best_display_fps', on_update_options);
+    on_update_options();
+}
