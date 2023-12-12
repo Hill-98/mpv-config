@@ -8,6 +8,13 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
+[*.bat]
+end_of_line = crlf
+
+[*.ps1]
+charset = utf-16be
+end_of_line = crlf
+
 [*.{yml, yaml}]
 indent_size = 2
 
