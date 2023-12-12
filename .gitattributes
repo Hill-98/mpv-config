@@ -2,4 +2,4 @@
 *.hook linguist-detectable=false
 *.ttc filter=lfs diff=lfs merge=lfs -text
 *.bat text eol=crlf
-*.ps1 text eol=crlf working-tree-encoding=utf-16be
+*.ps1 text eol=crlf working-tree-encoding=utf-16
