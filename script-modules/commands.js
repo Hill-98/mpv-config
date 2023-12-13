@@ -131,6 +131,6 @@ module.exports = {
     loadfile: loadfile,
     restore_profile: restore_profile,
     subprocess: subprocess,
-    subprocess_async: subprocess_async
+    subprocess_async: subprocess_async,
 };
 

@@ -8,4 +8,4 @@ export function pid_exists(pid: number): boolean;
 
 export function string_format(str: string, ...args: string[]): string;
 
-export function which(name: string, auto_append_exe: boolean = true): string | undefined;
+export function which(name: string, auto_append_exe?: boolean): string | undefined;

@@ -10,7 +10,7 @@ export function read_dir(dir: string, filter?: 'files' | 'dirs' | 'normal' | 'al
 
 export function read_file(file: string, max?: number): string;
 
-export function read_file_lines(file: string, ignore_comments: boolean = true): string[] | undefined;
+export function read_file_lines(file: string, ignore_comments?: boolean): string[] | undefined;
 
 export function remove_dir(dir: string): boolean;
 

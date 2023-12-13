@@ -35,9 +35,9 @@ function on_file_loaded() {
     });
 }
 
-mp.register_event('file-loaded', on_file_loaded);
-
-if (state.os !== 'linux') {
+if (state.os === 'linux') {
+    mp.register_event('file-loaded', on_file_loaded);
+} else {
     mp.unregister_event(on_file_loaded);
     exit();
 }
