@@ -40,22 +40,22 @@
 
 **默认视频配置 (gpu-hq-enhance):**
 * profiles: `gpu-hq`
-* `scale` = `lanczos`
-* 着色器: [`KrigBilateral`](https://gist.github.com/igv/a015fc885d5c22e6891820ad89555637), [`SSimSuperRes`](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b)
+* `scale` = `ewa_lanczos4sharpest`
+* 着色器: [`KrigBilateral`](https://gist.github.com/igv/a015fc885d5c22e6891820ad89555637)
 * 垂直同步 (`tscale=oversample`)
 * 10 位色深视频禁用去带 (deband)
 
 > 可以使用快捷键 `~` 回退到 `gpu-hq`，然后还可以使用快捷键 ``Alt+` `` 回退到 `default`。
 
-**极速模式:** 可以在右键菜单中启用此模式，仅对本次播放生效。此模式将卸载所有着色器、回退到 `default` 配置文件、开启硬件解码、禁用垂直同步。适合低性能设备播放 4K60FPS 等视频文件时开启，或便携设备使用电池时开启。
+**极速模式:** 可以在右键菜单中启用此模式，仅对本次播放生效。此模式会卸载所有着色器、回退到 `default` 配置文件、启用硬件解码、禁用垂直同步。适合低性能设备播放 4K60FPS 等视频文件时开启，或便携设备使用电池时启用。
 
 **4K 显示设备播放 1080P 视频:**
 
 4K 以及更大的显示设备播放 1080P 或更低分辨率的视频是比较常见的情况，因为显示分辨率会大于视频分辨率，播放器需要使用升采样算法将视频提升到对应分辨率再输出，升采样算法的质量、特点决定了升采样后视频的质量。
 
-这个配置文件默认使用的升采样算法是 [lanczos](https://mpv.io/manual/master/#options-lanczos) 配合 [SSimSuperRes](https://gist.github.com/igv/2364ffa6e81540f29cb7ab4c9bc05b6b) 增强着色器，[lanczos](https://mpv.io/manual/master/#options-lanczos) 拥有中等的质量和速度，特征是比较锐利，对于大多数内容来说，这是个不错的选择，但如果是动漫，特别是日本 2D 动漫，它可能会使视频的线条看起来有些奇怪。
+这个配置文件默认使用的升采样算法是 [ewa_lanczos4sharpest](https://mpv.io/manual/master/#options-ewa-lanczos4sharpest) (亮度) 和 [KrigBilateral](https://gist.github.com/igv/a015fc885d5c22e6891820ad89555637) (色度)，[ewa_lanczos4sharpest](https://mpv.io/manual/master/#options-ewa-lanczos4sharpest) 的特征是非常锐利，但也比较消耗性能，对于大多数内容来说，这是个不错的选择。
 
-当你觉得升采样算法导致视频看起来比较奇怪时，可以使用右键菜单或快捷键切换至其他升采样着色器，使视频画面尽可能的完美。
+当你觉得默认升采样导致视频看起来比较奇怪时，可以使用右键菜单或快捷键切换至其他升采样着色器，使视频画面尽可能的完美。
 
 如果你为某个视频找到了适合它的着色器，可以通过 [Auto Press Key](#auto-press-key) 功能使其播放时自动激活。
 
@@ -70,9 +70,9 @@
 target-colorspace-hint=yes # HDR 直通
 ```
 
-> 显示设备支持 HDR 不代表它可以完美的显示 HDR 内容，只是它可以处理 HDR 信号。如果你的显示设备只是支持 HDR，没有 [VESA Display HDR](https://displayhdr.org) 等标准认证，建议不要开启 HDR 直通，而是继续让 mpv 将其转换为 SDR，即使拥有认证，我也建议只在拥有 Display HDR 600 及以上认证或类似认证的显示设备开启。
+> 显示设备支持 HDR 不代表它可以完美的显示 HDR 内容，只是它可以处理 HDR 信号。如果你的显示设备只是支持 HDR，没有 [VESA Display HDR](https://displayhdr.org) 等标准认证，建议不要启用 HDR 直通，而是继续让 mpv 将其转换为 SDR。即使拥有认证，我也建议只在拥有 Display HDR 600 及以上认证或类似认证的显示设备启用 HDR 直通。
 
-> 如果你的显示设备是电视，即使不拥有任何标准认证，HDR 体验依然可能会很优秀。
+> 如果你的显示设备是电视，即使没有任何标准认证，HDR 体验依然可能会很优秀。
 
 **HDR 视频截图:** 播放 HDR 视频并截图，mpv 会为截图文件写入色彩空间标签并使用与视频相同的位深（仅支持部分图片格式），但是目前支持色彩空间、高位深和 HDR 的图片查看器少之又少，导致 HDR 截图在大部分图片查看器并不能正确的显示。如果你有显示 HDR 截图的需求，或者想把 HDR 截图分享给他人，推荐使用 [Google Chrome](https://chrome.google.com) 或 mpv 查看图片，分享给他人务必以文件的形式发送，切勿使用 IM 或其他软件的发送图片功能，以及确保他人拥有 HDR 显示设备。
 
