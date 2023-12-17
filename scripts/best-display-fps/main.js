@@ -57,7 +57,7 @@ function call_refresh_rate(display, refresh_rate) {
     var rate = u.default_value(refresh_rate, 0);
     var process;
     if (state.os === 'windows') {
-        process = commands.subprocess(['PowerShell.exe', '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'RemoteSigned', '-File', scripts.windows, display, rate.toString()]);
+        process = commands.subprocess(['PowerShell.exe', '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'RemoteSigned', '-Command', scripts.windows, display, rate.toString()]);
     }
 
     if (process === undefined || process.status !== 0) {
