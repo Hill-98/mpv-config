@@ -35,7 +35,7 @@ jobs:
           }
           DeleteEmptyDirs -Path $PSScriptRoot
           EOF
-          echo 'CD %~dp0' > clean.bat
+          echo 'CD /D %~dp0' > clean.bat
           find . -type f ! -path ./clean.bat ! -path ./clean.ps1 | sed -e 's|^./|DEL |g' -e 's|/|\\|g' >> clean.bat
           echo 'PowerShell -NoLogo -NoProfile -ExecutionPolicy RemoteSigned -File clean.ps1' >> clean.bat
           echo 'DEL clean.ps1' >> clean.bat
