@@ -13,7 +13,7 @@ var options = {
     check_mpv_repo: 'shinchiro/mpv-winbuild-cmake',
     check_mpv_interval: 1,
     mpv_local_version_regex: '-g([a-z0-9-]{7})',
-    mpv_remote_name_regex: '-([\\w]+-git-[a-z0-9]{7})',
+    mpv_remote_name_regex: 'mpv-x86_64-([\\w]+-git-[a-z0-9]{7})',
     mpv_remote_version_regex: '-git-([a-z0-9-]{7})',
     http_proxy: '',
 };
@@ -104,6 +104,7 @@ function get_config_local_version() {
 function get_mpv_local_version() {
     var mpv_version = mp.get_property_native('mpv-version').trim();
     var matches = mpv_version.match(new RegExp(options.mpv_local_version_regex));
+    msg.verbose('mpv_local_version_matches: %s: %s ', mpv_version, JSON.stringify(matches));
     return matches === null ? null : matches[1];
 }
 
@@ -152,14 +153,16 @@ function get_mpv_remote_version(remote_repo, cb) {
         for (var i = 0; i < json.assets.length; i++) {
             /** @type {string} */
             var name = json.assets[i].name;
-            if (name.indexOf('mpv-x86_64-') !== 0) {
+            var name_matches = name.match(new RegExp(options.mpv_remote_name_regex));
+            msg.verbose(u.string_format('name_matches: %s: %s', name, JSON.stringify(name_matches)));
+            if (name_matches === null) {
                 continue;
             }
-            var name_matches = name.match(new RegExp(options.mpv_remote_name_regex));
             var version_matches = name.match(new RegExp(options.mpv_remote_version_regex));
+            msg.verbose(u.string_format('version_matches: %s: %s', name, JSON.stringify(version_matches)));
             if (version_matches !== null) {
                 cb(null, {
-                    name: name_matches === null ? null : name_matches[1],
+                    name: name_matches[1],
                     version: version_matches[1],
                 });
                 return;
@@ -243,7 +246,6 @@ function check_mpv_update(force) {
     var check_update_interval = parse_interval(options.check_mpv_interval);
     var local_version = get_mpv_local_version();
     var remote_repo = options.check_mpv_repo;
-    msg.info(local_version);
 
     if (local_version === null) {
         msg.error('检查 mpv 更新失败: 未获取到本地版本');

@@ -247,11 +247,11 @@ mpv 检查间隔: `check_update-check_mpv_interval=[number] # 每 N 天检查一
 
 mpv 检查源: `check_update-check_mpv_repo=[mpv-build-github-repo] # GitHub 上的 mpv 构建仓库。默认: shinchiro/mpv-winbuild-cmake (https://github.com/shinchiro/mpv-winbuild-cmake)`
 
-mpv 本地版本正则表达式: `check_update-mpv_local_version_regex=[JS RegExp string] # 默认: -g([a-z0-9-]{7})`
+mpv 本地版本正则表达式: `check_update-mpv_local_version_regex=[JS RegExp string] # 第一个子组为返回值。 默认: -g([a-z0-9-]{7})`
 
-mpv 远程发布名称正则表达式: `check_update-mpv_remote_name_regex=[JS RegExp string] # 默认: -([\w]+-git-[a-z0-9]{7})`
+mpv 远程发布名称正则表达式: `check_update-mpv_remote_name_regex=[JS RegExp string] # 第一个子组为返回值。 默认: mpv-x86_64-([\\w]+-git-[a-z0-9]{7})`
 
-mpv 远程发布版本正则表达式: `check_update-mpv_remote_version_regex=[JS RegExp string] # 默认: -git-([a-z0-9-]{7})`
+mpv 远程发布版本正则表达式: `check_update-mpv_remote_version_regex=[JS RegExp string] # 第一个子组为返回值。 默认: -git-([a-z0-9-]{7})`
 
 HTTP 代理: `check_update-http_proxy=[http-proxy] # 检查更新时使用的 HTTP 代理。默认: 无` 
 
