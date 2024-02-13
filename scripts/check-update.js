@@ -12,6 +12,9 @@ var options = {
     check_mpv_update: false,
     check_mpv_repo: 'shinchiro/mpv-winbuild-cmake',
     check_mpv_interval: 1,
+    mpv_local_version_regex: '-g([a-z0-9-]{7})',
+    mpv_remote_name_regex: '-([\\w]+-git-[a-z0-9]{7})',
+    mpv_remote_version_regex: '-git-([a-z0-9-]{7})',
     http_proxy: '',
 };
 var checking_state = {};
@@ -100,7 +103,7 @@ function get_config_local_version() {
  */
 function get_mpv_local_version() {
     var mpv_version = mp.get_property_native('mpv-version').trim();
-    var matches = mpv_version.match(/-g([a-z0-9-]{7})/);
+    var matches = mpv_version.match(new RegExp(options.mpv_local_version_regex));
     return matches === null ? null : matches[1];
 }
 
@@ -152,8 +155,8 @@ function get_mpv_remote_version(remote_repo, cb) {
             if (name.indexOf('mpv-x86_64-') !== 0) {
                 continue;
             }
-            var name_matches = name.match(/-([\w]+-git-[a-z0-9]{7})/);
-            var version_matches = name.match(/-git-([a-z0-9-]{7})/);
+            var name_matches = name.match(new RegExp(options.mpv_remote_name_regex));
+            var version_matches = name.match(new RegExp(options.mpv_remote_version_regex));
             if (version_matches !== null) {
                 cb(null, {
                     name: name_matches === null ? null : name_matches[1],
@@ -240,6 +243,7 @@ function check_mpv_update(force) {
     var check_update_interval = parse_interval(options.check_mpv_interval);
     var local_version = get_mpv_local_version();
     var remote_repo = options.check_mpv_repo;
+    msg.info(local_version);
 
     if (local_version === null) {
         msg.error('检查 mpv 更新失败: 未获取到本地版本');
