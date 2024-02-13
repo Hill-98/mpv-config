@@ -30,15 +30,6 @@ function init_http() {
 }
 
 /**
- * @param {number} last_time
- * @param {number} interval
- * @returns {boolean}
- */
-function check_interval(last_time, interval) {
-    return Date.now() - last_time >= interval;
-}
-
-/**
  * @param {string} name
  * @returns {string}
  */
@@ -185,7 +176,7 @@ function check_config_update(force) {
     checking_state[idx] = true;
 
     var cache = read_cache(idx);
-    var cache_valid = typeof cache.last_check_update_time === 'number' && typeof cache.remote_commit_time === 'number';
+    var cache_valid = typeof cache.next_check_update_time === 'number' && typeof cache.remote_commit_time === 'number';
     var check_update_interval = parse_interval(options.check_config_interval);
     var local_commit_time = get_config_local_version();
 
@@ -199,8 +190,7 @@ function check_config_update(force) {
         if (a >= b) {
             return false;
         }
-        var date = new Date(b);
-        var text = '检查到配置文件新版本: ' + date.toLocaleString();
+        var text = '检查到配置文件新版本: ' + new Date(b).toLocaleString();
         var osd = mp.create_osd_overlay('ass-events');
         osd.data = text;
         osd.update();
@@ -211,20 +201,20 @@ function check_config_update(force) {
         return true;
     };
 
-    if (force || !cache_valid || check_interval(cache.last_check_update_time, check_update_interval)) {
+    if (force || !cache_valid || cache.next_check_update_time <= Date.now()) {
         get_config_remote_version(function (err, remote_commit_time) {
             if (err) {
+                cache.next_check_update_time = Date.now() + 3600000; // 1h
+                write_cache(idx, cache);
                 msg.error('检查配置文件更新失败: ' + err);
                 checking_state[idx] = false;
                 return;
             }
-            var has_new = compare_version(local_commit_time, remote_commit_time);
-            var cache = {
-                last_check_update_time: Date.now(),
+            write_cache(idx, {
+                next_check_update_time: Date.now() + check_update_interval,
                 remote_commit_time: remote_commit_time,
-            };
-            write_cache(idx, cache);
-            if (!has_new && force) {
+            });
+            if (!compare_version(local_commit_time, remote_commit_time) && force) {
                 msg.info('本地配置文件版本已经是最新的了');
             }
             checking_state[idx] = false;
@@ -245,7 +235,7 @@ function check_mpv_update(force) {
     checking_state[idx] = true;
 
     var cache = read_cache(idx);
-    var cache_valid = typeof cache.last_check_update_time === 'number' && typeof cache.local_version === 'string' && typeof cache.remote_version === 'string';
+    var cache_valid = typeof cache.next_check_update_time === 'number' && typeof cache.local_version === 'string' && typeof cache.remote_version === 'string';
     /** @type {string} */
     var check_update_interval = parse_interval(options.check_mpv_interval);
     var local_version = get_mpv_local_version();
@@ -272,23 +262,23 @@ function check_mpv_update(force) {
         return true;
     };
 
-    if (force || !cache_valid || check_interval(cache.last_check_update_time, check_update_interval) || cache.local_version !== local_version || cache.remote_repo !== remote_repo) {
+    if (force || !cache_valid || cache.next_check_update_time <= Date.now() || cache.local_version !== local_version || cache.remote_repo !== remote_repo) {
         get_mpv_remote_version(remote_repo, function (err, remote) {
             if (err) {
+                cache.next_check_update_time = Date.now() + 3600000; // 1h
+                write_cache(idx, cache);
                 msg.error('检查 mpv 更新失败：' + err);
                 checking_state[idx] = false;
                 return;
             }
-            var has_new = compare_version(local_version, remote.version, remote.name);
-            var cache = {
-                last_check_update_time: Date.now(),
+            write_cache(idx, {
+                next_check_update_time: Date.now() + check_update_interval,
                 local_version: local_version,
                 remote_repo: remote_repo,
                 remote_version: remote.version,
                 remote_version_name: remote.name,
-            };
-            write_cache(idx, cache);
-            if (!has_new && force) {
+            });
+            if (!compare_version(local_version, remote.version, remote.name) && force) {
                 msg.info('本地 mpv 版本已经是最新的了');
             }
             checking_state[idx] = false;
