@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           lfs: true
           submodules: true
@@ -41,7 +41,7 @@ jobs:
           echo 'DEL clean.ps1' >> clean.bat
           echo 'DEL clean.bat' >> clean.bat
       - name: Upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mpv-config
           path: ${{ runner.temp }}/mpv-config
