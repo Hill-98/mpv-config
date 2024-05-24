@@ -9,7 +9,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          lfs: true
           submodules: true
       - name: Install dependencies
         run: sudo apt -y install findutils zip unzip
@@ -21,6 +20,13 @@ jobs:
           zip -9 -r -v "$RUNNER_TEMP/mpv-config".zip mpv-config
           zip -d -v "$RUNNER_TEMP/mpv-config.zip" \*.git\* mpv-config/git-modules\*
           unzip -d "$RUNNER_TEMP" "$RUNNER_TEMP/mpv-config.zip"
+      - name: Download and install usoc
+        run: |
+          cd "$RUNNER_TEMP/mpv-config"
+          rm -r scripts\uosc
+          curl -o --connect-timeout 3 --fail --location --output usoc.zip https://github.com/tomasklaen/uosc/releases/latest/download/uosc.zip
+          unzip uosc.zip
+          rm uosc.zip
       - name: Create clean script
         run: |
           cd "$RUNNER_TEMP/mpv-config"

@@ -22,7 +22,7 @@
 2. 运行配置脚本: `setup\setup.bat`
 3. 打开 Windows 设置或控制面板设置文件关联。
 
-> 如果你擅长使用 Git，也可以使用 git 将此仓库克隆到本地进行安装。（需要 [Git LFS](https://git-lfs.com/) 和 [Git 符号链接](https://github.com/git-for-windows/git/wiki/Symbolic-Links) 支持）
+> 如果你擅长使用 Git，也可以使用 git 将此仓库克隆到本地进行安装。（需要 [Git 符号链接](https://github.com/git-for-windows/git/wiki/Symbolic-Links) 支持）
 
 ## 说明
 
