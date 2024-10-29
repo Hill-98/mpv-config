@@ -13,24 +13,25 @@ jobs:
           submodules: true
       - name: Install dependencies
         run: sudo apt -y install findutils zip unzip
-      - name: Delete unused files
+      - name: Create commit time
         run: |
           cd "$GITHUB_WORKSPACE"
           echo $(($(git log -1 --format=%ct) * 1000)) > .commit_time
+      - name: Use zip and unzip repack files
+        run: |
           cd ..
           zip -9 -r -v "$RUNNER_TEMP/mpv-config".zip mpv-config
           zip -d -v "$RUNNER_TEMP/mpv-config.zip" \*.git\* mpv-config/git-modules\*
           unzip -d "$RUNNER_TEMP" "$RUNNER_TEMP/mpv-config.zip"
+          cd "$RUNNER_TEMP/mpv-config"
       - name: Download and install uosc
         run: |
-          cd "$RUNNER_TEMP/mpv-config"
           curl --connect-timeout 3 --fail --location --output uosc.zip https://github.com/tomasklaen/uosc/releases/download/5.2.0/uosc.zip
           rm -r fonts/uosc_icons.otf fonts/uosc_textures.ttf scripts/uosc
           unzip uosc.zip
           rm uosc.zip
       - name: Create clean script
         run: |
-          cd "$RUNNER_TEMP/mpv-config"
           cat > clean.ps1 <<'EOF'
           using namespace System.IO
           function DeleteEmptyDirs([string]$Path) {
@@ -52,3 +53,4 @@ jobs:
         with:
           name: mpv-config
           path: ${{ runner.temp }}/mpv-config
+          include-hidden-files: true
