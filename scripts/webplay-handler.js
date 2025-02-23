@@ -1,6 +1,6 @@
 'use strict';
 
-var PROTOCOL_PREFIX = 'webplay:?';
+var PROTOCOL_PREFIX = 'webplay://open/?';
 
 var msg = mp.msg;
 var commands = require('../script-modules/commands');
