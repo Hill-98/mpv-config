@@ -19,7 +19,7 @@ jobs:
           echo $(($(git log -1 --format=%ct) * 1000)) > .commit_time
       - name: Download and install uosc
         run: |
-          cd "$RUNNER_TEMP/mpv-config"
+          cd "$GITHUB_WORKSPACE"
           curl --connect-timeout 3 --fail --location --output uosc.zip https://github.com/tomasklaen/uosc/releases/download/$(git -C ./git-modules/uosc tag --contains HEAD)/uosc.zip
           rm -r fonts/uosc_icons.otf fonts/uosc_textures.ttf scripts/uosc
           unzip uosc.zip
