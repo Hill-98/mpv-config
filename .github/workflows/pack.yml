@@ -26,7 +26,7 @@ jobs:
       - name: Download and install uosc
         run: |
           cd "$RUNNER_TEMP/mpv-config"
-          curl --connect-timeout 3 --fail --location --output uosc.zip https://github.com/tomasklaen/uosc/releases/download/5.6.0/uosc.zip
+          curl --connect-timeout 3 --fail --location --output uosc.zip https://github.com/tomasklaen/uosc/releases/download/$(git -C ./git-modules/uosc tag --contains HEAD)/uosc.zip
           rm -r fonts/uosc_icons.otf fonts/uosc_textures.ttf scripts/uosc
           unzip uosc.zip
           rm uosc.zip
