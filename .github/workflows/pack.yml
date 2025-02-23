@@ -20,7 +20,7 @@ jobs:
       - name: Download and install uosc
         run: |
           cd "$GITHUB_WORKSPACE"
-          curl --connect-timeout 3 --fail --location --output uosc.zip https://github.com/tomasklaen/uosc/releases/download/$(git -C ./git-modules/uosc tag --contains HEAD)/uosc.zip
+          curl --connect-timeout 3 --fail --location --output uosc.zip https://github.com/tomasklaen/uosc/releases/download/5.8.0/uosc.zip
           rm -r fonts/uosc_icons.otf fonts/uosc_textures.ttf scripts/uosc
           unzip uosc.zip
           rm uosc.zip
