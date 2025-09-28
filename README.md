@@ -5,9 +5,26 @@
 
 **Linux 安装方法: 如果你已经在使用 Linux 了，那么这应该难不倒你。**
 
-**以下是 Windows 10+ 安装方法**
+### macOS 使用方法
 
-### 安装
+#### 安装
+
+1. 前往 GitHub Actions 下载最新版本并解压: <https://github.com/Hill-98/mpv-config/actions>
+2. 使用终端运行配置脚本: `setup\setup-macos.sh`
+
+如何下载 GitHub Actions 的文件: <https://docs.github.com/actions/managing-workflow-runs/downloading-workflow-artifacts>
+
+#### 更新
+
+0. 运行旧版本清理脚本: `clean-macos.sh`
+1. 前往 GitHub Actions 下载最新版本并解压到旧版本目录: <https://github.com/Hill-98/mpv-config/actions>
+2. 使用终端运行配置脚本: `setup\setup-macos.sh`
+
+> 如果你擅长使用 Git，也可以使用 git 将此仓库克隆到本地进行安装。
+
+### Windows 10+ 使用方法
+
+#### 安装
 
 1. 前往 GitHub Actions 下载最新版本并解压: <https://github.com/Hill-98/mpv-config/actions>
 2. 运行配置脚本: `setup\setup.bat`
@@ -15,7 +32,7 @@
 
 如何下载 GitHub Actions 的文件: <https://docs.github.com/actions/managing-workflow-runs/downloading-workflow-artifacts>
 
-### 更新
+#### 更新
 
 0. 运行旧版本清理脚本: `clean.bat`
 1. 前往 GitHub Actions 下载最新版本并解压到旧版本目录: <https://github.com/Hill-98/mpv-config/actions>
@@ -270,6 +287,8 @@ HTTP 代理: `check_update-http_proxy=[http-proxy] # 检查更新时使用的 HT
 为 mpv 新增 `webplay` 协议，用于从浏览器调用 mpv 播放媒体。
 
 可以配合油猴脚本 [WebPlay for ytdl](https://github.com/Hill-98/userscripts/raw/main/webplay-ytdl.user.js) 使用。
+
+> 暂时不支持 macOS
 
 ## 感谢
 

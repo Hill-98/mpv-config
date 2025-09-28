@@ -30,7 +30,15 @@ jobs:
           zip -9 -r -v "$RUNNER_TEMP/mpv-config".zip mpv-config
           zip -d -v "$RUNNER_TEMP/mpv-config.zip" \*.git\* mpv-config/git-modules\*
           unzip -d "$RUNNER_TEMP" "$RUNNER_TEMP/mpv-config.zip"
-      - name: Create clean script
+      - name: Create clean script (macOS)
+        run: |
+          cd "$RUNNER_TEMP/mpv-config"
+          echo -e '#!/bin/sh\ncd "$(dirname "$0")" || exit 1' > clean-macos.sh
+          find . -type f ! -path ./clean-macos.sh | sed -e 's|^./|rm |g' >> clean-macos.sh
+          echo 'find . -type d -empty -print -delete' >> clean-macos.sh
+          echo 'find . -type f -empty -print -delete' >> clean-macos.sh
+          echo 'rm clean-macos.sh' >> clean-macos.sh
+      - name: Create clean script (Windows)
         run: |
           cd "$RUNNER_TEMP/mpv-config"
           cat > clean.ps1 <<'EOF'
