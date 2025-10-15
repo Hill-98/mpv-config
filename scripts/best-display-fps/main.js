@@ -248,7 +248,7 @@ if (io.file_exist(state.pid_file)) {
     }
 }
 
-if (state.exit) {
+if (state.exit || state.os !== 'windows') {
     exit();
 } else {
     io.write_file(state.pid_file, state.pid.toString());
