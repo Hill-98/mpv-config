@@ -7,6 +7,8 @@
 
 ### macOS 使用方法
 
+macOS 推荐使用官方的 mpv 构建：<https://nightly.link/mpv-player/mpv/workflows/build/master>
+
 #### 安装
 
 1. 前往 GitHub Actions 下载最新版本并解压: <https://github.com/Hill-98/mpv-config/actions>
@@ -78,6 +80,8 @@
 
 **HDR 视频播放:**
 
+**macOS 默认启用 HDR 视频播放支持**
+
 如果你的显示设备不支持 HDR，那么播放 HDR 视频不需要做任何事，mpv 会自动将其转换为 SDR。
 
 如果你的显示设备支持 HDR，先在系统设置里启用 HDR，然后启用 mpv 的 HDR 直通选项，你可以修改 `local.conf` 文件。
@@ -122,7 +126,9 @@ volume-max 音量上限
 
 > 正常退出 mpv 时，如果文件没有播放完毕，将为文件保存这些选项，下次播放这个文件时应用这些选项。
 
-> 可以使用快捷键 `DEL` 清除保存的选项。
+> 可以使用快捷键 `DEL (fn + ⌫)` 清除保存的选项。
+
+> Alt 对应 macOS 的 option (⌥)，Ctrl 对应 macOS 的 control (^)，Shift 对应 macOS 的 ⇧。
 
 ### 不完整快捷键列表:
 ```txt
@@ -165,7 +171,7 @@ Ctrl+c 切换自动裁剪黑边
 Ctrl+p 填充黑边使视频比例与当前窗口比例相同 (解决视频比例大于屏幕比例时字幕位置偏高)
 ```
 
-> 快捷键区分大小写，键盘未开启大写锁定时可以按住 `Shift` 输入对应大写快捷键。
+> 快捷键区分大小写，键盘未开启大写锁定时可以按住 `Shift (⇧)` 输入对应大写快捷键。
 
 ## 自定义配置
 
@@ -206,8 +212,6 @@ script-opts-append="check_update-check_mpv_update=yes" # 启用 mpv 新版本检
 * FONTS
 * 字体
 
-> 由于 Windows 系统的路径不区分大小写，所以 `fonts`, `Fonts`, `FONTS` 没有区别。
-
 **兼容模式:** 兼容模式主要用于解决一些 fontconfig 的性能问题和 Windows 系统上特定分区的错误，脚本在兼容模式下加载字体文件时会将 `fonts` 文件夹复制到指定位置，然后使用新位置进行加载。默认位置为配置目录的 `.fonts` 目录，如果配置目录所在分区也存在兼容性问题，你还可以自定义兼容目录位置。
 
 > 兼容模式在 `native` 模式下也会生效，不过可能没有任何改善。
@@ -230,7 +234,7 @@ script-opts-append="check_update-check_mpv_update=yes" # 启用 mpv 新版本检
 
 自动将显示设备刷新率设置为支持范围内最适合视频帧率的刷新率，比如视频帧率为 30 FPS，显示设备如果支持 30Hz 刷新率，那么就设置为 30Hz，如果不支持 30Hz，但是支持 60 Hz，就设置为 60Hz，因为 60 是 30 的倍数。
 
-目前仅支持 Windows，不支持 Linux。与其他类似脚本不同的是，此脚本在 Windows 不依赖第三方工具，相关操作使用 PowerShell + Win32 API 实现。
+目前仅支持 Windows。此脚本不依赖第三方工具，相关操作使用 Windows PowerShell + Win32 API 实现。
 
 > 正常情况不推荐使用这个脚本，因为默认的垂直同步已经足够了。除非你有强迫症或者是为了节能想关闭垂直同步。
 
@@ -238,7 +242,7 @@ script-opts-append="check_update-check_mpv_update=yes" # 启用 mpv 新版本检
 
 启用: `best_display_fps-enable=[yes|no] # 默认: no`
 
-切换显示设备后的延迟: `best_display_fps-change_display_delay=[number] # mpv 移至另一个显示设备后，延迟多少毫秒执行更改刷新率等操作。默认: 3000`
+切换显示设备后的延迟: `best_display_fps-change_display_delay=[number] # mpv 窗口移至另一个显示设备后，延迟多少毫秒执行更改刷新率等操作。默认: 3000`
 
 文件结束后的延迟: `best_display_fps-end_file_delay=[number] # 文件结束后，延迟多少毫秒执行还原刷新率等操作。默认: 3000`
 
@@ -288,11 +292,11 @@ HTTP 代理: `check_update-http_proxy=[http-proxy] # 检查更新时使用的 HT
 
 可以配合油猴脚本 [WebPlay for ytdl](https://github.com/Hill-98/userscripts/raw/main/webplay-ytdl.user.js) 使用。
 
-> 暂时不支持 macOS
+> 暂不支持 macOS
 
 ## 感谢
 
-感谢 [mpv-player](https://github.com/mpv-player) 项目以及所有开发者们
+感谢 [mpv-player](https://github.com/mpv-player) 项目以及所有开发者们。
 
 感谢以下开源项目以及所有开发者们:
 
