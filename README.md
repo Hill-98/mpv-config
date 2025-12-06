@@ -56,6 +56,7 @@ macOS 推荐使用官方的 mpv 构建：<https://nightly.link/mpv-player/mpv/wo
 * 垂直同步 (`video-sync=display-resample`)
 * 字幕字体: [文泉驿微米黑](http://wenq.org/wqy2/)
 * 字幕字体提供程序: `fontconfig` (支持自动加载当前播放文件路径下 `fonts` 文件夹的字体文件，详情见[特色功能](#auto-load-fonts)。)
+* 启用 HDR 和空间音频支持。（仅限 macOS）
 
 **默认视频配置 (gpu-hq-enhance):**
 * profiles: `gpu-hq`
