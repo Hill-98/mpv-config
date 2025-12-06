@@ -229,10 +229,6 @@ function on_update_options() {
     }
 }
 
-if (state.os !== 'windows') {
-    msg.warn('Currently only Windows operating systems are supported.');
-}
-
 if (io.file_exist(state.pid_file)) {
     var pid = 0;
     try {
